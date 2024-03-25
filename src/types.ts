@@ -5,6 +5,12 @@ export type Product = {
   price: number;
 };
 
+export type FindFilterAtHome = {
+  name: string,
+  list: [],
+  propertyNameOfSlectedItem: string
+}
+
 export type PizzaSize = 'S' | 'M' | 'L' | 'XL';
 
 export type CartItem = {

@@ -5,60 +5,73 @@ import { StyleSheet, TouchableOpacity, View, Image, Text, Platform, Modal } from
 // import { View } from "@/components/Themed"
 // import DatePicker from 'react-native-modern-datepicker' 
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { FindFilterAtHome } from "@/types";
 
+type changeIntervalTimeProps = {
+    item: Date,
+}
+type chooseFilterItemProps = {
+    item: never,
+    filterType: string,
+}
+
+type renderFiltersListProps = {
+    item: FindFilterAtHome
+}
+
+export const filters = [
+    { 
+        name: "Sắp xếp theo",
+        list: [
+            {
+                name: "Mới nhất",
+                imagePath: require('@assets/images/newest.png')
+            },
+            {
+                name: "Hot",
+                imagePath: require('@assets/images/hotest.png')
+            },
+        ],
+        propertyNameOfSlectedItem: "sortByItem"
+    },
+    {
+        name: "Chọn chủ đề",
+        list: [
+            {
+                name: "Giải đáp Thắc mắc",
+                imagePath: require('@assets/images/replyQuestion.png')
+            }, 
+            {
+                name: "Cẩm nang",
+                imagePath: require('@assets/images/handbook.png')
+            },
+            {
+                name: "Tìm đồ",
+                imagePath: require('@assets/images/findItem.png')
+            },
+            {
+                name: "Pass đồ",
+                imagePath: require('@assets/images/passItem.png')
+            },
+        ],
+        propertyNameOfSlectedItem: "topicItem"
+    },
+    {
+        name: "Khoảng thời gian",
+        list: [
+            {
+                name: "Từ ngày",
+                imagePath: require('@assets/images/schedule.png')
+            },
+            {
+                name: "Đến ngày",
+                imagePath: require('@assets/images/schedule.png')
+            }
+        ]
+    } 
+]
 export default function Filter() {
     const [openCalendar, setOpenCalender] = useState(false) 
-    const filters = [
-        { 
-            name: "Sắp xếp theo",
-            list: [
-                {
-                    name: "Mới nhất",
-                    imagePath: require('@assets/images/newest.png')
-                },
-                {
-                    name: "Hot",
-                    imagePath: require('@assets/images/hotest.png')
-                },
-            ],
-            propertyNameOfSlectedItem: "sortByItem"
-        },
-        {
-            name: "Chọn chủ đề",
-            list: [
-                {
-                    name: "Giải đáp Thắc mắc",
-                    imagePath: require('@assets/images/replyQuestion.png')
-                }, 
-                {
-                    name: "Cẩm nang",
-                    imagePath: require('@assets/images/handbook.png')
-                },
-                {
-                    name: "Tìm đồ",
-                    imagePath: require('@assets/images/findItem.png')
-                },
-                {
-                    name: "Pass đồ",
-                    imagePath: require('@assets/images/passItem.png')
-                },
-            ],
-            propertyNameOfSlectedItem: "topicItem"
-        },
-        {
-            name: "Khoảng thời gian",
-            list: [
-                {
-                    name: "Từ ngày",
-                    imagePath: require('@assets/images/schedule.png')
-                },
-                {
-                    name: "Đến ngày",
-                    imagePath: require('@assets/images/schedule.png')
-                }
-            ]
-        } 
-    ]
     const compareWithFiltersName = {
         sortBy: "Sắp xếp theo",
         topic: "Chọn chủ đề",
@@ -71,15 +84,17 @@ export default function Filter() {
         startDate: new Date(),
         endDate: '',
     }) 
-
-    const handleChangeIntervalTime = (e, item) => {
+    // ===== CÁC BỘ LỌC THU NHỎ PHẠM VI HIỂN THỊ BÀI ĐĂNG =====
+    // Bộ lọc thay đổi khoảng thời gian
+    const handleChangeIntervalTime = ({item} : changeIntervalTimeProps) => {
         setSelectedItem({
             ...selectedItem,
             startDate: item
         })
     }
 
-    const handleChooseFilterItem = (item, filterType, itemOfFilters) => {
+    // Bộ lọc chọn chủ đề (topic)
+    const handleChooseFilterItem = (item, filterType) => { 
         if(filterType === filters[1].propertyNameOfSlectedItem) 
         {
             // Khi select comboBox Topic thì vào logic này
@@ -103,6 +118,8 @@ export default function Filter() {
             }) 
         }   
     }
+
+    // Bộ lọc chọn khoảng thời gian bài đăng
     const handleOpenCalender = () => {
         setOpenCalender(!openCalendar);
         console.log('ok')
@@ -141,7 +158,7 @@ export default function Filter() {
                     onPress={
                         item.name === compareWithFiltersName.intervalTime
                         ? () => handleOpenCalender() 
-                        : () => handleChooseFilterItem(itemInList.name, item.propertyNameOfSlectedItem, item)
+                        : () => handleChooseFilterItem(itemInList.name, item.propertyNameOfSlectedItem)
                     }
                 > 
                         <Image
@@ -181,7 +198,7 @@ export default function Filter() {
 
     return (
         <View
-            style={ styles.container }
+            style={ styles.container } 
         >
             <Stack.Screen
                 options={{
@@ -198,13 +215,13 @@ export default function Filter() {
                     </View> 
                 ))
             } 
-            <View style={styles.modalView}>
+            {/* <View style={styles.modalView}>
                 <DateTimePicker
                     mode="date"
                     value={selectedItem.startDate}
                     onChange={handleChangeIntervalTime}
                 ></DateTimePicker>
-            </View>
+            </View> */}
         </View>
     )
 }
