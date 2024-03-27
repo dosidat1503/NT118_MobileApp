@@ -229,17 +229,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: 'white',
     justifyContent: 'space-around',
-    marginBottom: 10,
+    marginVertical: 5,
   },
   choosePostImage: {
     // width: '100%',
-    height: '10%',
+    // height: '10%',
     color: 'green',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    // flexDirection: 'row',
+    // justifyContent: "flex-start",
+    // alignItems: "flex-start",
     // marginHorizontal: 10,
-    marginVertical: 5
+    marginVertical: 5,
+    
   },
   expandInputPostInfo: {
     height: 120,

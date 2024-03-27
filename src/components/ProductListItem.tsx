@@ -36,10 +36,11 @@ const ProductListItem = ({product} : ProductListItemProps) => {
           <Pressable style={styles.container}> */}
         <View style={styles.postContent}>
           <View style={styles.postContentText}>
-            Mùa thu hoa nở, hạ tàn. 
-            Lòng anh nao nức đợi nàng đến chơi, 
-            Làm việc chăm chỉ chẳng nghỉ ngơi, 
-
+            <Text>
+              Mùa thu hoa nở, hạ tàn. 
+              Lòng anh nao nức đợi nàng đến chơi, 
+              Làm việc chăm chỉ chẳng nghỉ ngơi, 
+            </Text>
           </View>
           <View style={styles.postContentContainImage}>
             <Image 
@@ -89,13 +90,14 @@ const styles = StyleSheet.create({
   },
   image_avatar: {
     maxWidth: '100%',
-    height: '100%',
+    maxHeight: '100%',
     aspectRatio: 1,
-    borderRadius: 20, 
+    borderRadius: 100, 
   },
   postHeaderCenter: {
     flexDirection: "column",
-    justifyContent: 'flex-start'
+    justifyContent: 'flex-start',
+    paddingLeft: 20
   },
   postHeaderLeft: {
     flexDirection: 'row',
