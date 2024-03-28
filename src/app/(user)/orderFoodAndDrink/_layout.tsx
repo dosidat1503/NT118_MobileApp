@@ -10,7 +10,7 @@ export default function MenuStack(){
           <Stack.Screen
             name="index" 
             options={{
-                title: 'Menu', 
+                title: 'Đặt món', 
                 headerRight: () => (
                     <Link href="/cart" asChild>
                       <Pressable>

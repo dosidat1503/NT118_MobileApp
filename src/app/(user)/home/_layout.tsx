@@ -46,7 +46,7 @@ export default function MenuStack(){
                                 name="search"
                                 size={25}
                                 color={Colors.light.tint}
-                                style={[styles.buttonSearch, pressed && styles.addStyleButtonSearch]}
+                                // style={[styles.buttonSearch, pressed && styles.addStyleButtonSearch]}
                               />
                             )}
                           </Pressable>
@@ -94,8 +94,7 @@ const styles = StyleSheet.create({
   filterIcon: {
     width: 30,
     height: 30,
-    color: 'green',
-    
+    color: 'green', 
   },
   comboSearch:{
     flexDirection: "row",

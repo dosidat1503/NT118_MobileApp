@@ -34,9 +34,9 @@ export default function TabLayout() {
       />
       
       <Tabs.Screen
-        name="two"
+        name="orderFoodAndDrink"
         options={{
-          // title: 'Tab Two',
+          title: 'Order Food & Drink',
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
           tabBarLabel: () => null
@@ -70,7 +70,7 @@ export default function TabLayout() {
         options={{href: null}}
       ></Tabs.Screen> 
       <Tabs.Screen 
-        name='menu' 
+        name='two' 
         options={{href: null}}
       ></Tabs.Screen> 
 
