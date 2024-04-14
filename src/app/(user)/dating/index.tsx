@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View, Text } from 'react-native';
+import { FlatList, StyleSheet, View, Text, ScrollView } from 'react-native';
 import ProductListItem from '@components/ProductListItem'; 
 import products from '@assets/data/products';
 import { Product } from '@/types';
@@ -9,14 +9,9 @@ export default function TabOneScreen() {
   const renderItemProduct = ({item}) =>  <ProductListItem product={item}></ProductListItem>
   
   return (  
-    <FlatList
-      data={products}
-      renderItem={renderItemProduct}
-      numColumns={2}
-      contentContainerStyle={{gap: 10}}
-      columnWrapperStyle={{gap: 10}}
-    >
-    </FlatList> 
+    <ScrollView>
+      <View>Trang hẹn hò</View>
+    </ScrollView>
   );
 }
 

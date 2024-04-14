@@ -6,7 +6,7 @@ import { useCartContext } from "@/providers.tsx/CartProvider";
 export default function SearchFAD() {
     const { heightScreen, widthScreen } = useCartContext();
     
-    const heightSearchFAD = heightScreen * 0.08;
+    const heightSearchFAD = heightScreen * 0.06;
     const widthSearchFAD = widthScreen * 0.7;
     const widthPaddingSearchFAD = widthScreen * 0.04
 
@@ -15,7 +15,8 @@ export default function SearchFAD() {
             // paddingVertical: "auto",
             alignSelf: 'center',
             paddingHorizontal: widthPaddingSearchFAD,
-            backgroundColor: "#89CFF0"
+            backgroundColor: "#89CFF0",
+            fontSize: heightScreen * 0.02,
         },
         searchFADContainer: {
             height: heightSearchFAD,

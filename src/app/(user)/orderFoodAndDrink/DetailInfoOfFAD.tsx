@@ -45,7 +45,7 @@ interface OrderInfo {
 
 
 export default function DetailInfoOfFAD() {
-    const { heightScreen, widthScreen } = useCartContext();
+    const { heightScreen, widthScreen, mainColor } = useCartContext();
     const heightNameFAD = heightScreen * 0.08;
     const widthNameFAD = widthScreen * 0.95;
     const widthPaddingNameFAD = widthScreen * 0.04 
@@ -351,7 +351,7 @@ export default function DetailInfoOfFAD() {
             <View>
                 <Stack.Screen 
                     options={{ 
-                        title: "Giỏ hàng",
+                        title: "Chi tiết sản phẩm",
                         headerRight: () => (
                             <Link href="/(user)/orderFoodAndDrink/Cart" asChild>
                                 <Pressable>
@@ -360,7 +360,15 @@ export default function DetailInfoOfFAD() {
                                             name="shopping-cart"
                                             size={25}
                                             color={Colors.light.tint}
-                                            style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                                            style={{ 
+                                                marginRight: widthScreen * 0.04, 
+                                                opacity: pressed ? 0.5 : 1, 
+                                                borderWidth: 1,
+                                                borderColor: mainColor,
+                                                borderRadius: widthScreen * 0.03,
+                                                paddingHorizontal: widthScreen * 0.015,
+                                                paddingVertical: heightScreen * 0.008
+                                            }}
                                         />
                                     )}
                                 </Pressable>

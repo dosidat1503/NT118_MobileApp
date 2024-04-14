@@ -251,7 +251,7 @@ export default function Payment() {
                 console.log(item.isCheckedForPayment, "checked")
                 if(item.isCheckedForPayment)
                     return (
-                        <View style={styles.itemDivContainer} > 
+                        <View style={styles.itemDivContainer} key={index}> 
                             {/* checkbox */}
                             <View style={{
                                     flexDirection: "row",

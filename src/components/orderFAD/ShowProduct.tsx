@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import { View, Image, Text } from "react-native";
 import { useCartContext } from '@/providers.tsx/CartProvider';
 import { Link } from "expo-router";
@@ -11,7 +11,10 @@ export default function ShowProduct({products}: {products: any[]}) {
     
     const renderFADCategory = ({item}: {item: any}) => {
         return( 
-            <Link href="/(user)/orderFoodAndDrink/FoodStallShop" asChild> 
+            // <Link href="/(user)/orderFoodAndDrink/FoodStallShop" asChild> 
+            <TouchableOpacity 
+                onPress={() => navigation.navigate('FoodStallShop', { item })}
+            >   
                 <View style={styles.FADCategoryContainer}>
                     <Image
                     source={{uri: item.image}}
@@ -29,8 +32,9 @@ export default function ShowProduct({products}: {products: any[]}) {
                             Giá: {item.price} k
                         </Text>
                     </View>
-                </View>
-            </Link>
+                </View> 
+            </TouchableOpacity>
+            // </Link>
         )
     }
     const styles = StyleSheet.create({ 

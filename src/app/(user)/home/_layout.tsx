@@ -17,7 +17,7 @@ export default function MenuStack(){
                       marginRight: 15, 
                       justifyContent: "center", 
                       alignItems: "center", 
-                      paddingBottom: 20
+                      // paddingBottom: 20
                     }}> 
                       <View style={styles.comboSearch}>
                         <TextInput
@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
   comboSearch:{
     flexDirection: "row",
     alignItems: "center",
+    alignContent: "center",
     backgroundColor: "#FBFFC8",
     borderColor: '#89CFF0',
     borderWidth: 1,

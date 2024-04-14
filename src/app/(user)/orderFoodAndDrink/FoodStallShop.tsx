@@ -1,8 +1,8 @@
 import { Stack } from "expo-router";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Pressable } from "react-native";
 import SlideHeaderOrderFAD from "@/components/orderFAD/SlideHeaderOrderFAD";
 import { defaultPrizzaImage } from "@/components/ProductListItem"; 
-import { FontAwesome5 } from "@expo/vector-icons";  
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";  
 import InfoShop from "@/components/orderFAD/FoodStallShop/InfoShop";
 import { InfoFADofShop } from "@/components/orderFAD/FoodStallShop/InfoFADofShop";
 import { BackHandler } from "react-native";
@@ -12,7 +12,7 @@ import { useCartContext } from "@/providers.tsx/CartProvider";
 import { Link } from "expo-router";
 
 export default function FoodStallShop() { 
-    const {heightScreen, widthScreen} = useCartContext();
+    const {heightScreen, widthScreen, mainColor} = useCartContext();
     const infoShop = {
         cover: defaultPrizzaImage ,
         avatar: defaultPrizzaImage,
@@ -59,7 +59,30 @@ export default function FoodStallShop() {
         <ScrollView>
             <View> 
                 <Stack.Screen 
-                    options={{ headerShown: false }}
+                    options={{ 
+                        headerRight: () => (
+                            <Link href="/(user)/orderFoodAndDrink/Cart" asChild>
+                                <Pressable>
+                                    {({ pressed }) => (
+                                        <FontAwesome
+                                            name="shopping-cart"
+                                            size={25}
+                                            color={mainColor}
+                                            style={{ 
+                                                marginRight: widthScreen * 0.04, 
+                                                opacity: pressed ? 0.5 : 1, 
+                                                borderWidth: 1,
+                                                borderColor: mainColor,
+                                                borderRadius: widthScreen * 0.03,
+                                                paddingHorizontal: widthScreen * 0.015,
+                                                paddingVertical: heightScreen * 0.008
+                                            }}
+                                        />
+                                    )}
+                                </Pressable>
+                            </Link>
+                        ), 
+                     }}
                 ></Stack.Screen>  
 
                 {/* Hiển thị ảnh cover */}
@@ -69,7 +92,7 @@ export default function FoodStallShop() {
                 ></Image>  
 
                 {/* Nút back */}
-                <TouchableOpacity 
+                {/* <TouchableOpacity 
                     onPress={handleBackPress}
                     style={styles.touchableBack}
                 >
@@ -79,10 +102,10 @@ export default function FoodStallShop() {
                     size={30}
                     style={styles.backIcon}
                     />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 {/* Nút giỏ hàng */}
-                    <TouchableOpacity 
+                    {/* <TouchableOpacity 
                         onPress={handleBackPress}
                         style={styles.touchableCart}
                     >
@@ -95,7 +118,7 @@ export default function FoodStallShop() {
                             // style={styles.cartIcon}
                             />
                         </Link>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 {/* Thông tin shop */}
                 <InfoShop infoShop={infoShop}></InfoShop>
 

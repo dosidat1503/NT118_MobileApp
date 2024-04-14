@@ -10,6 +10,7 @@ import ItemInCartAndPayment from "@/components/orderFAD/Cart/ItemInCartAndPaymen
 import Button from "./Button";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Cart() {
     const { heightScreen, widthScreen, mainColor } = useCartContext(); 
@@ -70,7 +71,7 @@ export default function Cart() {
             marginBottom: heightScreen * 0.009
         }
     })
-
+    const navigation = useNavigation();
     const [array_itemListInCart, setArray_itemListInCart] = useState<any[]>([]);
     const [isCheckedForPaymentAll, setIsCheckedForPaymentAll] = useState(false);
     const [totalForPayment, setTotalForPayment] = useState(0);
@@ -260,13 +261,13 @@ export default function Cart() {
                     <Text style={styles.textInCart} >
                         {array_itemListInCart.reduce((total, item) => item.isCheckedForPayment === true ? total + item.totalOfItem : total, 0)}
                     </Text>
-                    <Link href={'/(user)/orderFoodAndDrink/Payment'}>
+                    {/* <Link href={'/(user)/orderFoodAndDrink/Payment'}> */}
                         <Button
                             iconName="money-bill-alt"
                             buttonName="THANH TOÁN"
-                            handlePress={() => {}}
+                            handlePress={() => { navigation.navigate('Payment', null)}}
                         ></Button>
-                    </Link>
+                    {/* </Link> */}
                 </View>
             </View>
         </SafeAreaView>
