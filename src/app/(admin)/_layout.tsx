@@ -28,9 +28,9 @@ export default function TabLayout() {
       }}>
 
       {/* Tab.Screen dưới đây có tác dụng ẩn đi tab bị dư ra*/}
-      <Tabs.Screen 
-        name='index' 
-        options={{href: null}}
+      <Tabs.Screen
+        name='index'
+        options={{ href: null }}
       ></Tabs.Screen>
 
       <Tabs.Screen
@@ -39,10 +39,10 @@ export default function TabLayout() {
           title: 'Menu',
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
-          
+
         }}
       />
-      
+
       <Tabs.Screen
         name="two"
         options={{

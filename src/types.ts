@@ -1,3 +1,16 @@
+// user
+export type User = {
+  id: number;
+  name: string;
+  phone: string;
+  type: string;
+  image: string;
+  password: string;
+  friend: string;
+  follow: string;
+  is_deleted: boolean;
+};
+
 export type Product = {
   id: number;
   image: string | null;
