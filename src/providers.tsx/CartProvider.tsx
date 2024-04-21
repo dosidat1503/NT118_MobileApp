@@ -13,7 +13,11 @@ type CartType = {
     mainColor: string,
     products: [],
     itemListInCart: any,
-    setItemListInCrart: any
+    setItemListInCrart: any,
+    baseURL: string,
+    emailPattern: RegExp,
+    phoneNumberPattern: RegExp,
+    fullNamePattern: RegExp
 }
 
 const CartContext = createContext<CartType>({
@@ -26,7 +30,11 @@ const CartContext = createContext<CartType>({
     mainColor: "#89CFF0",
     products: [],
     itemListInCart: [],
-    setItemListInCrart: () => {}
+    setItemListInCrart: () => {},
+    baseURL: "localhost:8000",
+    emailPattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+    phoneNumberPattern: /^0\d{9}$/,
+    fullNamePattern: /^[\p{L}\s]+$/u
 });
 
 const CartProvider = ({children} : PropsWithChildren) => {
@@ -56,6 +64,10 @@ const CartProvider = ({children} : PropsWithChildren) => {
     const widthScreen = Dimensions.get("window").width
     const heightScreen = Dimensions.get("window").height
     const mainColor = "#89CFF0"
+    const baseURL = "http://localhost:8000/api"
+    const emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+    const phoneNumberPattern = /^0\d{9}$/
+    const fullNamePattern = /^[\p{L}\s]+$/u
     
     const products = [
         {
@@ -149,7 +161,10 @@ const CartProvider = ({children} : PropsWithChildren) => {
  
     return (
         <CartContext.Provider value={{
-            items, addItem, updateQuantity, total, heightScreen, widthScreen, mainColor, products, itemListInCart, setItemListInCrart
+            items, addItem, updateQuantity, total, 
+            heightScreen, widthScreen, mainColor, products, 
+            itemListInCart, setItemListInCrart,
+            baseURL, emailPattern, phoneNumberPattern, fullNamePattern // Fix: Update the type of emailPattern to string
         }}> 
             {children}
         </CartContext.Provider>
