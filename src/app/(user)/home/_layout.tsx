@@ -11,6 +11,9 @@ export default function MenuStack(){
             name="index" 
             options={{
                 title: 'Home', 
+                headerLeft: () => (<View></View>),
+                headerBackVisible: false,
+                headerBackButtonMenuEnabled: false, 
                 headerRight: () => (
                     <View style={{ 
                       flexDirection: 'row', 
