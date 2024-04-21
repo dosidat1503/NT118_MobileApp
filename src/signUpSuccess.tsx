@@ -36,7 +36,7 @@ export default function SignUpSuccess() {
                 }}
             /> 
             <ImageBackground
-                source={require('@assets/images/backgroundBlue.png')}
+                source={require('@assets/images/backgroundBlue.jpg')}
                 style={{
                 width: widthScreen,
                 height: heightScreen,

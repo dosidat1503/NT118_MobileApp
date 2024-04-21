@@ -99,7 +99,7 @@ const index = () => {
     <View style={styles.divContainer}>
       <Stack.Screen  options={{ headerShown: false }} />
       <ImageBackground
-        source={require('@assets/images/backgroundBlue.png')}
+        source={require('@assets/images/backgroundBlue.jpg')}
         style={{
           width: widthScreen,
           height: heightScreen,
