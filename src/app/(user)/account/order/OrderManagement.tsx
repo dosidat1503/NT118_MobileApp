@@ -174,8 +174,7 @@ export default function OrderManagement() {
                 options={{
                     title: 'Quản lý đơn hàng',
                 }}
-            ></Stack.Screen>
-            {/* header */}
+            ></Stack.Screen> 
             
             <View style={styles.headerContainer}>
                 {

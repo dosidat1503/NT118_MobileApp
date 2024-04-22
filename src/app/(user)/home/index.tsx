@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View, Text, Image, TextInput, Button, ScrollView, Pressable, SectionList} from 'react-native';
+import { FlatList, StyleSheet, View, Text, Image, TextInput, Button, ScrollView, Pressable, SectionList, Linking } from 'react-native';
 import { Stack, Link } from 'expo-router';
 import ProductListItem from '@components/ProductListItem'; 
 import products from '@assets/data/products';
@@ -17,6 +17,8 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 import { SelectList } from 'react-native-dropdown-select-list';
 import { filters } from './filter'; 
+import Filter from './filter';
+import { useNavigation } from 'expo-router';
 
 type renderItemProductProp = {
   item: any,
@@ -24,7 +26,7 @@ type renderItemProductProp = {
 }
 
 export default function TabOneScreen() { 
-  const renderItemProduct = ({item}: renderItemProductProp) =>  <ProductListItem product={item}></ProductListItem>
+  const renderItemProduct = ({item}: renderItemProductProp) =>  <ProductListItem product={item} segments={[]}></ProductListItem>
   const [expandInputPostInfo, setExpandInputPostInfo] = useState(false)
   const [topicSelectedToPost, setTopicSelectedToPost] = useState("")
   
@@ -44,15 +46,18 @@ export default function TabOneScreen() {
         return(
           dataToSelectTopic.push({
             key: `${index + 2}`,
-            value: item.name
+            value: item.name,
+            disabled: false
           })
         )
       }
     )
   }
+  const navigation = useNavigation();
 
   const toogleExpand = () => {
-    setExpandInputPostInfo(!expandInputPostInfo)
+    navigation.navigate('AddPost')
+    // setExpandInputPostInfo(!expandInputPostInfo)
   }
   const [image, setImage] = useState<object | null>(null)
   const listImage = [
@@ -68,6 +73,7 @@ export default function TabOneScreen() {
   ]
   const pickImage = async () => {  
     console.log('ok123')
+    navigation.navigate('AddPost')
     // ImagePicker.openPicker({
     //   multiple: true,
     //   maxFiles: 10,
@@ -96,6 +102,7 @@ export default function TabOneScreen() {
   
   return (  
     <ScrollView>  
+      
       <View> 
         <View style={ [styles.createPost, expandInputPostInfo && styles.expandInputPostInfoContainer]}> 
           <Image

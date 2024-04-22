@@ -4,12 +4,12 @@ import Button from '../components/Button';
 import { Link, Stack } from 'expo-router';
 import { useCartContext } from '@/providers.tsx/CartProvider';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { CheckBox } from 'react-native-elements';
-import SignUp from './(authentication)/SignIn_SignUp/signup';
+import { CheckBox } from 'react-native-elements'; 
 import axios from 'axios';
 import { FontAwesome5 } from '@expo/vector-icons';
+// import index from '.';
 
-const index = () => {
+function index () {
 
   const {heightScreen, widthScreen, mainColor, baseURL, emailPattern, phoneNumberPattern, fullNamePattern} = useCartContext();
     const styles = StyleSheet.create({
@@ -79,22 +79,7 @@ const index = () => {
 
         console.log('Đăng ký thành công!', signUpInfo);
     };
-
-
-  // return (
-    // <View style={{ flex: 1, justifyContent: 'center'}}>
-      {/* <Link href={'/(user)'} asChild>
-        <Button text="User" />
-      </Link> */}
-      {/* <Link href={'/(admin)'} asChild>
-        <Button text="Admin" />
-      </Link> 
-      <Link href={'/(authentication)'} asChild>
-        <Button text="Authentication" />
-      </Link>  */}
-      {/* <View>Trang đăng nhập</View>
-    </View> */}
-  // );
+ 
   return (   
     <View style={styles.divContainer}>
       <Stack.Screen  options={{ headerShown: false }} />
@@ -234,7 +219,7 @@ const index = () => {
         </Link>
       </ImageBackground>
     </View> 
-);
+  );
 };
 
-export default index;
+export default index

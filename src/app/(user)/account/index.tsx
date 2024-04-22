@@ -51,7 +51,7 @@ export default function TabOneScreen() {
       marginHorizontal: widthScreen * 0.04,
       paddingHorizontal: widthScreen * 0.03,
       alignItems: 'center',
-      borderBottomWidth: 1, 
+      // borderBottomWidth: 1, 
       borderBottomColor: '#d1cfcf', 
     },
     itemTextInBody: {
@@ -117,18 +117,18 @@ export default function TabOneScreen() {
           {
             listItem.featureManagement.map((item, index) => {
               return(
-                // <TouchableOpacity
-                //   onPress={() => { navigation.navigate('OrderManagement', null)} }
-                // >
-                  <Link href={item.linkHref} asChild>
+                <TouchableOpacity
+                  // onPress={() => { navigation.navigate('OrderManagement', null)} }
+                >
+                  <Link href={item.linkHref} >
                     <View style={styles.itemContainerInBody}>
                       <View style={{width: widthScreen * 0.06, flexDirection: 'row', justifyContent: 'center'}}>
                         <FontAwesome5 name={item.icon} size={item.size} color={mainColor} />
                       </View>
-                      <Text  style={styles.itemTextInBody}>{item.title}</Text>
+                      <Text style={styles.itemTextInBody}>{item.title}</Text>
                     </View>
                   </Link>
-                // {/* </TouchableOpacity> */}
+                </TouchableOpacity>
               )
             } )
           } 

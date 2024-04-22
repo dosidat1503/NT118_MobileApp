@@ -64,7 +64,7 @@ const index = () => {
   }
 
   const handleLogin = () => {  
-    
+    navigation.navigate('(user)'); 
     axios.post(baseURL + '/signin', signInInfo) 
     .then((response) => {
       
@@ -73,7 +73,7 @@ const index = () => {
         AsyncStorage.setItem('token', response.data.token);
         AsyncStorage.setItem('user', JSON.stringify(response.data.user));
         setIsLoggedIn(true);
-        navigation.navigate('(user)', { replace: true }); 
+        navigation.navigate('(user)'); 
       }
  
     })
@@ -81,26 +81,12 @@ const index = () => {
       console.log(error);
     });
   };
- 
-  // return (
-    // <View style={{ flex: 1, justifyContent: 'center'}}>
-      {/* <Link href={'/(user)'} asChild>
-        <Button text="User" />
-      </Link> */}
-      {/* <Link href={'/(admin)'} asChild>
-        <Button text="Admin" />
-      </Link> 
-      <Link href={'/(authentication)'} asChild>
-        <Button text="Authentication" />
-      </Link>  */}
-      {/* <View>Trang đăng nhập</View>
-    </View> */}
-  // );
+  
   return (   
     <View style={styles.divContainer}>
       <Stack.Screen  options={{ headerShown: false }} />
       <ImageBackground
-        source={require('@assets/images/backgroundBlue.png')}
+        source={require('@assets/images/backgroundBlue.jpg')}
         style={{
           width: widthScreen,
           height: heightScreen,
@@ -154,18 +140,23 @@ const index = () => {
             >Ghi nhớ mật khẩu</Text>
           </View>
           <View style={{flexDirection: 'row'}}>
-            <Text
-              style={{ textDecorationLine: 'underline', color: 'white', fontSize: widthScreen * 0.04}}
-            >Quên mật khẩu?</Text>
+            
+            {/* <Link href={"/(user)/home/"}> */}
+                <Text
+                  style={{ textDecorationLine: 'underline', color: 'white', fontSize: widthScreen * 0.04}}
+                >Quên mật khẩu?</Text>
+            {/* </Link> */}
           </View>
         </View> 
           <Button 
             text='Đăng nhập' 
             onPress={handleLogin}
           >
+        {/* <Link href={"/(user)/home"}> */}
             <FontAwesome5 name="sign-in-alt" size={widthScreen * 0.03} color="white" />
+        {/* </Link> */}
           </Button> 
-        <Link href={'/signUp'} asChild>
+        <Link href={'/signUpSuccess'} asChild>
           <View style={{flexDirection: 'row', alignItems: "center"}}>
             <Text
               style={{
@@ -176,7 +167,7 @@ const index = () => {
                 textDecorationLine: 'underline',
               }}
               >Đăng ký tài khoản</Text>
-            <FontAwesome5 n
+            <FontAwesome5 
               name="user-plus" 
               size={widthScreen * 0.03}
               color="white" 

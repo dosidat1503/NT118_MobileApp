@@ -1,11 +1,18 @@
-import { Stack, Link } from "expo-router"
-import { Pressable, View, TextInput, Image, StyleSheet } from "react-native"
-import { FontAwesome } from "@expo/vector-icons"
-import Colors from "@/constants/Colors"
-import DetailProduct from "./[id]"
+import { Stack, Link, useNavigation } from "expo-router"
+import { Pressable, View, TextInput, Image, StyleSheet, TouchableOpacity } from "react-native" 
+import { createStackNavigator } from '@react-navigation/stack'; 
+import AddPost from "./AddPost"
+import TabOneScreen from "." 
+import Filter from "./filter";
+import { FontAwesome } from "@expo/vector-icons";
+import Colors from "@/constants/Colors";
+
 
 export default function MenuStack(){
-    return (
+
+  const navigation = useNavigation();
+  const Stack2 = createStackNavigator();
+    return (  
         <Stack>
           <Stack.Screen
             name="index" 
@@ -54,7 +61,12 @@ export default function MenuStack(){
                 ),  
             }}
           />  
-          
+          <Stack.Screen
+            name="AddPost" 
+            options={{
+                title: 'Add New Post',    
+            }}
+          />
         </Stack>
     )
 }

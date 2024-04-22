@@ -10,7 +10,11 @@ export default function TabOneScreen() {
   
   return (  
     <ScrollView>
-      <View>Trang hẹn hò</View>
+      <View>
+        <Text>
+          Trang hẹn hò
+        </Text>
+      </View>
     </ScrollView>
   );
 }
