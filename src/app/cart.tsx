@@ -11,9 +11,7 @@ import Button from '@/components/Button';import { Stack } from 'expo-router';
  ;
 
 export default function CartScreen() {
-
-
-
+ 
   const { items, total } = useCartContext();
   return (
     <View>

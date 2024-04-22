@@ -16,7 +16,7 @@ import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 // import Carousel from 'react-native-snap-carousel';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 import { SelectList } from 'react-native-dropdown-select-list';
-import { filters } from './filter';
+import { filters } from './filter'; 
 
 type renderItemProductProp = {
   item: any,
@@ -93,8 +93,9 @@ export default function TabOneScreen() {
       </View>
     )
   }  
+  
   return (  
-    <ScrollView> 
+    <ScrollView>  
       <View> 
         <View style={ [styles.createPost, expandInputPostInfo && styles.expandInputPostInfoContainer]}> 
           <Image

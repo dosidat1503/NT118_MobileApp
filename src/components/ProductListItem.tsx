@@ -4,7 +4,7 @@ import { Link, useSegments } from 'expo-router';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 
 
-export const defaultPrizzaImage = 'https://scontent.fhan4-2.fna.fbcdn.net/v/t1.6435-9/120636978_1253573331661662_6728220112422474812_n.jpg?stp=dst-jpg_p960x960&_nc_cat=111&ccb=1-7&_nc_sid=5f2048&_nc_ohc=x-OtHJuqItcAX-t10tZ&_nc_ht=scontent.fhan4-2.fna&oh=00_AfBK7TrOmsUpHMX317aAs2MOcXgKFi4qeu0jqzur2p_fvA&oe=661E857E'
+export const defaultPrizzaImage = 'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/extravaganzza.png'
 
 type ProductListItemProps = {
   product: Product,

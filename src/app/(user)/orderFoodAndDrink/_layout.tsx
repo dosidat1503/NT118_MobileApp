@@ -12,7 +12,7 @@ export default function MenuStack(){
             options={{
                 title: 'Đặt món', 
                 headerRight: () => (
-                    <Link href="/cart" asChild>
+                    <Link href="/(user)/orderFoodAndDrink/Cart" asChild>
                       <Pressable>
                         {({ pressed }) => (
                           <FontAwesome

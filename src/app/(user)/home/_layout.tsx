@@ -11,33 +11,21 @@ export default function MenuStack(){
             name="index" 
             options={{
                 title: 'Home', 
+                headerLeft: () => (<View></View>),
+                headerBackVisible: false,
+                headerBackButtonMenuEnabled: false, 
                 headerRight: () => (
                     <View style={{ 
                       flexDirection: 'row', 
                       marginRight: 15, 
                       justifyContent: "center", 
-                      alignItems: "center",
-                      // marginHorizontal: 10
-                      paddingBottom: 20
-                    }}>
-                      {/* <Link href="/cart" asChild>
-                        <Pressable>
-                          {({ pressed }) => (
-                            <FontAwesome
-                              name="shopping-cart"
-                              size={25}
-                              color={Colors.light.tint}
-                              style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                            />
-                          )}
-                        </Pressable>
-                      </Link>  */}
+                      alignItems: "center", 
+                      // paddingBottom: 20
+                    }}> 
                       <View style={styles.comboSearch}>
                         <TextInput
                           placeholder="Search..."
-                          style={styles.inputSearch}
-                          // value={searchQuery}
-                          // onChangeText={(text) => setSearchQuery(text)}
+                          style={styles.inputSearch} 
                         /> 
                         <Link href="/cart" asChild>
                           <Pressable>
@@ -45,34 +33,15 @@ export default function MenuStack(){
                               <FontAwesome
                                 name="search"
                                 size={25}
-                                color={Colors.light.tint}
-                                // style={[styles.buttonSearch, pressed && styles.addStyleButtonSearch]}
+                                color={Colors.light.tint} 
                               />
                             )}
                           </Pressable>
                         </Link> 
-                      </View>
-                      {/* <Link href="/cart" asChild>
-                        <Pressable>
-                          {({ pressed }) => (
-                            <FontAwesome
-                              name="search"
-                              size={25}
-                              color={Colors.light.tint}
-                              style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                            />
-                          )}
-                        </Pressable>
-                      </Link>  */}
+                      </View> 
                       <Link href="/home/filter" asChild>
                         <Pressable>
-                          {({ pressed }) => (
-                            // <FontAwesome
-                            //   name="bars"
-                            //   size={25}
-                            //   color={Colors.light.tint}
-                            //   style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                            // />
+                          {({ pressed }) => ( 
                             <Image
                               source={require('@assets/images/filter_home_2.png')}
                               style={styles.filterIcon}
@@ -99,6 +68,7 @@ const styles = StyleSheet.create({
   comboSearch:{
     flexDirection: "row",
     alignItems: "center",
+    alignContent: "center",
     backgroundColor: "#FBFFC8",
     borderColor: '#89CFF0',
     borderWidth: 1,
