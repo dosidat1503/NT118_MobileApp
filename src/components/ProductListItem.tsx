@@ -8,7 +8,7 @@ export const defaultPrizzaImage = 'https://scontent.fhan4-2.fna.fbcdn.net/v/t1.6
 
 type ProductListItemProps = {
   product: Product,
-  segments: []
+  // segments: []
 }
 
 const ProductListItem = ({ product }: ProductListItemProps) => {

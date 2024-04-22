@@ -1,7 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
 import { Pressable, useColorScheme } from 'react-native';
-
 import Colors from '../../constants/Colors';
 
 /**
@@ -34,20 +33,27 @@ export default function TabLayout() {
       ></Tabs.Screen>
 
       <Tabs.Screen
-        name="menu" //Trỏ vào folder menu
+        name="home" //Trỏ vào folder menu
         options={{
-          title: 'Menu',
+          title: 'Home',
           headerShown: false,
-          tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
-
+          tabBarIcon: ({ color }) => <TabBarIcon name={`home`} color={color} />,
         }}
       />
 
       <Tabs.Screen
-        name="two"
+        name="order"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Orders',
+          tabBarIcon: ({ color }) => <TabBarIcon name={`clipboard`} color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="user"
+        options={{
+          title: 'User',
+          tabBarIcon: ({ color }) => <TabBarIcon name={`user`} color={color} />,
         }}
       />
     </Tabs>
