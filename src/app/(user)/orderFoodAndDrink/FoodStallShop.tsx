@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Pressable } from "react-native";
 import SlideHeaderOrderFAD from "@/components/orderFAD/SlideHeaderOrderFAD";
-import { defaultPrizzaImage } from "@/components/ProductListItem"; 
+import { defaultPrizzaImage } from "@/components/PostList"; 
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";  
 import InfoShop from "@/components/orderFAD/FoodStallShop/InfoShop";
 import { InfoFADofShop } from "@/components/orderFAD/FoodStallShop/InfoFADofShop";

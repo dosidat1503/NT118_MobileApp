@@ -13,11 +13,16 @@ type CartType = {
     mainColor: string,
     products: [],
     itemListInCart: any,
-    setItemListInCrart: any,
+    setItemListInCart: any,
     baseURL: string,
     emailPattern: RegExp,
     phoneNumberPattern: RegExp,
-    fullNamePattern: RegExp
+    fullNamePattern: RegExp,
+    defaultImageID: string,
+    textQueryPost: string,
+    setTextQueryPost: any,
+    orderStatusList: any,
+    userID: number,
 }
 
 const CartContext = createContext<CartType>({
@@ -30,11 +35,16 @@ const CartContext = createContext<CartType>({
     mainColor: "#89CFF0",
     products: [],
     itemListInCart: [],
-    setItemListInCrart: () => {},
+    setItemListInCart: () => {},
     baseURL: "localhost:8000",
     emailPattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
     phoneNumberPattern: /^0\d{9}$/,
-    fullNamePattern: /^[\p{L}\s]+$/u
+    fullNamePattern: /^[\p{L}\s]+$/u,
+    defaultImageID: '1_6_1702549349',
+    textQueryPost: "",
+    setTextQueryPost: () => {},
+    orderStatusList: [],
+    userID: 0,
 });
 
 const CartProvider = ({children} : PropsWithChildren) => {
@@ -68,6 +78,10 @@ const CartProvider = ({children} : PropsWithChildren) => {
     const emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
     const phoneNumberPattern = /^0\d{9}$/
     const fullNamePattern = /^[\p{L}\s]+$/u
+    const defaultImageID = '1_6_1702549349'
+    const [textQueryPost, setTextQueryPost] = useState("")
+
+    const [userID, setUserID] = useState(0)
     
     const products = [
         {
@@ -141,7 +155,7 @@ const CartProvider = ({children} : PropsWithChildren) => {
         },
     ];
 
-    const [itemListInCart, setItemListInCrart] =  useState([
+    const [itemListInCart, setItemListInCart] =  useState([
         {
             name: "Cơm sườn",
             price: 45000,
@@ -157,14 +171,24 @@ const CartProvider = ({children} : PropsWithChildren) => {
             quantity: 1
         }
     ])
+
+    const orderStatusList = [
+        { id: 1, name: "Chờ xác nhận", icon: "clock"},
+        { id: 2, name: "Đang chuẩn bị", icon: "clock" },
+        { id: 3, name: "Đang giao", icon: "motorcycle" },
+        { id: 4, name: "Đã giao", icon: "clipboard-check" },
+        { id: 5, name: "Đã hủy", icon: "window-close" }
+    ]
   
  
     return (
         <CartContext.Provider value={{
             items, addItem, updateQuantity, total, 
             heightScreen, widthScreen, mainColor, products, 
-            itemListInCart, setItemListInCrart,
-            baseURL, emailPattern, phoneNumberPattern, fullNamePattern // Fix: Update the type of emailPattern to string
+            itemListInCart, setItemListInCart,
+            baseURL, emailPattern, phoneNumberPattern, fullNamePattern, // Fix: Update the type of emailPattern to string
+            defaultImageID, textQueryPost, setTextQueryPost,
+            orderStatusList, userID, setUserID
         }}> 
             {children}
         </CartContext.Provider>

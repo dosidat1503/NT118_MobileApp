@@ -3,7 +3,7 @@ import { DarkTheme, DefaultTheme, NavigationContainer, ThemeProvider } from '@re
 import { useFonts } from 'expo-font';
 import { SplashScreen } from 'expo-router';
 import {  Stack } from 'expo-router';
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import CartProvider from '@/providers.tsx/CartProvider';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -54,25 +54,27 @@ function RootLayoutNav() {
   // const Stack = createStackNavigator();
 
   return (
-    <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
-      <CartProvider>
-        <Stack>
-          <Stack.Screen name="(user)" options={{ headerShown: false }} />
-          <Stack.Screen name="(admin)" options={{ headerShown: false }} /> 
-          <Stack.Screen name="signUpSuccess" options={{ headerShown: false }} />
-          {/* <Stack.Screen name="filter"  options={{ headerShown: false }} component = {Filter}/> */}
-        </Stack>
-        {/* <NavigationContainer>
-          <Stack.Navigator> 
-            <Stack.Screen name="UserHome" component={TabOneScreen} />
-            <Stack.Screen name="(user)" component={TabLayout} options={{ headerShown: false }} /> */}
-            {/* <Stack.Screen name="userTest" component={TabLayout} options={{ headerShown: false }} /> */}
-            {/* <Stack.Screen name="(admin)" options={{ headerShown: false }} />
-            <Stack.Screen name="(authentication)" options={{ headerShown: false }} />
-            <Stack.Screen name="cart" options={{ presentation: 'modal' }} /> */}
-          {/* </Stack.Navigator>
-        </NavigationContainer> */}
-      </CartProvider>
-    </ThemeProvider>
+    <Fragment>
+      <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
+        <CartProvider>
+          <Stack>
+            <Stack.Screen name="(user)" options={{ headerShown: false }} />
+            <Stack.Screen name="(admin)" options={{ headerShown: false }} /> 
+            <Stack.Screen name="signUpSuccess" options={{ headerShown: false }} />
+            {/* <Stack.Screen name="filter"  options={{ headerShown: false }} component = {Filter}/> */}
+          </Stack>
+          {/* <NavigationContainer>
+            <Stack.Navigator> 
+              <Stack.Screen name="UserHome" component={TabOneScreen} />
+              <Stack.Screen name="(user)" component={TabLayout} options={{ headerShown: false }} /> */}
+              {/* <Stack.Screen name="userTest" component={TabLayout} options={{ headerShown: false }} /> */}
+              {/* <Stack.Screen name="(admin)" options={{ headerShown: false }} />
+              <Stack.Screen name="(authentication)" options={{ headerShown: false }} />
+              <Stack.Screen name="cart" options={{ presentation: 'modal' }} /> */}
+            {/* </Stack.Navigator>
+          </NavigationContainer> */}
+        </CartProvider>
+      </ThemeProvider>
+    </Fragment>
   );
 }

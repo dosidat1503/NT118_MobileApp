@@ -2,7 +2,7 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, ScrollView, Pressable } from "react-native";
 import { CheckBox } from 'react-native-elements'; 
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/ProductListItem";
+import { defaultPrizzaImage } from "@/components/PostList";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import SlideHeaderOrderFAD from "@/components/orderFAD/SlideHeaderOrderFAD";
 import { useState } from "react";

@@ -1,17 +1,55 @@
 import { Stack, Link, useNavigation } from "expo-router"
-import { Pressable, View, TextInput, Image, StyleSheet, TouchableOpacity } from "react-native" 
-import { createStackNavigator } from '@react-navigation/stack'; 
-import AddPost from "./AddPost"
-import TabOneScreen from "." 
-import Filter from "./filter";
+import { Pressable, View, TextInput, Image, StyleSheet, TouchableOpacity } from "react-native"  
 import { FontAwesome } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
+import { useState } from "react";
+import axios from "axios";
+import { useCartContext } from "@/providers.tsx/CartProvider"; 
 
+export default function SearchPost(){ 
+  const navigation = useNavigation(); 
+  const [textQuery, setTextQuery] = useState('');
+  const { baseURL, setTextQueryPost } = useCartContext();
 
-export default function MenuStack(){
+    
 
-  const navigation = useNavigation();
-  const Stack2 = createStackNavigator();
+  const renderHeaderRight = () => (
+    <View style={{ 
+      flexDirection: 'row', 
+      marginRight: 15, 
+      justifyContent: "center", 
+      alignItems: "center", 
+      // paddingBottom: 20
+    }}> 
+      <View style={styles.comboSearch}>
+        <TextInput
+          placeholder="Search..."
+          style={styles.inputSearch} 
+          onChangeText={(text) => setTextQueryPost(text)}
+        />  
+        {/* <TouchableOpacity onPress={() => handleSearch}>    */}
+        <Link href="/home/SearchPost" asChild>
+          <FontAwesome
+            name="search"
+            size={25}
+            color={Colors.light.tint} 
+          />    
+        </Link>
+        {/* </TouchableOpacity> */}
+      </View> 
+      <Link href="/home/filter" asChild>
+        <Pressable>
+          {({ pressed }) => ( 
+            <Image
+              source={require('@assets/images/filter_home_2.png')}
+              style={styles.filterIcon}
+            ></Image>
+          )}
+        </Pressable>
+      </Link>  
+    </View>
+  )
+
     return (  
         <Stack>
           <Stack.Screen
@@ -21,50 +59,19 @@ export default function MenuStack(){
                 headerLeft: () => (<View></View>),
                 headerBackVisible: false,
                 headerBackButtonMenuEnabled: false, 
-                headerRight: () => (
-                    <View style={{ 
-                      flexDirection: 'row', 
-                      marginRight: 15, 
-                      justifyContent: "center", 
-                      alignItems: "center", 
-                      // paddingBottom: 20
-                    }}> 
-                      <View style={styles.comboSearch}>
-                        <TextInput
-                          placeholder="Search..."
-                          style={styles.inputSearch} 
-                        /> 
-                        <Link href="/cart" asChild>
-                          <Pressable>
-                            {({ pressed }) => (
-                              <FontAwesome
-                                name="search"
-                                size={25}
-                                color={Colors.light.tint} 
-                              />
-                            )}
-                          </Pressable>
-                        </Link> 
-                      </View> 
-                      <Link href="/home/filter" asChild>
-                        <Pressable>
-                          {({ pressed }) => ( 
-                            <Image
-                              source={require('@assets/images/filter_home_2.png')}
-                              style={styles.filterIcon}
-                            ></Image>
-                          )}
-                        </Pressable>
-                      </Link> 
-                      
-                    </View>
-                ),  
+                headerRight: renderHeaderRight,  
             }}
           />  
           <Stack.Screen
             name="AddPost" 
             options={{
                 title: 'Add New Post',    
+            }}
+          />
+          <Stack.Screen
+            name="SearchPost" 
+            options={{
+                title: 'Tìm kiếm',    
             }}
           />
         </Stack>

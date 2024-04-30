@@ -1,7 +1,7 @@
 import { Link, Stack } from "expo-router";
-import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, TouchableOpacity, Button } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, TouchableOpacity, Button, FlatList, ActivityIndicator } from "react-native";
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/ProductListItem";
+import { defaultPrizzaImage } from "@/components/PostList";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import Colors from "@/constants/Colors"
 import { CheckBox } from 'react-native-elements';  
@@ -9,10 +9,38 @@ import ItemInCartAndPayment from "@/components/orderFAD/Cart/ItemInCartAndPaymen
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import axios from "axios"; 
+
+interface orderItem {
+    ORDER_ID: number;
+    TOTAL_PAYMENT: string;
+    FAD_QUANTITY: number;
+    PAYMENT_METHOD: string;
+    DATE: string;
+    FAD_INFO: {
+        IMAGE_URL: string,
+        FAD_NAME: string,
+        FAD_ID: number,
+        FAD_PRICE: number
+    };
+    FADFirst: { imgURL: string; name: string; quantity: number; price: number; }; 
+    necessaryInfo: { FADQuantityHaveOrder: number; time: string; paymentMethod: string; voucherID: string; };
+    paymentToTal: number; 
+}
+
+interface infoManagementEveryOrderStatus { 
+    orderStatusName: string,
+    orderStatusCode: number,
+    orderStatusIcon: string,
+    orderItemList: orderItem[],
+    pageNumber: number, 
+    isActive: boolean
+}
+
 
 export default function OrderManagement() {
 
-    const {heightScreen, widthScreen, mainColor} = useCartContext();
+    const {heightScreen, widthScreen, mainColor, orderStatusList, baseURL, userID} = useCartContext();
 
     const avatarSize = widthScreen * 0.13;
 
@@ -26,7 +54,10 @@ export default function OrderManagement() {
             flexDirection: "row",
             justifyContent: "space-around",    
             paddingVertical: heightScreen * 0.005,
-            paddingHorizontal: widthScreen * 0.003,                                                                                                                                                                              
+            paddingHorizontal: widthScreen * 0.003,      
+            flexWrap: "wrap",
+            backgroundColor: "white",
+            position: "absolute",                                                                                                                                      
         },
         itemStatusHeader: {
             paddingHorizontal: widthScreen * 0.02,
@@ -42,7 +73,7 @@ export default function OrderManagement() {
             fontWeight: 'bold',
             color: mainColor,
             marginLeft: widthScreen * 0.01,
-            fontSize: widthScreen * 0.03
+            fontSize: widthScreen * 0.04
         },
         itemOrderContainer: {
             marginHorizontal: widthScreen * 0.02,
@@ -150,105 +181,196 @@ export default function OrderManagement() {
                 voucherID: "C_NQ_D20"
             },
             paymentToTal: 300000
-        },
-        {
-            FADFirst: {
-                imgURL: defaultPrizzaImage,
-                name: "Pizza hải sản",
-                quantity: 1,
-                price: 100000,
-            },
-            necessaryInfo: {
-                FADQuantityHaveOrder: 3,
-                time: "2021-09-01 12:00:00",
-                paymentMethod: "Thanh toán khi nhận hàng",
-                voucherID: "C_NQ_D20"
-            },
-            paymentToTal: 300000
-        }
+        } 
     ]);
 
+
+
+    const [infoManagementEveryOrderStatus, setInfoManagementEveryOrderStatus] = useState<infoManagementEveryOrderStatus[]>([]);
+    const [dataLoadFromServe, setDataLoadFromServe] = useState([]);
+
+    const itemQuantityEveryLoad = 4;
+    const [initialLoad, setInitialLoad] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+ 
+
+    useEffect(() => {   
+        let newInfoManagementEveryOrderStatus: infoManagementEveryOrderStatus[] = []
+        orderStatusList.map((item: any, index: any) => { 
+            console.log(dataLoadFromServe, "dataLoadFromServe", item.id, orderStatusList[0].id)
+            newInfoManagementEveryOrderStatus.push(
+                {
+                    orderStatusName: item.name,
+                    orderStatusIcon: item.icon,
+                    orderStatusCode: item.id,
+                    orderItemList: item.id === orderStatusList[0].id ? dataLoadFromServe : [],
+                    pageNumber: 1,
+                    isActive: item.name === orderStatusList[0].name ? true : false
+                } 
+            )
+        })  
+        setInfoManagementEveryOrderStatus(newInfoManagementEveryOrderStatus)
+        setInitialLoad(true);
+    }, []);
+
+    useEffect(() => {
+        getOrderListFromServe(orderStatusList[0].id, 1);
+        console.log(infoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus useeffect")
+    }, [initialLoad])
+
+    //orderStatusName = "" thì có nghĩa là load lần đầu. mà load lần đầu thì load 10 trạng thái đơn hàng đầu tiên của mỗi trạng thái đơn hàng
+    //orderStatusName = "Đang chuẩn bị" (có thể là tên các trạng thái khác) thì load 10 trạng thái đơn hàng tiếp theo của trạng thái đơn hàng "Đang chuẩn bị"
+    const getOrderListFromServe = (orderStatusCode: number, pageNumber: number) => { 
+
+        // nếu mà load theo một trạng thái thì startIndexLoadOneStatus = số lượng đơn hàng muốn load thêm * (số trang - 1) + 1
+        // ví dụ load thêm 10 đơn hàng của trạng thái "Đang chuẩn bị" thì startIndexLoadOneStatus = 10 * (2 - 1) + 1 = 11 
+        setIsLoading(true);
+        const requestData = {
+            orderStatusCode: orderStatusCode,
+            startIndex: (itemQuantityEveryLoad * ( pageNumber - 1 )),
+            endIndex: orderStatusCode === 0 ? itemQuantityEveryLoad : itemQuantityEveryLoad * pageNumber, 
+            userID: userID === 0 ? 1 : userID
+        }
+
+        console.log(requestData, "requestData", orderStatusCode)
+
+        axios.get( baseURL + "/getOrderInfoOfUser", { params: requestData })
+        .then((response) => {
+            console.log(response.data.infoOrder, "response.data")
+            const newInfoManagementEveryOrderStatus =  infoManagementEveryOrderStatus.map((itemInList) => {
+                if (itemInList.orderStatusCode === orderStatusCode) {
+                    return {
+                        ...itemInList,
+                        orderItemList: itemInList.orderItemList.concat(response.data.infoOrder),
+                        pageNumber: ++pageNumber,
+                        isActive: true
+                    };
+                }
+                return {
+                    ...itemInList, 
+                    isActive: false
+                };
+            }) 
+            setInfoManagementEveryOrderStatus(newInfoManagementEveryOrderStatus)
+            console.log(newInfoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus")
+            setIsLoading(false);
+        })
+    }
+
+    const getOrderInfo = (item: infoManagementEveryOrderStatus) => {
+        getOrderListFromServe(item.orderStatusCode, item.pageNumber); 
+    }
+
+    const renderOrderList = ({item}: {item: orderItem}) =>  (
+        <View  style={styles.itemOrderContainer}>
+            <View style={styles.headerOfItemOrder}>
+                <Image source={{ uri: item.FAD_INFO.IMAGE_URL }} style={styles.imgOfItem}/>
+                <View style={{marginLeft: widthScreen * 0.02 }}>
+                    <Text style={styles.headerTitelOfItemOder}>{item.FAD_INFO.FAD_NAME}</Text>
+                    <Text style={styles.headerNormalTextOfItemOder}>Giá: {item.FAD_INFO.FAD_PRICE} - id: {item.ORDER_ID}</Text>
+                </View>
+            </View>
+
+            <View style={styles.bodyOfItemOrder}> 
+                <View style={styles.NeceesaryInfoInBodyOfItemOrder}>
+                    <View style={styles.NeceesaryInfoInBodyOfItemOrder_row}>
+                        <View style={styles.NeceesaryInfoInBodyOfItemOrder_row_item}>
+                            <Text style={styles.headerNormalTextOfItemOder}>Thời gian:</Text>
+                            <Text style={styles.NeceesaryInfoInBodyOfItemOrder_row_item_mainText}>{item.DATE}</Text>
+                        </View> 
+                    </View>
+                    <View style={styles.NeceesaryInfoInBodyOfItemOrder_row}>
+                        <View style={styles.NeceesaryInfoInBodyOfItemOrder_row_item}>
+                            <Text style={styles.headerNormalTextOfItemOder}>Thanh toán:</Text>
+                            <Text style={styles.NeceesaryInfoInBodyOfItemOrder_row_item_mainText}>{item.PAYMENT_METHOD}</Text>
+                        </View> 
+                    </View>
+                    <View style={styles.NeceesaryInfoInBodyOfItemOrder_row}>
+                        <View style={styles.NeceesaryInfoInBodyOfItemOrder_row_item}>
+                            <Text style={styles.headerNormalTextOfItemOder}>Số lượng món:</Text>
+                            <Text style={styles.NeceesaryInfoInBodyOfItemOrder_row_item_mainText}>{item.FAD_QUANTITY}</Text>
+                        </View> 
+                    </View>
+                </View>
+
+                <TouchableOpacity style={styles.detailInfoOfOderTextContainer}>
+                    <Text style={styles.detailInfoOfOderText}>Thông tin chi tiết đơn hàng &gt;</Text>
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.footerOfItemOder}>
+                <Button
+                    title="Hủy đơn"
+                    color={mainColor}
+                ></Button>
+                <View style={{flexDirection: "row"}}>
+                    <Text style={styles.headerNormalTextOfItemOder}>Tổng tiền: </Text>
+                    <Text style={styles.footerTextMoneyOfItemOder}>{item.TOTAL_PAYMENT}</Text>
+                </View>
+            </View>
+        </View>
+    )  
+
+    const renderFooter = () => {
+        return(
+            isLoading &&
+            <View style={{ marginTop: heightScreen * 0.002, alignItems: "center" }}>
+                <ActivityIndicator size="large" color={mainColor} />
+            </View>
+        )
+    }
+
+    const renderEveryStatus = () => {
+        return infoManagementEveryOrderStatus.map((itemStatus, index) => {
+            if (itemStatus.isActive) {
+                console.log(itemStatus.orderStatusName, "isActive");
+                return (
+                    <FlatList
+                        data={itemStatus.orderItemList}
+                        renderItem={renderOrderList} 
+                        ListFooterComponent={renderFooter}
+                        onEndReached={() => getOrderInfo(itemStatus)}
+                        onEndReachedThreshold={0.04}
+                    ></FlatList>
+                );
+            } else return null;
+        });
+ 
+    }
+
     return (
-        <ScrollView> 
+        <SafeAreaView style={{flex: 1}}>
             <Stack.Screen
                 options={{
                     title: 'Quản lý đơn hàng',
                 }}
             ></Stack.Screen> 
-            
             <View style={styles.headerContainer}>
+                {/* <View style={{paddingTop: heightScreen * 0.2}}></View> */}
                 {
-                    orderStatus.map((item, index) => { 
+                    infoManagementEveryOrderStatus.map((item, index) => { 
                         return(
-                            <TouchableOpacity key={index}>
-                                <View style={styles.itemStatusHeader}>
-                                    <FontAwesome5 name={item.icon} style={{color: mainColor,}}></FontAwesome5>
-                                    <Text style={styles.itemTextInStatusHeader}>{item.name}</Text>
+                            <TouchableOpacity 
+                                key={index} 
+                                onPress={() => getOrderListFromServe(item.orderStatusCode, item.pageNumber)}
+                                style={{ marginVertical: heightScreen * 0.005}}
+                            >
+                                <View style={[styles.itemStatusHeader, item.isActive && { backgroundColor: "yellow" }]}>
+                                    <FontAwesome5 name={item.orderStatusIcon} style={{color: mainColor, fontWeight: "bold"}}></FontAwesome5>
+                                    <Text style={styles.itemTextInStatusHeader}>{item.orderStatusName}</Text>
                                 </View>
                             </TouchableOpacity>
                         )
                     })
                 }
             </View>
-            <View style={{borderBottomWidth: 1, marginHorizontal: widthScreen * 0.01, borderBottomColor: "#cdcdcd", marginBottom: heightScreen * 0.009}}>
-            </View>
-                
-            {/* body */}
-            <View>
-                {
-                    orderList.map((item, index) => {
-                        return(
-                            <View style={styles.itemOrderContainer}>
-                                <View style={styles.headerOfItemOrder}>
-                                    <Image source={{uri: item.FADFirst.imgURL}} style={styles.imgOfItem}/>
-                                    <View style={{marginLeft: widthScreen * 0.02 }}>
-                                        <Text style={styles.headerTitelOfItemOder}>{item.FADFirst.name}</Text>
-                                        <Text style={styles.headerNormalTextOfItemOder}>Giá: {item.FADFirst.price} - Số lượng: {item.FADFirst.quantity}</Text>
-                                    </View>
-                                </View>
-
-                                <View style={styles.bodyOfItemOrder}> 
-                                    <View style={styles.NeceesaryInfoInBodyOfItemOrder}>
-                                        <View style={styles.NeceesaryInfoInBodyOfItemOrder_row}>
-                                            <View style={styles.NeceesaryInfoInBodyOfItemOrder_row_item}>
-                                                <Text style={styles.headerNormalTextOfItemOder}>Thời gian:</Text>
-                                                <Text style={styles.NeceesaryInfoInBodyOfItemOrder_row_item_mainText}>{item.necessaryInfo.time}</Text>
-                                            </View> 
-                                        </View>
-                                        <View style={styles.NeceesaryInfoInBodyOfItemOrder_row}>
-                                            <View style={styles.NeceesaryInfoInBodyOfItemOrder_row_item}>
-                                                <Text style={styles.headerNormalTextOfItemOder}>Thanh toán:</Text>
-                                                <Text style={styles.NeceesaryInfoInBodyOfItemOrder_row_item_mainText}>{item.necessaryInfo.paymentMethod}</Text>
-                                            </View> 
-                                        </View>
-                                        <View style={styles.NeceesaryInfoInBodyOfItemOrder_row}>
-                                            <View style={styles.NeceesaryInfoInBodyOfItemOrder_row_item}>
-                                                <Text style={styles.headerNormalTextOfItemOder}>Số lượng món:</Text>
-                                                <Text style={styles.NeceesaryInfoInBodyOfItemOrder_row_item_mainText}>{item.necessaryInfo.FADQuantityHaveOrder}</Text>
-                                            </View> 
-                                        </View>
-                                    </View>
-
-                                    <TouchableOpacity style={styles.detailInfoOfOderTextContainer}>
-                                        <Text style={styles.detailInfoOfOderText}>Thông tin chi tiết đơn hàng &gt;</Text>
-                                    </TouchableOpacity>
-                                </View>
-
-                                <View style={styles.footerOfItemOder}>
-                                    <Button
-                                        title="Hủy đơn"
-                                        color={mainColor}
-                                    ></Button>
-                                    <View style={{flexDirection: "row"}}>
-                                        <Text style={styles.headerNormalTextOfItemOder}>Tổng tiền: </Text>
-                                        <Text style={styles.footerTextMoneyOfItemOder}>{item.paymentToTal}</Text>
-                                    </View>
-                                </View>
-                            </View>
-                        )
-                    })
-                }
-            </View>
-        </ScrollView>
+            <View style={{borderBottomWidth: 1, marginHorizontal: widthScreen * 0.01, borderBottomColor: "#cdcdcd", marginBottom: heightScreen * 0.009}}/>
+            <ScrollView style={{ marginTop: heightScreen * 0.128}}>  
+                {/* body */}
+                <View>
+                    { renderEveryStatus() }
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     )
 }

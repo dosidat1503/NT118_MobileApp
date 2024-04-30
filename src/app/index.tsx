@@ -66,16 +66,14 @@ const index = () => {
   const handleLogin = () => {  
     navigation.navigate('(user)'); 
     axios.post(baseURL + '/signin', signInInfo) 
-    .then((response) => {
-      
+    .then((response) => { 
       console.log(response.data);
       if(response.data.statusCode === 200) {
         AsyncStorage.setItem('token', response.data.token);
-        AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+        AsyncStorage.setItem('userID', JSON.stringify(response.data.userID)); 
         setIsLoggedIn(true);
         navigation.navigate('(user)'); 
-      }
- 
+      } 
     })
     .catch((error) => {
       console.log(error);

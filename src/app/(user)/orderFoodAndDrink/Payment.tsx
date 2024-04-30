@@ -1,7 +1,7 @@
 import { Link, Stack } from "expo-router";
 import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, TextInput } from "react-native";
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/ProductListItem";
+import { defaultPrizzaImage } from "@/components/PostList";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import Colors from "@/constants/Colors"
 import { CheckBox } from 'react-native-elements'; 

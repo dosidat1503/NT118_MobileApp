@@ -1,14 +1,14 @@
 import { FlatList, StyleSheet, View, Text, Image, TextInput, Button, ScrollView, Pressable, SectionList, Linking } from 'react-native';
 import { Stack, Link } from 'expo-router';
-import ProductListItem from '@components/ProductListItem'; 
+import ProductListItem from '@/components/PostList'; 
 import products from '@assets/data/products';
 import { Product } from '@/types';
 // import Button from '@/components/Button';
 import { useCartContext } from '@/providers.tsx/CartProvider'; 
-import { defaultPrizzaImage } from '@components/ProductListItem';
+import PostList, { defaultPrizzaImage } from '@/components/PostList';
 import FontAwesome from '@expo/vector-icons/FontAwesome'; 
 import { FontAwesome5 } from '@expo/vector-icons';
-import { useState } from 'react'; 
+import { useEffect, useState } from 'react'; 
 // import * as ImagePicker from 'expo-image-picker'
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 // import ImagePicker from 'react-native-image-crop-picker'; 
@@ -19,14 +19,30 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import { filters } from './filter'; 
 import Filter from './filter';
 import { useNavigation } from 'expo-router';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type renderItemProductProp = {
+type renderItemPostProp = {
   item: any,
   segment?: any,
 }
 
-export default function TabOneScreen() { 
-  const renderItemProduct = ({item}: renderItemProductProp) =>  <ProductListItem product={item} segments={[]}></ProductListItem>
+interface itemInfoPost {
+  LIKE_QUANTITY: number;
+  CONTENT: string;
+  POST_ID: number;
+  NAME: string;
+  IMG_URL: string;
+  USER_ID: number; 
+  TIME: string; 
+  id: any; 
+  body: any; 
+}
+
+export default function TabOneScreen() {  
+  const { heightScreen, widthScreen, mainColor, baseURL, setUserID } = useCartContext();
+  const navigation = useNavigation();
+ 
   const [expandInputPostInfo, setExpandInputPostInfo] = useState(false)
   const [topicSelectedToPost, setTopicSelectedToPost] = useState("")
   
@@ -39,8 +55,74 @@ export default function TabOneScreen() {
     // {key:'6', value:'Diary Products'},
     // {key:'7', value:'Drinks'},
   ]
-  const importDataFromFilters = () => {
+
+  const [infoPost, setInfoPost] = useState([{
+    user: {
+      ID:  0,
+      avatarImage: '',
+      Name: '',
+    },
+    post: {
+      ID: 0,
+      content: '',
+      time: '',
+      image: '',
+      likeQuantity: 0,
+    },
+    interact: {
+      isLiked: false,
+      isSaved: false,
+    }
+  }])
+
+  useEffect(() => {
+
     
+    const getUserID = async () => {
+      const userID = await AsyncStorage.getItem("userID");
+      return userID; 
+    }
+
+    setUserID(1)
+
+    const getInforPost = () => {
+      axios.get(baseURL + '/getInfoPost')
+      .then((response) => {
+        console.log(response.data, "getInforPost")
+        const updateInfoPost = [...infoPost]
+        response.data.infoPost.map((item: itemInfoPost, index: any) => {
+          updateInfoPost.push({
+            user: {
+              ID:  item.USER_ID,
+              avatarImage: response.data.infoAvatarImage[index].URL,
+              Name: response.data.infoUser[index].NAME,
+            },
+            post: {
+              ID: item.POST_ID,
+              time: item.TIME,
+              content: item.CONTENT,
+              image: response.data.infoAvatarImage[index].URL,
+              likeQuantity: response.data.infoPost[index].LIKE_QUANTITY,
+            },
+            interact: {
+              isLiked: false,
+              isSaved: false,
+            }
+          })
+        })
+
+        setInfoPost(updateInfoPost) 
+      })
+    }
+
+    getInforPost()
+  }, [])
+
+  useEffect(() => {
+    console.log(infoPost)
+  }, [infoPost])
+
+  const importDataFromFilters = () => { 
     filters[1].list.forEach((item, index) => {
         console.log(index, 'ok')
         return(
@@ -53,24 +135,12 @@ export default function TabOneScreen() {
       }
     )
   }
-  const navigation = useNavigation();
 
   const toogleExpand = () => {
     navigation.navigate('AddPost')
     // setExpandInputPostInfo(!expandInputPostInfo)
   }
-  const [image, setImage] = useState<object | null>(null)
-  const listImage = [
-    {
-      path: 'https://scontent.fsgn2-7.fna.fbcdn.net/v/t39.30808-6/362676453_1451519459020293_1570629234986068265_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeE3_FTlymtML-F00eW_urEfdh2kYoB1fo12HaRigHV-jSqmOhj9Mw3Ovv8KLbvLhFwvDGbNssoAUWNdKjsaAJ_T&_nc_ohc=AhVsSSJg3a4AX85eiUg&_nc_ht=scontent.fsgn2-7.fna&oh=00_AfC4vvM2qrnqrwZeg2Cv2h4XdJU45sg0LF_qj6iiNETfTA&oe=66042E7D'
-    },
-    {
-      path: 'https://scontent.fsgn2-7.fna.fbcdn.net/v/t39.30808-6/362676453_1451519459020293_1570629234986068265_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeE3_FTlymtML-F00eW_urEfdh2kYoB1fo12HaRigHV-jSqmOhj9Mw3Ovv8KLbvLhFwvDGbNssoAUWNdKjsaAJ_T&_nc_ohc=AhVsSSJg3a4AX85eiUg&_nc_ht=scontent.fsgn2-7.fna&oh=00_AfC4vvM2qrnqrwZeg2Cv2h4XdJU45sg0LF_qj6iiNETfTA&oe=66042E7D'
-    },
-    {
-      path: 'https://scontent.fsgn2-7.fna.fbcdn.net/v/t39.30808-6/362676453_1451519459020293_1570629234986068265_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_eui2=AeE3_FTlymtML-F00eW_urEfdh2kYoB1fo12HaRigHV-jSqmOhj9Mw3Ovv8KLbvLhFwvDGbNssoAUWNdKjsaAJ_T&_nc_ohc=AhVsSSJg3a4AX85eiUg&_nc_ht=scontent.fsgn2-7.fna&oh=00_AfC4vvM2qrnqrwZeg2Cv2h4XdJU45sg0LF_qj6iiNETfTA&oe=66042E7D'
-    } 
-  ]
+ 
   const pickImage = async () => {  
     console.log('ok123')
     navigation.navigate('AddPost')
@@ -89,16 +159,9 @@ export default function TabOneScreen() {
       const result = await launchImageLibrary({mediaType: 'photo'})
     // }
     // console.log(result, 'ok')
-  }
-  const renderItem = ({image, index}) => { 
-    return (
-      <View key={index}>
-          <Image
-              source={{uri: image.path}}
-          ></Image>
-      </View>
-    )
-  }  
+  } 
+
+  const renderItemPost = ({item}: renderItemPostProp) => (<PostList infoPostItem = {item} infoPostList = {infoPost} setInfoPost = {setInfoPost} segments={[]}></PostList>)
   
   return (  
     <ScrollView>  
@@ -138,50 +201,7 @@ export default function TabOneScreen() {
               onBlur={toogleExpand}
               onFocus={toogleExpand}
               multiline={true}
-            ></TextInput> 
-            <ScrollView style={styles.scrollViewForPreviewImage}>
-              <View style={styles.scrollViewForPreviewImageCustomize}>
-                <Image 
-                  source={{ uri: image || defaultPrizzaImage}}
-                  style={styles.imagePreview}
-                ></Image> 
-              </View>
-              <View style={styles.scrollViewForPreviewImageCustomize}>
-                <Image 
-                  source={{ uri: image || defaultPrizzaImage}}
-                  style={styles.imagePreview}
-                ></Image> 
-              </View>
-              {/* <AddPostNew
-                newImages={listImage} 
-              ></AddPostNew> */}
-              {/* <Carousel
-                  data={listImage}
-                  renderItem={renderItem}
-                  onSnapToItem={(index) => console.log(index)}
-                  sliderWidth={400}
-                  itemWidth={400}
-                  vertical={false}
-              ></Carousel> */} 
-              <FlatList
-                data={listImage}
-                renderItem={({item}) => {
-                  console.log(item.path, 'ok')
-                  return(
-                    <View style={styles.scrollViewForPreviewImageCustomize}>
-                      <Image 
-                        source={{ uri: item.path || defaultPrizzaImage}}
-                        style={styles.imagePreview}
-                      ></Image> 
-                    </View>
-                  )
-                }
-                } 
-                // snapToAlignment='center'
-                // showsHorizontalScrollIndicator={false}
-                horizontal
-              ></FlatList>
-            </ScrollView>
+            ></TextInput>  
           </View>
           <View>
             <FontAwesome5 
@@ -194,13 +214,13 @@ export default function TabOneScreen() {
               name='paper-plane' 
               size={30} 
               style={styles.choosePostImage} 
-              // onPress={pickImage}
+              onPress={pickImage}
             ></FontAwesome>  
           </View>
         </View>  
         <FlatList
-          data={products}
-          renderItem={renderItemProduct}
+          data={infoPost}
+          renderItem={renderItemPost}
           numColumns={1}
           // contentContainerStyle={{gap: 10}}
           // columnWrapperStyle={{gap: 10}}
@@ -247,8 +267,7 @@ const styles = StyleSheet.create({
     // justifyContent: "flex-start",
     // alignItems: "flex-start",
     // marginHorizontal: 10,
-    marginVertical: 5,
-    
+    marginVertical: 5, 
   },
   expandInputPostInfo: {
     height: 120,

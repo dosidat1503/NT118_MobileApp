@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { Platform, StyleSheet, TextInput } from 'react-native';  
 import { Text, View, Image } from 'react-native';
-import { defaultPrizzaImage } from '@/components/ProductListItem';
+import { defaultPrizzaImage } from '@/components/PostList';
 import { Stack } from 'expo-router';
 import Button from '@/components/Button';
 import * as ImagePicker from 'expo-image-picker'

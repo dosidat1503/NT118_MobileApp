@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, View, Text, Image, TouchableOpacity  } from 'react-native';
-import ProductListItem from '@components/ProductListItem'; 
+import ProductListItem from '@/components/PostList'; 
 import products from '@assets/data/products';
 import { Product } from '@/types';
 import Button from '@/components/Button';

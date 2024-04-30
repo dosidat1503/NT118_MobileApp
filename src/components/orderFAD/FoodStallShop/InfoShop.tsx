@@ -1,7 +1,7 @@
 import { View, TextInput, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/ProductListItem";
+import { defaultPrizzaImage } from "@/components/PostList";
 import { Link } from "expo-router";
 import { useNavigation } from '@react-navigation/native'; 
 

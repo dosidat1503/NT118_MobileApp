@@ -1,6 +1,6 @@
 import { View, Text, Image, StyleSheet, ScrollView, Pressable, TouchableOpacity } from "react-native"; 
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/ProductListItem";
+import { defaultPrizzaImage } from "@/components/PostList";
 import AdjustQuantity from "../../../app/(user)/orderFoodAndDrink/AdjustQuantity";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { color } from "react-native-elements/dist/helpers";

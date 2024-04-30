@@ -1,8 +1,8 @@
 import { FlatList, StyleSheet, View, Text, Image, Pressable } from 'react-native';
-import ProductListItem from '@components/ProductListItem'; 
+import ProductListItem from '@/components/PostList'; 
 import products from '@assets/data/products';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { defaultPrizzaImage } from '@components/ProductListItem';
+import { defaultPrizzaImage } from '@/components/PostList';
 import { useState } from 'react';
 import Button from '@/components/Button';
 import { useCartContext } from '@/providers.tsx/CartProvider';
