@@ -154,7 +154,7 @@ const index = () => {
             <FontAwesome5 name="sign-in-alt" size={widthScreen * 0.03} color="white" />
         {/* </Link> */}
           </Button> 
-        <Link href={'/signUpSuccess'} asChild>
+        <Link href={'/signUp'} asChild>
           <View style={{flexDirection: 'row', alignItems: "center"}}>
             <Text
               style={{

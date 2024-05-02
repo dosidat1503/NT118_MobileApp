@@ -7,6 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { CheckBox } from 'react-native-elements'; 
 import axios from 'axios';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useNavigation } from 'expo-router';
 // import index from '.';
 
 function index () {
@@ -37,9 +38,12 @@ function index () {
       email: '',
       phoneNumber: '',
       password: '',
+      repeatPassword: '',
       birthday: '2000-01-01',
       gender: 0
     });
+
+    const navigation = useNavigation();
 
     const handleInputInfo = (key: string, value: any) => {
         if(key !== "gender") {
@@ -76,6 +80,10 @@ function index () {
         }
 
         axios.post(baseURL + '/signup', signUpInfo)
+        .then((response) => {
+          console.log(response.data);
+          navigation.navigate('signUpSuccess');
+        })
 
         console.log('Đăng ký thành công!', signUpInfo);
     };
@@ -128,8 +136,8 @@ function index () {
         <TextInput
             style={styles.input}
             placeholder="Nhập lại mật khẩu"
-            onChangeText={text => handleInputInfo('password', text)}
-            value={signUpInfo.password}
+            onChangeText={text => handleInputInfo('repeatPassword', text)}
+            value={signUpInfo.repeatPassword}
         />
         <DateTimePicker
           value={signUpInfo.birthday}

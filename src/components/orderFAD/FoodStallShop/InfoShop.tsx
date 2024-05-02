@@ -4,6 +4,7 @@ import { useCartContext } from "@/providers.tsx/CartProvider";
 import { defaultPrizzaImage } from "@/components/PostList";
 import { Link } from "expo-router";
 import { useNavigation } from '@react-navigation/native'; 
+import { useEffect } from "react";
 
 export default function InfoShop({infoShop}: {infoShop: any}) {
     const { heightScreen, widthScreen } = useCartContext();
@@ -11,6 +12,10 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
     const heightInfoShop = heightScreen * 0.08; 
     const avatarSize = heightScreen * 0.05;
     const navigation = useNavigation(); 
+
+    useEffect(() => {
+        console.log(infoShop, "infoShop")
+    }, [])
 
     const styles = StyleSheet.create({  
         infoShopDivContainer: {
@@ -80,13 +85,13 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                 {/* avatar & name shop */}
                 <View style={styles.infoShopItem}>
                     <Image
-                        source={{uri: infoShop.avatar}}
+                        source={{uri: infoShop.AVT_IMAGE_URL}}
                         style={styles.avatar}
                     />
                     <Text
                         style={styles.nameShopText}
                     >
-                        {infoShop.name}
+                        {infoShop.SHOP_NAME}
                     </Text>
                 </View> 
 
@@ -115,7 +120,27 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                     />
                     <Text
                         style={styles.address}
-                    >{infoShop.address}</Text>
+                    >
+                        {
+                            Object.keys(infoShop).length !== 0 ? 
+                                infoShop.ADDRESS.DETAIL + ", " +
+                                infoShop.ADDRESS.COMMUNE + ", " +
+                                infoShop.ADDRESS.DISTRICT + ", " +
+                                infoShop.ADDRESS.PROVINCE
+                            : ""
+                        }
+                    </Text>
+                </View> 
+
+                {/* address shop */}
+                <View style={styles.infoShopItem}>
+                    <FontAwesome5
+                        name="phone-square-alt"
+                        style={styles.star}
+                    />
+                    <Text
+                        style={styles.address}
+                    >{infoShop.PHONE}</Text>
                 </View> 
             </View>
         </View>
