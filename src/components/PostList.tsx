@@ -65,7 +65,7 @@ const PostList = ({infoPostItem, infoPostList, setInfoPost } : PostListProps) =>
           <View style={ styles.postHeaderLeft }>
             <Image
               style={ styles.image_avatar }
-              source={{ uri: defaultPrizzaImage}} 
+              source={{ uri: infoPostItem.user.avatarImage}} 
             ></Image>  
             <View style={styles.postHeaderCenter}>
               <Text style={styles.postHeaderCenterName} >{infoPostItem.user.Name}</Text>

@@ -11,7 +11,7 @@ export default function SlideHeaderOrderFAD({products}: { products: any[] }) {
             // style={[styles.containerItemImage]}
           >
             <Image
-              source= {{uri: item.image}}
+              source= {{uri: item.image}} 
               style={{
                 height: heightSlideProductImage,
                 width: widthScreen,

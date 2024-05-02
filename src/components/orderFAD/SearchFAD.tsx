@@ -67,7 +67,7 @@ export default function SearchFAD() {
                     ></FontAwesome5>
                 </TouchableOpacity>
                 <TextInput 
-                    placeholder='Bạn đang thèm gì nào?'
+                    placeholder='Bạn muốn ăn gì?'
                     style={styles.searchFADInput}
                     onSubmitEditing={handleSearch}
                 ></TextInput>

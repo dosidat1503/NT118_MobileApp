@@ -11,7 +11,7 @@ import { SelectList } from 'react-native-dropdown-select-list';
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { filters } from './filter'; 
 import CartProvider, { useCartContext } from "@/providers.tsx/CartProvider";
-import ImagePicker from "react-native-customized-image-picker";
+// import ImagePicker from "react-native-customized-image-picker";
 import { launchImageLibrary } from "react-native-image-picker";
 // import { CameraRoll } from "react-native";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
@@ -145,16 +145,7 @@ export default function AddPost() {
     const [expandInputPostInfo, setExpandInputPostInfo] = useState(false)
     const [topicSelectedToPost, setTopicSelectedToPost] = useState("") 
     const [image, setImage] = useState<object | null>(null)
-    const listImage = [
-      {
-        path: "https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/362676453_1451519459020293_1570629234986068265_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_ohc=Ydzp2GBckqsAb4Ax32p&_nc_ht=scontent.fsgn19-1.fna&oh=00_AfDTS0yYoppNQlNkdtp5elKN9tFpaXtSFkfA7iboi0HCxQ&oe=662C2BFD"
-      },
-      {
-        path: 'https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/362676453_1451519459020293_1570629234986068265_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_ohc=Ydzp2GBckqsAb4Ax32p&_nc_ht=scontent.fsgn19-1.fna&oh=00_AfDTS0yYoppNQlNkdtp5elKN9tFpaXtSFkfA7iboi0HCxQ&oe=662C2BFD'
-      },
-      {
-        path: 'https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/362676453_1451519459020293_1570629234986068265_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=5f2048&_nc_ohc=Ydzp2GBckqsAb4Ax32p&_nc_ht=scontent.fsgn19-1.fna&oh=00_AfDTS0yYoppNQlNkdtp5elKN9tFpaXtSFkfA7iboi0HCxQ&oe=662C2BFD'
-      },
+    const listImage = [ 
       {
         path: defaultPrizzaImage
       },
@@ -293,7 +284,7 @@ export default function AddPost() {
                 ]}> 
                     <Image
                         style={ styles.image }
-                        source={{ uri: defaultPrizzaImage}} 
+                        source={require('@assets/images/avatar.jpg')}
                     ></Image> 
                     <View style={styles.createPostCenterContainer}> 
                         <View style={{ 

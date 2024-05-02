@@ -101,7 +101,7 @@ export default function TabOneScreen() {
               ID: item.POST_ID,
               time: item.TIME,
               content: item.CONTENT,
-              image: response.data.infoAvatarImage[index].URL,
+              image: response.data.infoPostImage[index].URL,
               likeQuantity: response.data.infoPost[index].LIKE_QUANTITY,
             },
             interact: {
@@ -119,7 +119,7 @@ export default function TabOneScreen() {
   }, [])
 
   useEffect(() => {
-    console.log(infoPost)
+    console.log(infoPost, 'infoPost')
   }, [infoPost])
 
   const importDataFromFilters = () => { 
@@ -170,7 +170,7 @@ export default function TabOneScreen() {
         <View style={ [styles.createPost, expandInputPostInfo && styles.expandInputPostInfoContainer]}> 
           <Image
             style={ styles.image }
-            source={{ uri: defaultPrizzaImage}} 
+            source={require('@assets/images/avatar.jpg')}
           ></Image> 
           <View style={styles.createPostCenterContainer}>  
             {importDataFromFilters()}
