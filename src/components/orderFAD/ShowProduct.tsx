@@ -13,7 +13,7 @@ export default function ShowProduct({products}: {products: any[]}) {
         return( 
             // <Link href="/(user)/orderFoodAndDrink/FoodStallShop" asChild> 
             <TouchableOpacity 
-                onPress={() => navigation.navigate('FoodStallShop', { item })}
+                onPress={() => navigation.navigate('DetailInfoOfFAD', { item })}
             >   
                 <View style={styles.FADCategoryContainer}>
                     <Image

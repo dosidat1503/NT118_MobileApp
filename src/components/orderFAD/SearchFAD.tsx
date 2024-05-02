@@ -1,6 +1,7 @@
-import { View, TextInput, StyleSheet } from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { View, TextInput, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { useCartContext } from "@/providers.tsx/CartProvider";
+import { Link, Stack, useNavigation } from "expo-router";
 
 
 export default function SearchFAD() {
@@ -43,17 +44,32 @@ export default function SearchFAD() {
             justifyContent: 'center'
         },
     })
+
+    const navigation = useNavigation();
+
+    const handleSearch = () => {
+        navigation.navigate('ShowFADSearchInfo')
+    }
     return(
     // {/* input search bạn muốn ăn gì */}
-        <View style={styles.searchFADDivContainer}>
+        <View style={styles.searchFADDivContainer}> 
             <View style={styles.searchFADContainer}>
-                <FontAwesome5 
-                name="search" 
-                style={styles.searchFADIcon}
-                ></FontAwesome5>
+                <TouchableOpacity
+                    onPress={handleSearch}
+                    style={{
+                        flexDirection: 'row', 
+                        alignItems: "center"
+                    }}
+                >
+                    <FontAwesome5 
+                        name="search" 
+                        style={styles.searchFADIcon}
+                    ></FontAwesome5>
+                </TouchableOpacity>
                 <TextInput 
-                placeholder='Bạn đang thèm gì nào?'
-                style={styles.searchFADInput}
+                    placeholder='Bạn đang thèm gì nào?'
+                    style={styles.searchFADInput}
+                    onSubmitEditing={handleSearch}
                 ></TextInput>
             </View>
         </View>

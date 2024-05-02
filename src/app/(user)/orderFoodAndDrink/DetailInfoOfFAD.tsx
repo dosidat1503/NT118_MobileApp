@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Link, Stack } from "expo-router";
 import Colors from "@/constants/Colors"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect } from "react";
+import { useEffect } from "react"; 
 
 
 type RootStackParamList = {
@@ -198,9 +198,7 @@ export default function DetailInfoOfFAD() {
             fontWeight: 'bold',
             textAlign: 'center',
         },
-    })
-
-    
+    }) 
 
     const [orderInfoOfItem, setOrderInfoOfItem] = useState<OrderInfo>({
         id: product.id,
@@ -219,6 +217,12 @@ export default function DetailInfoOfFAD() {
         isCheckedForPayment: true,
         totalOfItem: 0
     })
+
+    // useEffect(() => {
+    //     const route = useRoute();
+    //     const { item } = route.params;
+    //     console.log(item, "item")
+    // }, [])
 
     useEffect(() => {
         const totalOfTopping = orderInfoOfItem.toppings.reduce((total, item) => total + item.price * item.quantity, 0);

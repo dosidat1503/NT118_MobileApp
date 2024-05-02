@@ -163,7 +163,7 @@ export default function AddPost() {
       } 
     ] 
     const dataToSelectTopic = [
-        {key:'1', value:'Chọn chủ đề', disabled:true},
+        // {key:'1', value:'Chọn chủ đề', disabled:true},
         // {key:'2', value: filters[1].list[0].name},
         // {key:'3', value:'Cameras'},
         // {key:'4', value:'Computers', disabled:true},
@@ -321,10 +321,10 @@ export default function AddPost() {
                                         setSelected={() => {setInfoAddPost({...infoAddPost, topic: topicSelectedToPost})}}
                                         data={dataToSelectTopic}
                                         placeholder='Chọn chủ đề'
-                                        defaultOption={dataToSelectTopic[0]}
+                                        defaultOption={{key:'1', value:'Chọn chủ đề', disabled:true}}
                                         boxStyles={{ 
                                             paddingVertical: heightScreen * 0.006,
-                                            paddingHorizontal: widthScreen * 0.01,
+                                            paddingHorizontal: widthScreen * 0.04,
                                             borderColor: "#89CFF0",
                                             marginBottom: heightScreen * 0.0005, 
                                         
@@ -336,7 +336,7 @@ export default function AddPost() {
                                             paddingTop: 0,
                                             marginTop: 2, 
                                         }} 
-                                        
+                                        search={false}
                                     ></SelectList>
                                 </View>
                             </View>

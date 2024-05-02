@@ -286,7 +286,7 @@ export default function Filter() {
                     </View> 
                 ))
             }  
-            <View
+            {/* <View
                 style={{ marginTop: heightScreen * 0.4, backgroundColor: mainColor }}
             >
                 <TouchableOpacity
@@ -294,7 +294,7 @@ export default function Filter() {
                 > 
                     <Text>áp dụng</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
         </View>
     )
 }

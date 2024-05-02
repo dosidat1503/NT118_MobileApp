@@ -23,6 +23,7 @@ type CartType = {
     setTextQueryPost: any,
     orderStatusList: any,
     userID: number,
+    FADShop_ID: number,
 }
 
 const CartContext = createContext<CartType>({
@@ -45,6 +46,7 @@ const CartContext = createContext<CartType>({
     setTextQueryPost: () => {},
     orderStatusList: [],
     userID: 0,
+    FADShop_ID: 0,
 });
 
 const CartProvider = ({children} : PropsWithChildren) => {
@@ -79,9 +81,9 @@ const CartProvider = ({children} : PropsWithChildren) => {
     const phoneNumberPattern = /^0\d{9}$/
     const fullNamePattern = /^[\p{L}\s]+$/u
     const defaultImageID = '1_6_1702549349'
-    const [textQueryPost, setTextQueryPost] = useState("")
-
+    const [textQueryPost, setTextQueryPost] = useState("") 
     const [userID, setUserID] = useState(0)
+    const [FADShop_ID, setFADShop_ID] = useState(0)
     
     const products = [
         {
@@ -188,7 +190,8 @@ const CartProvider = ({children} : PropsWithChildren) => {
             itemListInCart, setItemListInCart,
             baseURL, emailPattern, phoneNumberPattern, fullNamePattern, // Fix: Update the type of emailPattern to string
             defaultImageID, textQueryPost, setTextQueryPost,
-            orderStatusList, userID, setUserID
+            orderStatusList, userID, setUserID,
+            setFADShop_ID, FADShop_ID
         }}> 
             {children}
         </CartContext.Provider>
