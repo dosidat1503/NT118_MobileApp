@@ -51,7 +51,7 @@ function RootLayoutNav() {
   const Stack2 = createStackNavigator();
 
   return (
-    <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <CartProvider>
         <Stack>
           <Stack.Screen name="(user)" options={{ headerShown: false }} />
@@ -69,6 +69,6 @@ function RootLayoutNav() {
           </Stack2.Navigator>
         </NavigationContainer> */}
       </CartProvider>
-    </ThemeProvider>
+    </ThemeProvider >
   );
 }

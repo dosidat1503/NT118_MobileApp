@@ -1,4 +1,5 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { Link, Tabs } from 'expo-router';
 import { Pressable, useColorScheme } from 'react-native';
 
@@ -12,6 +13,13 @@ function TabBarIcon(props: {
   color: string;
 }) {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+}
+
+function TabBarIcon1(props: {
+  name: React.ComponentProps<typeof FontAwesome5>['name'];
+  color: string;
+}) {
+  return <FontAwesome5 size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -28,26 +36,35 @@ export default function TabLayout() {
       }}>
 
       {/* Tab.Screen dưới đây có tác dụng ẩn đi tab bị dư ra*/}
-      <Tabs.Screen 
-        name='index' 
-        options={{href: null}}
+      <Tabs.Screen
+        name='index'
+        options={{ href: null }}
       ></Tabs.Screen>
 
       <Tabs.Screen
-        name="menu" //Trỏ vào folder menu
+        name="home"
         options={{
-          title: 'Menu',
+          title: 'Restaurant',
           headerShown: false,
-          tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
-          
+          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+
         }}
       />
-      
+
       <Tabs.Screen
-        name="two"
+        name="order"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Orders',
+          tabBarIcon: ({ color }) => <TabBarIcon1 name="box" color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="user"
+        options={{
+          title: 'User',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
       />
     </Tabs>
