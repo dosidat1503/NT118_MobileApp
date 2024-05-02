@@ -35,7 +35,6 @@ export default function TabLayout() {
         }
       }}>
 
-      {/* Tab.Screen dưới đây có tác dụng ẩn đi tab bị dư ra*/}
       <Tabs.Screen
         name='index'
         options={{ href: null }}
