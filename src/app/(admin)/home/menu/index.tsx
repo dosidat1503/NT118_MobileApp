@@ -7,6 +7,8 @@ import {
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
 import { useFonts } from 'expo-font';
+import { router } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ShopScreen() {
   const [fontsLoaded] = useFonts({
@@ -14,10 +16,85 @@ export default function ShopScreen() {
     Roboto_500Medium,
     Roboto_700Bold,
   });
+  const navigation = useNavigation();
   return (
     <View style={styles.homeContainer}>
-      <Text>This is shop screen
-      </Text>
+      <View style={styles.headerBar}>
+        <Pressable
+          onPress={() => router.back()} // Navigate back to the previous screen
+          style={{ padding: 10 }} // Add padding to make the button easier to press
+        >
+          <View style={styles.backButton}>
+            <FontAwesome name="angle-left" size={24} color="white" />
+          </View>
+        </Pressable>
+        <Text>Thêm món ăn</Text>
+      </View>
+
+      <View>
+        <View>
+          <Text>Có sẵn</Text>
+        </View>
+        <View>
+          <Text>Số liệu</Text>
+        </View>
+      </View>
+
+      <View>
+        <Image source={require('../../../../../assets/images/wine-menu.png')} style={{ width: 40, height: 40 }} />
+
+        <Text>
+          Thiết lập thực đơn
+        </Text>
+
+        <Pressable
+          onPress={() => navigation.navigate('editMenu')}
+          style={{ padding: 10 }}
+        >
+          <View style={[styles.backButton, { opacity: 1 }]}>
+            <FontAwesome name="angle-right" size={24} color="white" />
+          </View>
+        </Pressable>
+      </View>
+
+      <View>
+        <View>
+          <Text>Các món chính</Text>
+        </View><View>
+          <Text>Tuỳ chọn nhóm</Text>
+        </View>
+      </View>
+
+      <View>
+        <View>
+          <Text>Menu <Text style={{ marginLeft: 10, color: "gray", fontSize: 12 }}>(2 danh mục)</Text></Text>
+
+          <Pressable>
+            <Text>Chọn</Text>
+          </Pressable>
+        </View>
+
+        <View>
+          <View>
+            <Text>Lẩu</Text>
+            <View>
+              <Text>
+                3 Món
+              </Text>
+              <FontAwesome name="angle-down" size={24} color="black" />
+            </View>
+          </View>
+          <View>
+            <Text>Ăn vặt</Text>
+            <View>
+              <Text>
+                3 Món
+              </Text>
+              <FontAwesome name="angle-down" size={24} color="black" />
+            </View>
+          </View>
+        </View>
+      </View>
     </View >
   );
 }
@@ -25,56 +102,26 @@ export default function ShopScreen() {
 const styles = StyleSheet.create({
   homeContainer: {
     backgroundColor: "#e0effa",
-    // marginHorizontal: "2%",
-    paddingHorizontal: 10,
     gap: 10,
     width: "100%",
     height: "100%"
-  }
-  ,
-  homeTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 10
   },
-  summaryContainer: {
-    paddingTop: 10,
-    paddingBottom: 20,
-    borderRadius: 10,
-    justifyContent: "center"
-  },
-  serviceContainer: {
+  headerBar: {
+    height: "12%",
     backgroundColor: "white",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 10,
-    marginTop: 10,
-    marginBottom: 10,
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: { width: 0, height: 20 }, // iOS shadow
-    shadowOpacity: 0.5, // iOS shadow
-    shadowRadius: 4, // iOS shadow
-    elevation: 20, // Android shadow
+    alignItems: "center",
+    display: "flex",
+    flexDirection: "row",
+    shadowColor: "#000",
   },
-  text: {
-    fontFamily: 'Helvetica'
-  },
-  income: {
-    backgroundColor: "blue",
-    // marginHorizontal: "2%",
-    paddingHorizontal: 20,
-    paddingVertical: 40,
-    gap: 10,
-    borderRadius: 25,
-    shadowColor: '#000', // iOS shadow
-    shadowOffset: { width: 0, height: 4 }, // iOS shadow
-    shadowOpacity: 0.3, // iOS shadow
-    shadowRadius: 4, // iOS shadow
-    elevation: 20, // Android shadow
-  },
-  category: { display: "flex", flexDirection: "column", alignItems: "center" }
-  , categoryText: {
-    fontFamily: "Roboto_500Medium"
+  backButton: {
+    backgroundColor: '#6495ed',
+    width: 30,
+    height: 30,
+    borderRadius: 15, // Makes the circle perfectly round
+    borderCurve: "continuous",
+    justifyContent: 'center',
+    alignItems: 'center',
+    opacity: 0.8, // A bit more opaque to ensure visibility
   }
 });

@@ -14,9 +14,9 @@ export default function SaleStack() {
         }}
       />
       <Stack.Screen
-        name="createPizza"
+        name="editMenu"
         options={{
-          title: 'Food creation',
+          title: 'Thiết lập thực đơn',
           headerShown: false
         }}
       >

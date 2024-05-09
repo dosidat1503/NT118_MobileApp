@@ -1,8 +1,4 @@
 import { FlatList, StyleSheet, View, Text, Pressable, Image } from 'react-native';
-import ProductListItem from '@components/ProductListItem';
-import products from '@assets/data/products';
-import { Product } from '@/types';
-import Button from '@/components/Button';
 import AvatarExample from '@/components/Avartar';
 import { FontAwesome, FontAwesome5, Entypo } from '@expo/vector-icons';
 import {
@@ -13,11 +9,12 @@ import {
 import Colors from '@/constants/Colors';
 import { useFonts } from 'expo-font';
 import { Link, useNavigation } from 'expo-router';
+import HeaderBar from '@/components/HeaderBar';
 
 // front end coded by BangBui
-export default function TabOneScreen({ navigation }) {
+export default function TabOneScreen() {
   // const renderItemProduct = ({ item }) => <ProductListItem product={item}></ProductListItem>
-  // const navigation = useNavigation();
+  const navigation = useNavigation();
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
     Roboto_500Medium,
@@ -25,20 +22,7 @@ export default function TabOneScreen({ navigation }) {
   });
   return (
     <View style={styles.homeContainer}>
-      <View style={styles.homeTop}>
-        <AvatarExample></AvatarExample>
-        <Pressable>
-          {({ pressed }) => (
-            <FontAwesome
-              name="bell"
-              size={25}
-              color={Colors.light.tint}
-              style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-            />
-          )}
-        </Pressable>
-      </View>
-
+      <HeaderBar />
       <View style={styles.summaryContainer}>
         <Text style={{ fontSize: 30, fontWeight: "800" }}>Doanh thu</Text>
         <View style={styles.income}>
@@ -67,7 +51,7 @@ export default function TabOneScreen({ navigation }) {
             <Text style={styles.categoryText}>Cửa hàng</Text>
           </View>
           <View style={styles.category}>
-            <Pressable onPress={() => { navigation.navigate("") }}>
+            <Pressable onPress={() => { navigation.navigate("menu") }}>
               <View style={{ backgroundColor: "#f1f3f2", width: 70, height: 70, borderRadius: 40, justifyContent: "center", alignItems: "center" }}>
                 <Image source={require('../../../../assets/images/bar.png')} style={{ height: 40, width: 40 }} />
               </View>
