@@ -1,15 +1,21 @@
-import { View, Text, StyleSheet, TextInput, ImageBackground, TouchableOpacity } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import Button from '../components/Button';
-import { Link, Redirect, Stack, useNavigation } from 'expo-router';
-import { useCartContext } from '@/providers.tsx/CartProvider';
-import { CheckBox } from 'react-native-elements';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { FontAwesome5 } from '@expo/vector-icons';
-import axios from 'axios';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import Button from "../components/Button";
+import { Link, Redirect, Stack, useNavigation } from "expo-router";
+import { useCartContext } from "@/providers.tsx/CartProvider";
+import { CheckBox } from "react-native-elements";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FontAwesome5 } from "@expo/vector-icons";
+import axios from "axios";
 
 const index = () => {
-
   const { heightScreen, widthScreen, mainColor, baseURL } = useCartContext();
   const styles = StyleSheet.create({
     divContainer: {
@@ -20,25 +26,24 @@ const index = () => {
       // backgroundImage: "url('https://www.w3schools.com/css/img_lights.jpg')"
     },
     input: {
-      width: '90%',
+      width: "90%",
       height: heightScreen * 0.06,
       borderRadius: widthScreen * 0.02,
-      borderColor: 'gray',
+      borderColor: "gray",
       borderWidth: 1,
       marginTop: 10,
       paddingHorizontal: 10,
-      backgroundColor: 'white'
+      backgroundColor: "white",
     },
-
-  })
-  const [signInInfo, setSignInInfo] = useState({
-    email: '',
-    password: '',
   });
   const [signInInfo, setSignInInfo] = useState({
     email: "",
     password: "",
   });
+  // const [signInInfo, setSignInInfo] = useState({
+  //   email: "",
+  //   password: "",
+  // });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [rememberPassword, setRememberPassword] = useState(false);
@@ -62,23 +67,21 @@ const index = () => {
   };
 
   const handleRememberPassword = () => {
-    AsyncStorage.setItem('rememberPassword', JSON.stringify(!rememberPassword));
+    AsyncStorage.setItem("rememberPassword", JSON.stringify(!rememberPassword));
     setRememberPassword(!rememberPassword);
-  }
+  };
 
   const handleLogin = () => {
-
-    axios.post(baseURL + '/signin', signInInfo)
+    axios
+      .post(baseURL + "/signin", signInInfo)
       .then((response) => {
-
         console.log(response.data);
         if (response.data.statusCode === 200) {
-          AsyncStorage.setItem('token', response.data.token);
-          AsyncStorage.setItem('user', JSON.stringify(response.data.user));
+          AsyncStorage.setItem("token", response.data.token);
+          AsyncStorage.setItem("user", JSON.stringify(response.data.user));
           setIsLoggedIn(true);
-          navigation.navigate('(user)', { replace: true });
+          navigation.navigate("(user)", { replace: true });
         }
-
       })
       .catch((error) => {
         console.log(error);
@@ -87,20 +90,26 @@ const index = () => {
 
   // return (
   // <View style={{ flex: 1, justifyContent: 'center'}}>
-  {/* <Link href={'/(user)'} asChild>
+  {
+    /* <Link href={'/(user)'} asChild>
         <Button text="User" />
-      </Link> */}
-  {/* <Link href={'/(admin)'} asChild>
+      </Link> */
+  }
+  {
+    /* <Link href={'/(admin)'} asChild>
         <Button text="Admin" />
       </Link> 
       <Link href={'/(authentication)'} asChild>
         <Button text="Authentication" />
-      </Link>  */}
-  {/* <View>Trang đăng nhập</View>
-    </View> */}
+      </Link>  */
+  }
+  {
+    /* <View>Trang đăng nhập</View>
+    </View> */
+  }
   // );
   return (
-    <Redirect href={'/(admin)'}></Redirect>
+    <Redirect href={"/(admin)"}></Redirect>
     // <View style={styles.divContainer}>
     //   <Stack.Screen options={{ headerShown: false }} />
     //   <ImageBackground
