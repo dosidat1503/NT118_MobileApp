@@ -18,41 +18,39 @@ export default function editMenu() {
         <Text>Thiết lập thực đơn</Text>
       </View>
 
-      <View>
-        <View>
+      <View style={styles.whiteContainer}>
+        <View style={styles.containerItem}>
+          <Text style={styles.buttonText}>Các món chính</Text>
+        </View ><View style={styles.containerItem}>
+          <Text style={styles.buttonText}>Tuỳ chọn nhóm</Text>
+        </View>
+      </View>
+
+
+      <View style={styles.menuList}>
+        <View style={styles.row}>
           <Text>Menu <Text style={{ marginLeft: 10, color: "gray", fontSize: 12 }}>(2 danh mục)</Text></Text>
 
           <Pressable>
             <Text>Chọn</Text>
           </Pressable>
         </View>
-
-        <View>
+        <View style={styles.menuRow}>
+          <Text>Lẩu</Text>
           <View>
-            <Text>Các món chính</Text>
-          </View><View>
-            <Text>Tuỳ chọn nhóm</Text>
+            <Text>
+              3 Món
+            </Text>
+            <FontAwesome name="angle-down" size={24} color="black" />
           </View>
         </View>
-
-        <View>
+        <View style={styles.menuRow}>
+          <Text>Ăn vặt</Text>
           <View>
-            <Text>Lẩu</Text>
-            <View>
-              <Text>
-                3 Món
-              </Text>
-              <FontAwesome name="angle-down" size={24} color="black" />
-            </View>
-          </View>
-          <View>
-            <Text>Ăn vặt</Text>
-            <View>
-              <Text>
-                3 Món
-              </Text>
-              <FontAwesome name="angle-down" size={24} color="black" />
-            </View>
+            <Text>
+              3 Món
+            </Text>
+            <FontAwesome name="angle-down" size={24} color="black" />
           </View>
         </View>
       </View>
@@ -75,6 +73,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     shadowColor: "#000",
   },
+  whiteContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  containerItem: {
+    flex: 0.5,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 35,
+    borderRadius: 10,
+    marginHorizontal: 10,
+    backgroundColor: "white",
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "bold",
+  }
+  ,
   backButton: {
     backgroundColor: '#6495ed',
     width: 30,
@@ -84,5 +102,30 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     opacity: 0.8, // A bit more opaque to ensure visibility
+  },
+  menuList: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    marginVertical: 20,
+    justifyContent: "space-between",
+    width: "100%",
   }
+  ,
+  menuRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 10,
+    backgroundColor: "white",
+  },
 });
