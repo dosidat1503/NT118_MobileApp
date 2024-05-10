@@ -2,7 +2,7 @@ import { Redirect } from "expo-router";
 import { StyleSheet } from "react-native";
 
 export default function TabIndex() {
-    return <Redirect href={'/(admin)/home/menu/editMenu'}></Redirect>
+    return <Redirect href={'/(admin)/home'}></Redirect>
 }
 
 const styles = StyleSheet.create({

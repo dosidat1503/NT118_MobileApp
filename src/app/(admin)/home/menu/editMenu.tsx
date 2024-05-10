@@ -15,7 +15,12 @@ export default function editMenu() {
             <FontAwesome name="angle-left" size={24} color="white" />
           </View>
         </Pressable>
-        <Text>Thiết lập thực đơn</Text>
+        <Text style={{
+          textAlign: 'center',
+          flex: 1, // This allows it to expand to take full width
+          fontSize: 18,
+          fontWeight: 'bold',
+        }}>Thiết lập thực đơn</Text>
       </View>
 
       <View style={styles.whiteContainer}>
@@ -27,30 +32,51 @@ export default function editMenu() {
       </View>
 
 
-      <View style={styles.menuList}>
-        <View style={styles.row}>
-          <Text>Menu <Text style={{ marginLeft: 10, color: "gray", fontSize: 12 }}>(2 danh mục)</Text></Text>
+      <View>
+        <View style={(styles.paddingTotal, styles.pickMenuHeader)}>
+          <Text style={{ color: "black", fontWeight: "700" }}>
+            Menu{" "}
+            <Text style={{ marginLeft: 10, color: "gray", fontSize: 12 }}>
+              (3 danh mục)
+            </Text>
+          </Text>
 
           <Pressable>
-            <Text>Chọn</Text>
+            <Text style={{ color: "#709dee" }}>Chọn</Text>
           </Pressable>
         </View>
-        <View style={styles.menuRow}>
-          <Text>Lẩu</Text>
-          <View>
-            <Text>
-              3 Món
-            </Text>
-            <FontAwesome name="angle-down" size={24} color="black" />
+
+        <View style={styles.menuContainer}>
+          <View style={styles.menuRow}>
+            <View style={{ display: "flex", flexDirection: "column" }}>
+              <Text style={{ fontWeight: "700" }}>Lẩu</Text>
+              <Text style={{ color: "#6495ED" }}>Chỉnh sửa danh mục</Text>
+            </View>
+            <View style={styles.mealCount}>
+
+              <Text>3 Món</Text>
+              <FontAwesome name="angle-down" size={24} color="black" />
+            </View>
           </View>
-        </View>
-        <View style={styles.menuRow}>
-          <Text>Ăn vặt</Text>
-          <View>
-            <Text>
-              3 Món
-            </Text>
-            <FontAwesome name="angle-down" size={24} color="black" />
+          <View style={styles.menuRow}>
+            <View style={{ display: "flex", flexDirection: "column" }}>
+              <Text style={{ fontWeight: "700" }}>Ăn vặt</Text>
+              <Text style={{ color: "#6495ED" }}>Chỉnh sửa danh mục</Text>
+            </View>
+            <View style={styles.mealCount}>
+              <Text>3 Món</Text>
+              <FontAwesome name="angle-down" size={24} color="black" />
+            </View>
+          </View>
+          <View style={styles.menuRow}>
+            <View style={{ display: "flex", flexDirection: "column" }}>
+              <Text style={{ fontWeight: "700" }}>Thức uống</Text>
+              <Text style={{ color: "#6495ED" }}>Chỉnh sửa danh mục</Text>
+            </View>
+            <View style={styles.mealCount}>
+              <Text>3 Món</Text>
+              <FontAwesome name="angle-down" size={24} color="black" />
+            </View>
           </View>
         </View>
       </View>
@@ -91,6 +117,15 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 14,
     fontWeight: "bold",
+  },
+  pickMenuHeader: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 10,
+  },
+  paddingTotal: {
+    padding: 10,
   }
   ,
   backButton: {
@@ -103,29 +138,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     opacity: 0.8, // A bit more opaque to ensure visibility
   },
-  menuList: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  row: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    marginVertical: 20,
-    justifyContent: "space-between",
-    width: "100%",
-  }
-  ,
   menuRow: {
     display: "flex",
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingHorizontal: 10,
     backgroundColor: "white",
+    justifyContent: "space-between",
+    padding: 10,
+  },
+  mealCount: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
+  },
+  menuContainer: {
+    display: "flex",
+    gap: 10,
   },
 });
