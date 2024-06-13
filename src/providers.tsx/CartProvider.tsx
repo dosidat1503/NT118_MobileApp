@@ -17,13 +17,20 @@ type CartType = {
     baseURL: string,
     emailPattern: RegExp,
     phoneNumberPattern: RegExp,
-    fullNamePattern: RegExp,
-    defaultImageID: string,
+    fullNamePattern: RegExp, 
+    defaultImageID: number,
     textQueryPost: string,
     setTextQueryPost: any,
     orderStatusList: any,
     userID: number,
     FADShop_ID: number,
+    DetailInfoOfFAD: any,
+    setDetailInfoOfFAD: any,
+    isLoading: boolean,
+    setIsLoading: any,
+    RD: number, //rectangular diagonal 
+    orderID: number,
+    setOrderID: any,
 }
 
 const CartContext = createContext<CartType>({
@@ -37,16 +44,23 @@ const CartContext = createContext<CartType>({
     products: [],
     itemListInCart: [],
     setItemListInCart: () => {},
-    baseURL: "localhost:8000",
+    baseURL: "http://tcp.ap.ngrok.io:12841/api",
     emailPattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
     phoneNumberPattern: /^0\d{9}$/,
-    fullNamePattern: /^[\p{L}\s]+$/u,
-    defaultImageID: '1_6_1702549349',
+    fullNamePattern: /^[\p{L}\s]+$/u, 
+    defaultImageID: 1,
     textQueryPost: "",
     setTextQueryPost: () => {},
     orderStatusList: [],
     userID: 0,
-    FADShop_ID: 0,
+    FADShop_ID: 0, 
+    DetailInfoOfFAD: {},
+    setDetailInfoOfFAD: () => {},
+    isLoading: false,
+    setIsLoading: () => {},
+    RD: 0,
+    orderID: 1,
+    setOrderID: () => {}
 });
 
 const CartProvider = ({children} : PropsWithChildren) => {
@@ -76,14 +90,18 @@ const CartProvider = ({children} : PropsWithChildren) => {
     const widthScreen = Dimensions.get("window").width
     const heightScreen = Dimensions.get("window").height
     const mainColor = "#89CFF0"
-    const baseURL = "http://localhost:8000/api"
+    const baseURL = "http://tcp.ap.ngrok.io:12841/api"
     const emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
     const phoneNumberPattern = /^0\d{9}$/
     const fullNamePattern = /^[\p{L}\s]+$/u
-    const defaultImageID = '1_6_1702549349'
+    const defaultImageID = 1
     const [textQueryPost, setTextQueryPost] = useState("") 
     const [userID, setUserID] = useState(0)
     const [FADShop_ID, setFADShop_ID] = useState(0)
+    const [DetailInfoOfFAD, setDetailInfoOfFAD] = useState({} as any) // Fix: Update the type of DetailInfoOfFAD to any
+    const [isLoading, setIsLoading] = useState(false)
+    const RD = widthScreen * heightScreen;//rectangular diagonal
+    const [orderID, setOrderID] = useState(1) // Fix: Update the type of orderDetailID to number 
     
     const products = [
         {
@@ -191,7 +209,11 @@ const CartProvider = ({children} : PropsWithChildren) => {
             baseURL, emailPattern, phoneNumberPattern, fullNamePattern, // Fix: Update the type of emailPattern to string
             defaultImageID, textQueryPost, setTextQueryPost,
             orderStatusList, userID, setUserID,
-            setFADShop_ID, FADShop_ID
+            setFADShop_ID, FADShop_ID,
+            DetailInfoOfFAD, setDetailInfoOfFAD,
+            isLoading, setIsLoading, RD,
+            orderID, setOrderID
+
         }}> 
             {children}
         </CartContext.Provider>

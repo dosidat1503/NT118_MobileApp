@@ -11,7 +11,7 @@ import { useNavigation } from "expo-router";
 export default function FADShop({products}: {products: any}){
     const { heightScreen, widthScreen, baseURL, setFADShop_ID } = useCartContext();
 
-    const [FADShopList, setFADShopList] = useState([])
+    const [FADShopList, setFADShopList] = useState(products)
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -36,7 +36,7 @@ export default function FADShop({products}: {products: any}){
                 {/* <View> */}
                     <View style={{ flex: 4.5, width: "100%", justifyContent: "center", alignItems: "center"}}>
                         <Image
-                            source={{uri: item.IMAGE_URL}}
+                            source={{uri: item.SHOP_IMAGE_URL}}
                             style={styles.FADShopImage as ImageStyle} // Cast the style to ImageStyle
                         ></Image>
                     </View>
@@ -56,17 +56,19 @@ export default function FADShop({products}: {products: any}){
     }
     const styles = StyleSheet.create({ 
         FADShopImage: {
-            height: "100%", 
+            height: "90%", 
             width: "100%",
             aspectRatio: 1,
             marginVertical: 5,
+            paddingVertical: heightScreen * 0.03,
+            borderRadius: widthScreen * 0.03,
         },
         FADShopContainer: {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center', 
             alignContent: "center",
-            borderRadius: "10%",
+            borderRadius: widthScreen * 0.02,
             marginHorizontal: widthScreen * 0.01,
             backgroundColor: "#e6dedc",
             height: heightScreen * 0.15,
@@ -95,7 +97,7 @@ export default function FADShop({products}: {products: any}){
     return(
         <View style={styles.FADShopDivContainer}>
             <FlatList
-                data={FADShopList}
+                data={products}
                 renderItem={renderFADShop}
                 horizontal
                 showsHorizontalScrollIndicator

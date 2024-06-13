@@ -11,6 +11,7 @@ import TabOneScreen from './(user)/home';
 import TabLayout from './(user)/_layout';
 import { Component } from 'react';
 import Filter from './(user)/home/filter';
+import React from 'react';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -60,21 +61,14 @@ function RootLayoutNav() {
           <Stack>
             <Stack.Screen name="(user)" options={{ headerShown: false }} />
             <Stack.Screen name="(admin)" options={{ headerShown: false }} /> 
-            <Stack.Screen name="signUpSuccess" options={{ headerShown: false }} />
-            {/* <Stack.Screen name="filter"  options={{ headerShown: false }} component = {Filter}/> */}
-          </Stack>
-          {/* <NavigationContainer>
-            <Stack.Navigator> 
-              <Stack.Screen name="UserHome" component={TabOneScreen} />
-              <Stack.Screen name="(user)" component={TabLayout} options={{ headerShown: false }} /> */}
-              {/* <Stack.Screen name="userTest" component={TabLayout} options={{ headerShown: false }} /> */}
-              {/* <Stack.Screen name="(admin)" options={{ headerShown: false }} />
-              <Stack.Screen name="(authentication)" options={{ headerShown: false }} />
-              <Stack.Screen name="cart" options={{ presentation: 'modal' }} /> */}
-            {/* </Stack.Navigator>
-          </NavigationContainer> */}
+            <Stack.Screen name="signUp" options={{ headerShown: false }} />
+            <Stack.Screen name="signUpSuccess" options={{ headerShown: false }} /> 
+            {/* <Stack.Screen name="(user)/home/filter" options={{ headerShown: false }} />  */}
+             
+          </Stack> 
         </CartProvider>
       </ThemeProvider>
     </Fragment>
   );
 }
+

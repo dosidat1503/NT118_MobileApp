@@ -6,6 +6,7 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import { FindFilterAtHome } from "@/types"; 
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import axios from "axios";
+import React from "react";
 
 export default function SearchPost() {  
     const { baseURL, textQueryPost } = useCartContext();

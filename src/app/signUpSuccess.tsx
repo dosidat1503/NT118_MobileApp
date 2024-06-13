@@ -6,6 +6,7 @@ import Button from "./(user)/orderFoodAndDrink/Button";
 import { useNavigation } from "expo-router";
 import { StyleSheet } from "react-native";
 import { useCartContext } from "@/providers.tsx/CartProvider";
+import React from "react";
 
 export default function SignUpSuccess() {
 

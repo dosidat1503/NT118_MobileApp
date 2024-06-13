@@ -19,6 +19,12 @@ import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";  
 import LoadingDots from "react-native-loading-dots";
+import * as ImagePicker from 'expo-image-picker';
+import { color } from "react-native-elements/dist/helpers";
+import { uploadToFirebase } from '../../../firebase/index';
+import * as FileSystem from 'expo-file-system';
+import React, { useRef }  from "react";
+import Response from "@/app/(user)/Response";
 
 type changeIntervalTimeProps = {
     item: Date,
@@ -33,13 +39,24 @@ type renderFiltersListProps = {
  
 export default function AddPost() {   
 
-    const {widthScreen, heightScreen} = useCartContext();
+    const {widthScreen, heightScreen, userID, baseURL} = useCartContext();
     const widthAvatar = widthScreen * 0.12;
     const endContainer = widthScreen * 0.15;
     const widthCenterContainer = widthScreen - widthAvatar - endContainer;
     const [isSavingPost, setIsSavingPost] = useState(false);
+    const [image, setImage] = useState('');
+    const [response, setResponse] = useState('');
+    const [imageList, setImageList] = useState<string[]>([]);
+    const inputRef = useRef<TextInput>(null);
+    const [haveImage, setHaveImage] = useState(true)//chú ý là giá trị khởi đầu bằng true, đồng nghĩa với việc đăng bài sẽ có ảnh
+    const [showWarning, setShowWarning] = useState(false)
 
     const styles = StyleSheet.create({
+        container: {
+            flexDirection: 'row',
+            flexWrap: 'wrap', 
+            height: heightScreen,
+        },
         displayNone: {
             display: "none"
         },
@@ -63,7 +80,7 @@ export default function AddPost() {
             marginVertical: 5,
         },
         expandInputPostInfo: {
-            height: 120,
+            // height: 120,
             // marginBottom: 20,
             // paddingBottom: 20
         },
@@ -99,10 +116,11 @@ export default function AddPost() {
             borderColor: '#89CFF0',
             borderCurve: 'continuous',
             borderWidth: 1,
+            fontSize: widthScreen * heightScreen * 0.00005
         },
         scrollViewForPreviewImage: {
           height: heightScreen * 0.42,
-          width: '100%',
+          width: widthCenterContainer,
           // alignItems: "center"
           marginTop: 5,
           borderRadius: 20
@@ -112,10 +130,10 @@ export default function AddPost() {
           justifyContent: 'center'
         },
         imagePreview: {
-          width: '100%',
+          width: widthCenterContainer,
           height: heightScreen * 0.4,
           borderRadius: 10,
-          marginTop: 5, 
+          marginTop: 5,  
         },
         choosePostImage: {
           // width: '100%',
@@ -140,20 +158,18 @@ export default function AddPost() {
           }
         }
         getUserID();
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
     }, [])
+
+    useEffect( () => {
+        console.log('response', response)
+    }, [response])
     
     const [expandInputPostInfo, setExpandInputPostInfo] = useState(false)
-    const [topicSelectedToPost, setTopicSelectedToPost] = useState("") 
-    const [image, setImage] = useState<object | null>(null)
-    const listImage = [ 
-      {
-        path: defaultPrizzaImage
-      },
-      {
-        path: defaultPrizzaImage
-      } 
-    ] 
-    const dataToSelectTopic = [
+    const [topicSelectedToPost, setTopicSelectedToPost] = useState("")   
+    const dataToSelectTopic: {}[] = [
         // {key:'1', value:'Chọn chủ đề', disabled:true},
         // {key:'2', value: filters[1].list[0].name},
         // {key:'3', value:'Cameras'},
@@ -165,14 +181,12 @@ export default function AddPost() {
     const [infoAddPost, setInfoAddPost] = useState({
         topic: topicSelectedToPost,
         content: '',
-        imageID: "1_6_1702549349",
-        userID: 5, 
+        imageList: [],
+        userID: userID, 
     })
  
-    const importDataFromFilters = () => {
-    
-        filters[1].list.forEach((item, index) => {
-            console.log(index, 'ok')
+    const importDataFromFilters = () => { 
+        filters[1].list.forEach((item, index) => { 
             return(
               dataToSelectTopic.push({
                 key: `${index + 2}`,
@@ -189,85 +203,141 @@ export default function AddPost() {
         // setExpandInputPostInfo(!expandInputPostInfo)
     }
     
-    const pickImage = async () => {  
-        console.log('ok123')
-        // CameraRoll.getPhotos({
-        //     first: 20,
-        //     assetType: 'Photos',
-        // })
-        // .then(r => {
-        //   this.setState({ photos: r.edges });
-        // })
-        // .catch((err) => {
-        //    console.log(err)
-        // });
-        // let getImage = await ImagePickerIOS.openPicker({
-        //   multiple: true,
-        //   maxFiles: 10,
-        //   mediaType: 'photo'
-        // })
-        // .then((images: any[]) => {
-        //   images.forEach((image) => {
-        //     console.log(image)
-        // });
-
-
-
-        // }).catch((error: any) => {
-        //   alert(JSON.stringify(error));
-        // });
-        // for(let i = 0; i < 10; i++){ 
-        // const result = await launchImageLibrary({
-        //     mediaType: "photo"
-        // });
-        // }
-        // console.log(result, 'ok')
-
-        // try {
-        //     const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
-        //     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        //       console.log("Camera permission given");
-        //       const result:any = await launchImageLibrary({mediaType:'photo'})
-        //       setImg(result.assets[0].uri);
-        //     } else {
-        //       console.log("Camera permission denied");
-        //     }
-        //   } catch (err) {
-        //     console.warn(err);
-        //   }
-
-        let image = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 1,
-        });
-    } 
-
-    const handleAddPost = () => {
-        console.log(infoAddPost, 'infoAddPost')
-        setIsSavingPost(true)
-        axios.post('http://localhost:8000/api/addPost', infoAddPost)
-        .then((response) => {
-            console.log(response.data)
-            setIsSavingPost(false)
-        })
-        .catch((error) => {
-            console.log(error)
-            setIsSavingPost(false)
-        })
-    } 
     
-    const renderCarouselProduct = ({item}: {item: any}) => {
+    const pickImage = async () => {
+
+        // let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        // setHasGalleryPermission(permissionResult.status === 'granted'); 
+
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All, 
+            allowsMultipleSelection: true,
+            aspect: [4, 3],
+            quality: 1,
+            orderedSelection: true,
+        });
+
+        console.log(result, 'result', imageList, 'imageList');
+
+        if (!result.canceled) {
+            // let localUri = result.assets[0].uri as string;
+            // let arrImage = [...image]
+            // let newArrImage = arrImage.push(result)
+
+            setImage(result.assets[0].uri as string); // Update the type of the value passed to setImage
+            setImageList( result.assets.map((item: any) => item.uri) )
+        }
+    } 
+ 
+    
+    const uploadMultipleImagesToFirebaseStorage = async () => { 
+        // sau khi upload hình ảnh thì sẽ sử dụng useEffect để gửi request lên server
+        let listLink: never[] = [] 
+        imageList.map(async (imageUri, index) => { 
+            const fileName = imageUri.split("/").pop();
+            const uploadResp = await uploadToFirebase(
+                                                        imageUri, 
+                                                        fileName, 
+                                                        (progress) => { 
+                                                            console.log(progress, 'progress') 
+                                                        },
+                                                        listLink
+                                                    )
+            console.log(uploadResp, 'uploadResp')
+            console.log(listLink, 'listLink', listLink.length === imageList.length)
+            if(listLink.length === imageList.length) {
+                setInfoAddPost({...infoAddPost, imageList: listLink})  
+            }
+        });   
+    };
+
+    const handleAddNewPost = () => {
+        // Kiểm tra xem nội dung và chủ đề đã được nhập chưa
+        if(infoAddPost.content === "" || infoAddPost.topic === "") {
+            console.log(infoAddPost.content, infoAddPost.topic, 'test infoAddPost')
+            setShowWarning(true)
+            return
+        }
+
+        // Nếu đăng có ảnh thì sẽ vào hàm uploadMultipleImagesToFirebaseStorage 
+        // để upload ảnh lên firebase và lấy link về, sau đó chạy vào useEffect để gửi request lên server lưu bài viết
+        if(imageList.length > 0) {
+            setIsSavingPost(true)  
+            uploadMultipleImagesToFirebaseStorage()
+        } else{
+            setIsSavingPost(true)  
+            axios.post( baseURL + '/addPost', infoAddPost) 
+            .then((response) => {   
+                console.log(response.data, 'success')
+                setIsSavingPost(false)
+                setResponse(response.data.status)
+            })
+            .catch((error) => {
+                console.log(error)
+                setIsSavingPost(false) 
+            })
+            console.log('infoAddPost22', infoAddPost) 
+        }
+        
+    }
+
+    useEffect(() => {  
+        console.log(infoAddPost.imageList.length, 'infoAddPost.imageList.length')
+        if(infoAddPost.imageList.length > 0){
+            axios.post( baseURL + '/addPost', infoAddPost) 
+            .then((response) => {   
+                console.log(response.data.status, 'success22f', response.data.imageList)
+                setIsSavingPost(false)
+                setResponse(response.data.status)
+            })
+            .catch((error) => {
+                console.log(error)
+                setIsSavingPost(false) 
+            })
+        }
+        console.log('infoAddPost22', infoAddPost.imageList.length)
+    }, [infoAddPost.imageList.length > 0])
+    
+    const renderCarouselProduct = ({item, index}: {item: any, index: number}) => {
         return (
           <View 
-            // style={[styles.containerItemImage]}
-          >
+            style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                width: widthCenterContainer * 0.94,
+                marginHorizontal: widthScreen * 0.02,   
+            }}
+            >
+            <TouchableOpacity
+                style={{
+                    position: "absolute",
+                    zIndex: 1,
+                    top: heightScreen * 0.05,
+                    right: widthScreen * 0.02, 
+                }}
+                onPress={() => {
+                    let newImageList = imageList.filter((value, indexDelete) => index !== indexDelete)
+                    setImageList(newImageList)
+                }}
+            >
+                <FontAwesome5
+                    name="window-close"
+                    style={{
+                        color: "white",
+                        fontSize: widthScreen * 0.05,
+                        fontWeight: "bold", 
+                    }}
+                ></FontAwesome5>
+            </TouchableOpacity>
             <Image
-              source={{ uri: item.path}}
+              source={{ uri: item}}
               style={{
-                width: widthCenterContainer,
+                borderRadius: widthScreen * 0.03,
+                width: "100%",
                 height: heightScreen * 0.4,
+                aspectRatio: 1, 
               }}
             ></Image> 
           </View>
@@ -275,180 +345,143 @@ export default function AddPost() {
     }
 
     return (
-        <SafeAreaView>
-            <View style={ styles.container }  >
-                <View style={[
-                    styles.createPost, 
-                    expandInputPostInfo && styles.expandInputPostInfoContainer,
-                    isSavingPost ? { display: "none"} : {}
-                ]}> 
-                    <Image
-                        style={ styles.image }
-                        source={require('@assets/images/avatar.jpg')}
-                    ></Image> 
-                    <View style={styles.createPostCenterContainer}> 
-                        <View style={{ 
-                            flexDirection: "row", 
-                            width: "100%",
-                            paddingHorizontal: widthScreen * 0.04,
-                            paddingVertical: heightScreen * 0.008,
-                            paddingRight: widthScreen * 0.04,
-                            // alignItems: "center",
-                            justifyContent: "space-between"
-                        }}>
-                            <View style={{position: "relative"}}>
-                                <Text style={{
-                                    fontWeight: '700',
-                                    fontSize: 16,
-                                    // position: "fixed"
-                                }}>
-                                    Đỗ Sĩ Đạt
-                                </Text>
-                            </View> 
-                            <View>
-                                {importDataFromFilters()}
-                                <View style={styles.selectTopicToPost}>
-                                    <SelectList
-                                        setSelected={() => {setInfoAddPost({...infoAddPost, topic: topicSelectedToPost})}}
-                                        data={dataToSelectTopic}
-                                        placeholder='Chọn chủ đề'
-                                        defaultOption={{key:'1', value:'Chọn chủ đề', disabled:true}}
-                                        boxStyles={{ 
-                                            paddingVertical: heightScreen * 0.006,
-                                            paddingHorizontal: widthScreen * 0.04,
-                                            borderColor: "#89CFF0",
-                                            marginBottom: heightScreen * 0.0005, 
-                                        
-                                        }}
-                                        dropdownItemStyles={{
-                                            paddingVertical:  heightScreen * 0.001, 
-                                        }}
-                                        dropdownStyles={{
-                                            paddingTop: 0,
-                                            marginTop: 2, 
-                                        }} 
-                                        search={false}
-                                    ></SelectList>
+        <SafeAreaView style = {{ backgroundColor: "white"}}>
+            <View>
+                {
+                    response === "" && <View style={ styles.container }  >
+                    <View style={[
+                        styles.createPost, 
+                        expandInputPostInfo && styles.expandInputPostInfoContainer,
+                        isSavingPost ? { display: "none"} : {}
+                    ]}> 
+                        <Image
+                            style={ styles.image }
+                            source={require('@assets/images/avatar.jpg')}
+                        ></Image> 
+                        <View style={styles.createPostCenterContainer}> 
+                            <View style={{ 
+                                flexDirection: "row", 
+                                width: "100%",
+                                paddingHorizontal: widthScreen * 0.04,
+                                paddingVertical: heightScreen * 0.008,
+                                paddingRight: widthScreen * 0.04,
+                                // alignItems: "center",
+                                justifyContent: "space-between"
+                            }}>
+                                <View style={{position: "relative"}}>
+                                    <Text style={{
+                                        fontWeight: '700',
+                                        fontSize: 16,
+                                        // position: "fixed"
+                                    }}>
+                                        Đỗ Sĩ Đạt
+                                    </Text>
+                                </View> 
+                                <View>
+                                    {importDataFromFilters()}
+                                    <View style={styles.selectTopicToPost}>
+                                        <SelectList
+                                            setSelected={(selectedItem: any) => {setInfoAddPost({...infoAddPost, topic: selectedItem})}}
+                                            data={dataToSelectTopic}
+                                            placeholder='Chọn chủ đề'
+                                            defaultOption={{key:'1', value:'Chọn chủ đề', disabled:true}}
+                                            boxStyles={{ 
+                                                paddingVertical: heightScreen * 0.006,
+                                                paddingHorizontal: widthScreen * 0.04,
+                                                borderColor: "#89CFF0",
+                                                marginBottom: heightScreen * 0.0005,  
+                                            }}
+                                            dropdownItemStyles={{
+                                                paddingVertical:  heightScreen * 0.001, 
+                                            }}
+                                            dropdownStyles={{
+                                                paddingTop: 0,
+                                                marginTop: 2, 
+                                            }} 
+                                            search={false}
+                                        ></SelectList>
+                                    </View>
                                 </View>
-                            </View>
-                        </View> 
-                        <TextInput 
-                            placeholder='Bạn đang nghĩ gì?'
-                            style={[styles.whatAreYouThinking, expandInputPostInfo && styles.expandInputPostInfo]} 
-                            onBlur={toogleExpand}
-                            onFocus={toogleExpand}
-                            multiline={true}
-                            onChangeText={(text) => { setInfoAddPost({...infoAddPost, content: text}) }}
-                        ></TextInput> 
-                        <ScrollView style={styles.scrollViewForPreviewImage}> 
-                            <FlatList
-                                data={listImage}
-                                renderItem={renderCarouselProduct}  
-                                showsHorizontalScrollIndicator
-                                bounces={false}
-                                pagingEnabled 
-                                horizontal
-                                style={styles.imagePreview} 
-                            ></FlatList>
-                        </ScrollView>
-                    </View>
-                    <View>
-                        <FontAwesome5 
-                            name='images' 
-                            size={30} 
-                            style={styles.choosePostImage} 
-                            onPress={pickImage}
-                        ></FontAwesome5>  
+                            </View> 
+                            <TextInput 
+                                ref={inputRef}
+                                placeholder='Bạn đang nghĩ gì?'
+                                style={[styles.whatAreYouThinking, expandInputPostInfo && styles.expandInputPostInfo]} 
+                                onBlur={toogleExpand}
+                                onFocus={toogleExpand}  
+                                multiline={true}
+                                onChangeText={(text) => { setInfoAddPost({...infoAddPost, content: text}) }}
+                                textAlignVertical="top"
+                            ></TextInput> 
+                            {
+                                showWarning && <Text style={{color: 'red', fontSize: 12}}>Bạn cần nhập nội dung và chọn chủ đề trước khi đăng bài</Text>
+                            }
+                            <ScrollView style={styles.scrollViewForPreviewImage}> 
+                                <FlatList
+                                    data={imageList}
+                                    renderItem={renderCarouselProduct}  
+                                    showsHorizontalScrollIndicator
+                                    bounces={false}
+                                    pagingEnabled 
+                                    horizontal
+                                    style={styles.imagePreview} 
+                                    decelerationRate="fast" 
+                                ></FlatList>
+                            </ScrollView>
+                        </View>
+                        <View>
+                            <FontAwesome5 
+                                name='images' 
+                                size={30} 
+                                style={styles.choosePostImage} 
+                                onPress={pickImage}
+                            ></FontAwesome5>  
                             <FontAwesome 
-                            name='paper-plane' 
-                            size={30} 
-                            style={styles.choosePostImage} 
-                            onPress={handleAddPost}
-                        ></FontAwesome>  
+                                name='paper-plane' 
+                                size={30} 
+                                style={styles.choosePostImage} 
+                                onPress={handleAddNewPost}
+                            ></FontAwesome>  
+                        </View>
+                    </View>  
+                    <View style={[styles.loadingScreen, isSavingPost ? {} : styles.displayNone]}>
+                        <View style={styles.dotsWrapper}>
+                            <LoadingDots />
+                        </View>
                     </View>
-                </View>  
-                <View style={[styles.loadingScreen, isSavingPost ? {} : styles.displayNone]}>
-                    <View style={styles.dotsWrapper}>
-                        <LoadingDots />
-                    </View>
-                </View>
+                    </View>  
+                }
+                { 
+                    response === 'success' 
+                    ? <Response
+                        content="Bài viết của bạn đã được đăng thành công."
+                        statusIcon="check-circle"
+                        href2="/(user)"
+                        buttonIcon2="eye"
+                        buttonName2="Bài Viết"
+                        buttonFunction2={() => { navigation.navigate('index', null)}}
+                    ></Response>
+                    : <Response
+                        content="Đã có lỗi xảy ra khi đăng bài. Hãy đăng lại bài viết."
+                        statusIcon="times-circle"
+                        href1="(user)"
+                        buttonIcon1="plus-square"
+                        buttonName1="Đăng lại bài viết"  
+                        buttonFunction1={() => { 
+                            setResponse('') 
+                            setInfoAddPost(
+                                {
+                                    topic: "",
+                                    content: '',
+                                    imageList: [],
+                                    userID: userID, 
+                                }
+                            )
+                        }}
+                    ></Response> 
+                }
             </View>
+            
         </SafeAreaView>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        flexWrap: 'wrap'
-    },
-    sortBy: {
-        width: '50%'
-    },
-    chooseTopic: {
-        width: '50%',
-        flexDirection: 'column',
-        alignItems: "center"
-    },
-    topicIsSelected: {
-        borderColor: 'green',
-        borderWidth: 1,
-    },
-    topicIcon: {
-        width: 20,
-        height: 20,
-    },
-    chooseTopicItem: {
-        flexDirection: 'row',
-        paddingHorizontal: '6%',
-        paddingVertical: 10,
-        borderWidth: 0.5,
-        borderRadius: 15,
-        borderColor: '#6495ED',
-        width: '70%',
-        marginVertical: 5,
-        maxWidth: 300,
-        elevation: 40, 
-
-    },
-    topicText: {
-        fontWeight: 'bold',
-        marginLeft: '10%',
-        opacity: 0.7
-    },
-    titleChooseTopic: {
-        fontWeight: 'bold',
-        opacity: 0.5,
-        marginTop: 20,
-        marginBottom: 5,
-        textAlign: "center"
-    },
-    sortByIcon: {
-        color: '#6495ED',
-        width: 20,
-        height: 20,
-    },
-    centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 22,
-    },
-    modalView: {
-        margin: 20,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        width: '90%',
-        padding: 35,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5
-    }
-})
- 

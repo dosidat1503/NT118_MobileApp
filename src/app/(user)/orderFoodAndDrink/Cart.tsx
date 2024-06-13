@@ -206,11 +206,16 @@ export default function Cart() {
                                 setArray_itemListInCart={setArray_itemListInCart}
                                 // indexItem={indexItem}       
                             ></ItemInCartAndPayment>
-                            <Text style={styles.textInCart}>
+                            <Text style={[
+                                styles.textInCart,
+                                item.toppings.length === 0 ? {display: "none"} : {display: "flex"}
+                            ]}>
                                 Topping
                             </Text>
                             {/* view này là của item topping */} 
-                            { renderTopping(item.toppings , index) } 
+                            {
+                                renderTopping(item.toppings , index) 
+                            } 
                             <View style={{
                                     flexDirection: "row",
                                     justifyContent: "space-between"

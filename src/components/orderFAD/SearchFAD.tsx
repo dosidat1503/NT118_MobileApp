@@ -2,10 +2,11 @@ import { View, TextInput, StyleSheet, TouchableOpacity, Pressable } from "react-
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import { Link, Stack, useNavigation } from "expo-router";
+import React from "react";
 
 
 export default function SearchFAD() {
-    const { heightScreen, widthScreen } = useCartContext();
+    const { heightScreen, widthScreen, mainColor } = useCartContext();
     
     const heightSearchFAD = heightScreen * 0.06;
     const widthSearchFAD = widthScreen * 0.7;
@@ -35,7 +36,8 @@ export default function SearchFAD() {
             height: "100%",
             width: "100%",
             backgroundColor: "#FBFFC8",
-            color: "red",
+            color: mainColor,
+            fontWeight: "bold",
             fontSize: heightScreen * 0.02,
             paddingHorizontal: widthScreen * 0.02
         },

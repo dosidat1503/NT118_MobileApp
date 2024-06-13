@@ -1,15 +1,12 @@
 import { Link, Stack } from "expo-router";
-import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, TouchableOpacity, Button, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, TouchableOpacity, FlatList, ActivityIndicator } from "react-native";
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import { defaultPrizzaImage } from "@/components/PostList";
-import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
-import Colors from "@/constants/Colors"
-import { CheckBox } from 'react-native-elements';  
-import ItemInCartAndPayment from "@/components/orderFAD/Cart/ItemInCartAndPayment"; 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons"; 
+import React, { useState, useEffect } from 'react'; 
 import axios from "axios"; 
+import Button from "@/app/(user)/orderFoodAndDrink/Button";
+import { useNavigation } from "expo-router";
 
 interface orderItem {
     ORDER_ID: number;
@@ -35,12 +32,11 @@ interface infoManagementEveryOrderStatus {
     orderItemList: orderItem[],
     pageNumber: number, 
     isActive: boolean
-}
-
+} 
 
 export default function OrderManagement() {
 
-    const {heightScreen, widthScreen, mainColor, orderStatusList, baseURL, userID} = useCartContext();
+    const {heightScreen, widthScreen, mainColor, orderStatusList, baseURL, userID, setOrderID} = useCartContext();
 
     const avatarSize = widthScreen * 0.13;
 
@@ -87,7 +83,8 @@ export default function OrderManagement() {
             shadowOffset: { width: 5, height: 7 }, 
             shadowOpacity: 0.1, 
             shadowRadius: 10,  
-            elevation: 70
+            elevation: 70,
+            backgroundColor: "white"
         }, 
         imgOfItem: { 
             height: avatarSize,
@@ -182,17 +179,14 @@ export default function OrderManagement() {
             },
             paymentToTal: 300000
         } 
-    ]);
-
-
+    ]); 
 
     const [infoManagementEveryOrderStatus, setInfoManagementEveryOrderStatus] = useState<infoManagementEveryOrderStatus[]>([]);
     const [dataLoadFromServe, setDataLoadFromServe] = useState([]);
 
     const itemQuantityEveryLoad = 4;
     const [initialLoad, setInitialLoad] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
- 
+    const [isLoading, setIsLoading] = useState(false); 
 
     useEffect(() => {   
         let newInfoManagementEveryOrderStatus: infoManagementEveryOrderStatus[] = []
@@ -236,33 +230,37 @@ export default function OrderManagement() {
 
         axios.get( baseURL + "/getOrderInfoOfUser", { params: requestData })
         .then((response) => {
-            console.log(response.data.infoOrder, "response.data")
-            const newInfoManagementEveryOrderStatus =  infoManagementEveryOrderStatus.map((itemInList) => {
-                if (itemInList.orderStatusCode === orderStatusCode) {
+            console.log(response.data.infoOrder, "response.data âccs")
+            if(response.data.infoOrder.length !== 0) {
+                const newInfoManagementEveryOrderStatus =  infoManagementEveryOrderStatus.map((itemInList) => {
+                    if (itemInList.orderStatusCode === orderStatusCode) {
+                        return {
+                            ...itemInList,
+                            orderItemList: itemInList.orderItemList.concat(response.data.infoOrder),
+                            pageNumber: ++pageNumber,
+                            isActive: true
+                        };
+                    }
                     return {
-                        ...itemInList,
-                        orderItemList: itemInList.orderItemList.concat(response.data.infoOrder),
-                        pageNumber: ++pageNumber,
-                        isActive: true
+                        ...itemInList, 
+                        isActive: false
                     };
-                }
-                return {
-                    ...itemInList, 
-                    isActive: false
-                };
-            }) 
-            setInfoManagementEveryOrderStatus(newInfoManagementEveryOrderStatus)
-            console.log(newInfoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus")
+                }) 
+                setInfoManagementEveryOrderStatus(newInfoManagementEveryOrderStatus)
+                console.log(newInfoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus")
+            }
             setIsLoading(false);
         })
     }
 
     const getOrderInfo = (item: infoManagementEveryOrderStatus) => {
-        getOrderListFromServe(item.orderStatusCode, item.pageNumber); 
+        getOrderListFromServe(item.orderStatusCode, item.pageNumber);
+        // console.log(item, "item") 
     }
+    const navigation = useNavigation();
 
-    const renderOrderList = ({item}: {item: orderItem}) =>  (
-        <View  style={styles.itemOrderContainer}>
+    const renderOrderList = (item: orderItem, itemStatus: infoManagementEveryOrderStatus) =>  (
+        <View  style={styles.itemOrderContainer} key={item.ORDER_ID}>
             <View style={styles.headerOfItemOrder}>
                 <Image source={{ uri: item.FAD_INFO.IMAGE_URL }} style={styles.imgOfItem}/>
                 <View style={{marginLeft: widthScreen * 0.02 }}>
@@ -293,16 +291,44 @@ export default function OrderManagement() {
                     </View>
                 </View>
 
-                <TouchableOpacity style={styles.detailInfoOfOderTextContainer}>
+                <TouchableOpacity 
+                    style={styles.detailInfoOfOderTextContainer} 
+                    onPress={() => {
+                        setOrderID(item.ORDER_ID)
+                        navigation.navigate("order/OrderDetail")
+                    }}
+                >
                     <Text style={styles.detailInfoOfOderText}>Thông tin chi tiết đơn hàng &gt;</Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.footerOfItemOder}>
-                <Button
-                    title="Hủy đơn"
+                {/* <Button
+                    title=
                     color={mainColor}
-                ></Button>
+                > 
+                </Button>  */}
+                <Button
+                    iconName={
+                        itemStatus.orderStatusName === "Chờ xác nhận" 
+                        ? "window-close" 
+                        : itemStatus.orderStatusName === "Đang chuẩn bị" || itemStatus.orderStatusName === "Đang giao"
+                            ? "phone-square-alt"
+                            :  itemStatus.orderStatusName === "Đã giao" 
+                                ? "star"
+                                :  "undo-alt"
+                    }
+                    buttonName={
+                        itemStatus.orderStatusName === "Chờ xác nhận" 
+                        ? "Huỷ đơn" 
+                        : itemStatus.orderStatusName === "Đang chuẩn bị" || itemStatus.orderStatusName === "Đang giao"
+                            ? "Liên hệ"
+                            : itemStatus.orderStatusName === "Đã giao" 
+                                ? "Đánh giá"
+                                :  "Đặt lại"
+                    }
+                    handlePress={() => {}}
+                ></Button> 
                 <View style={{flexDirection: "row"}}>
                     <Text style={styles.headerNormalTextOfItemOder}>Tổng tiền: </Text>
                     <Text style={styles.footerTextMoneyOfItemOder}>{item.TOTAL_PAYMENT}</Text>
@@ -314,7 +340,7 @@ export default function OrderManagement() {
     const renderFooter = () => {
         return(
             isLoading &&
-            <View style={{ marginTop: heightScreen * 0.002, alignItems: "center" }}>
+            <View style={{ marginTop: heightScreen * 0.002, marginBottom: heightScreen * 0.05, alignItems: "center" }}>
                 <ActivityIndicator size="large" color={mainColor} />
             </View>
         )
@@ -322,15 +348,15 @@ export default function OrderManagement() {
 
     const renderEveryStatus = () => {
         return infoManagementEveryOrderStatus.map((itemStatus, index) => {
+            console.log(itemStatus.orderStatusName, itemStatus.isActive, "isActive");
             if (itemStatus.isActive) {
-                console.log(itemStatus.orderStatusName, "isActive");
                 return (
                     <FlatList
                         data={itemStatus.orderItemList}
-                        renderItem={renderOrderList} 
+                        renderItem={({item}) => renderOrderList(item, itemStatus)} 
                         ListFooterComponent={renderFooter}
                         onEndReached={() => getOrderInfo(itemStatus)}
-                        onEndReachedThreshold={0.04}
+                        onEndReachedThreshold={0.01} 
                     ></FlatList>
                 );
             } else return null;
@@ -344,7 +370,7 @@ export default function OrderManagement() {
                 options={{
                     title: 'Quản lý đơn hàng',
                 }}
-            ></Stack.Screen> 
+            ></Stack.Screen>  
             <View style={styles.headerContainer}>
                 {/* <View style={{paddingTop: heightScreen * 0.2}}></View> */}
                 {
@@ -365,12 +391,12 @@ export default function OrderManagement() {
                 }
             </View>
             <View style={{borderBottomWidth: 1, marginHorizontal: widthScreen * 0.01, borderBottomColor: "#cdcdcd", marginBottom: heightScreen * 0.009}}/>
-            <ScrollView style={{ marginTop: heightScreen * 0.128}}>  
+            {/* <ScrollView >   */}
                 {/* body */}
-                <View>
+                <View style={{ marginTop: heightScreen * 0.128}}>
                     { renderEveryStatus() }
                 </View>
-            </ScrollView>
+            {/* </ScrollView> */}
         </SafeAreaView>
     )
 }

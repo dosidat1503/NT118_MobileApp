@@ -3,18 +3,19 @@ import { TouchableOpacity, StyleSheet, Text } from "react-native";
 import { useCartContext } from "@/providers.tsx/CartProvider";
 
 interface ButtonProps {
-    iconName: string;
-    buttonName: string;
-    handlePress: () => void;
+    iconName?: string;
+    buttonName?: string;
+    handlePress?: () => void;
+    color?: string;
 }
 
-export default function Button({iconName, buttonName, handlePress}: ButtonProps) { 
+export default function Button({iconName, buttonName, handlePress, color}: ButtonProps) { 
 
     const {widthScreen, heightScreen} = useCartContext();
 
     const styles = StyleSheet.create({
         button: {
-            backgroundColor: '#3498db',
+            backgroundColor: color ? color : '#3498db',
             paddingVertical: heightScreen * 0.008,
             paddingHorizontal: widthScreen * 0.02,
             borderRadius: 5,

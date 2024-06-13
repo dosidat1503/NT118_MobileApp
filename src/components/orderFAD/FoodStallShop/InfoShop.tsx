@@ -5,6 +5,7 @@ import { defaultPrizzaImage } from "@/components/PostList";
 import { Link } from "expo-router";
 import { useNavigation } from '@react-navigation/native'; 
 import { useEffect } from "react";
+import React from "react";
 
 export default function InfoShop({infoShop}: {infoShop: any}) {
     const { heightScreen, widthScreen } = useCartContext();
@@ -63,7 +64,7 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
             paddingHorizontal: widthScreen * 0.03
         },
         reviewText: {
-            fontWeight: 500,
+            fontWeight: "500",
             fontSize: heightScreen * 0.019,
             paddingLeft: widthScreen * 0.02,
             opacity: 0.7
@@ -75,7 +76,8 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
             fontSize: widthScreen * 0.05
         },
         address: {
-            marginHorizontal: widthScreen * 0.03
+            marginHorizontal: widthScreen * 0.03,
+            width: widthScreen * 0.45,
         }
     })
     return(

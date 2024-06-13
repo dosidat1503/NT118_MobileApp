@@ -5,6 +5,7 @@ import Collapsible from 'react-native-collapsible'
 import products from "@assets/data/products";
 import InfoListFADofShop from "./InfoListFADofShop";
 import { useCartContext } from "@/providers.tsx/CartProvider";
+import React from "react";
 
 
 export function InfoFADofShop() {
@@ -28,7 +29,7 @@ export function InfoFADofShop() {
                         },
                     ]) 
 
-    const toogleCollapse = (itemToToggle) => {
+    const toogleCollapse = (itemToToggle: { name: string; }) => {
         setListFAD(listFAD.map(item => 
                 item.name === itemToToggle.name 
                 ? { ...item, isCollapsed: !item.isCollapsed }
@@ -37,7 +38,7 @@ export function InfoFADofShop() {
         );
     } 
 
-    const renderList = ({item}) => {
+    const renderList = ({item}: {item: any}) => {
         return( 
             <View>
                 <TouchableOpacity 
@@ -69,7 +70,7 @@ export function InfoFADofShop() {
             alignSelf: "center"
         },
         collapseBarText: {
-            fontWeight: "bold",
+            // fontWeight: "bold",
             fontSize: widthScreen * 0.05,
             opacity: 0.95,
             color: mainColor

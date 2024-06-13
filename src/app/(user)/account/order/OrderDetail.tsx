@@ -1,24 +1,34 @@
-import { Link, Stack } from "expo-router";
+ 
 import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, TextInput } from "react-native";
-import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/PostList";
-import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
-import Colors from "@/constants/Colors"
-import { CheckBox } from 'react-native-elements'; 
-import AdjustQuantity from "./AdjustQuantity";
+import { useCartContext } from "@/providers.tsx/CartProvider"; 
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons"; 
+import { CheckBox } from 'react-native-elements';  
 import ItemInCartAndPayment from "@/components/orderFAD/Cart/ItemInCartAndPayment";
-import Button from "./Button";
+import Button from "../../orderFoodAndDrink/Button";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect } from 'react';
-import { color } from "react-native-elements/dist/helpers";
-import { fonts } from "react-native-elements/dist/config";
+import React, { useState, useEffect } from 'react'; 
 import ItemType1 from "@/components/orderFAD/Payment/ItemType1";
 import axios from "axios";
 import Loading from "@/components/Loading";
 
+interface ItemProductProps {
+    PRICE: any;
+    QUANTITY: any; 
+    ID_PARENT_OD_OF_THIS_OD: any, 
+    ORDER_DETAIL_ID: any; 
+    fad: { FAD_NAME: any; FAD_PRICE: any; }; 
+}
+
+interface ItemToppingProps {
+    sizes: string,
+    label: string,
+    name: string, 
+    price: number, 
+    quantity: number,
+}
 
 export default function Payment() {
-    const { heightScreen, widthScreen, mainColor, baseURL, userID, setIsLoading, isLoading } = useCartContext(); 
+    const { heightScreen, widthScreen, mainColor, baseURL, userID, setIsLoading, isLoading, orderID } = useCartContext(); 
     const avatarSize = widthScreen * 0.13;
 
     const styles = StyleSheet.create({
@@ -191,19 +201,20 @@ export default function Payment() {
             id: 1,
             name: "Đỗ Phạm Hoàng Ân",
             phone: "0968795750",
-            address: "Toà B4, KTX Khu B",
-            isDefault: true,
-            isChoose: true
+            address: "Toà B4, KTX Khu B", 
         },
         productList: [
             {
                 id: 1,
                 name: "trà sữa ô long",
                 price: 30000,
-                sizes: "M",
+                sizes: [
+                    { label: 'M', checked: true },
+                    { label: 'L', checked: false }, 
+                ],
                 toppings: [
-                    { id: 1, name: 'Thạch', price: 5000, quantity: 0 },
-                    { id: 2, name: 'Trân châu trắng', price: 5000, quantity: 0}, 
+                    { name: 'Thạch', price: 5000, quantity: 0 },
+                    { name: 'Trân châu trắng', price: 5000, quantity: 0}, 
                 ],
                 note: "",
                 quantity: 1, 
@@ -214,65 +225,79 @@ export default function Payment() {
         voucherID: 1,
         paymentAmount: 0,
         userID: userID
-    })
-
-    useEffect(() => {
-        setIsLoading(true);
-        const getitemListInCart = async () => {
-            try {
-                const jsonValue = await AsyncStorage.getItem('array_itemListInCart')
-                setArray_itemListInCart(jsonValue != null ? JSON.parse(jsonValue) : null); 
-                console.log(JSON.parse(jsonValue)[0], 'JSON.parse(jsonValue)');
-            } catch (error) {
-                console.log(error)
-            }
-        }
-        getitemListInCart(); 
-    }, []) 
+    }) 
     
-    useEffect(() => {  
-        
+    useEffect(() => {   
         const getAdress = async () => {
             const totalChecked = array_itemListInCart.reduce(((total, item) => item.isCheckedForPayment === true ? total += item.totalOfItem : total), 0);
-            
-            axios.get(baseURL + "/getDefaultDeliveryInfo", {params: { userID: userID}})
-            .then((response) => {
-                // console.log(response.data, "delivcccc222eryInfo", totalChecked, orderInfo)
-                // setDeliveryInfo(response.data.defaultAddress); 
+            console.log(orderID, "orderID")
+            axios.get(baseURL + "/getOrderDetailInfo", {params: { orderID: orderID}})
+            .then((response) => {  
                 setOrderInfo({  
                     ...orderInfo,
                     deliveryInfo: {
-                        id: response.data.defaultAddress.ADDRESS_ID,
-                        name: response.data.defaultAddress.NAME,
-                        phone: response.data.defaultAddress.PHONE,
-                        address: response.data.defaultAddress.DETAIL,
-                        isDefault: true,
-                        isChoose: true,
+                        id: response.data.orderDetailInfo[0].ORDER_ID,
+                        name: response.data.deliveryInfo[0].NAME,
+                        phone: response.data.deliveryInfo[0].PHONE,
+                        address: response.data.deliveryInfo[0].DETAIL, 
                     }, 
-                    productList: array_itemListInCart,
-                    paymentAmount: totalChecked
+                    productList: response.data.orderDetailInfo[0].order_details.map((itemMainFAD: ItemProductProps) => {
+                        let totalOfItem = 0;
+                        totalOfItem += itemMainFAD.fad.FAD_PRICE * itemMainFAD.QUANTITY;
+                        if(itemMainFAD.ID_PARENT_OD_OF_THIS_OD === null)
+                        {
+                            console.log(itemMainFAD.ORDER_DETAIL_ID, itemMainFAD, 'itemMainFAD.ORDER_DETAIL_ID')
+                            return {
+                                id: itemMainFAD.ORDER_DETAIL_ID, 
+                                name: itemMainFAD.fad.FAD_NAME,
+                                price: itemMainFAD.fad.FAD_PRICE,
+                                sizes: [
+                                    { label: 'M', checked: true },
+                                    { label: 'L', checked: false }, 
+                                ],
+                                quantity: itemMainFAD.QUANTITY,
+                                note: "",
+                                toppings: response.data.orderDetailInfo[0].order_details.filter((itemSubFAD: ItemProductProps) => {
+                                        return itemMainFAD.ORDER_DETAIL_ID === itemSubFAD.ID_PARENT_OD_OF_THIS_OD && itemMainFAD.ORDER_DETAIL_ID !== null;
+                                    }).map((itemSubFAD: ItemProductProps) => {
+                                        console.log(itemMainFAD.ORDER_DETAIL_ID, itemSubFAD.ID_PARENT_OD_OF_THIS_OD, 'itemSubFAD.ID_PARENT_OD_OF_THIS_OD', itemSubFAD.QUANTITY, 'total', totalOfItem);
+                                        totalOfItem += itemSubFAD.PRICE * itemSubFAD.QUANTITY;
+                                        return {
+                                            name: itemSubFAD.fad.FAD_NAME,
+                                            price: itemSubFAD.PRICE,
+                                            quantity: itemSubFAD.QUANTITY 
+                                        };
+                                    }),
+                                totalOfItem: totalOfItem, 
+                            } 
+                        }
+                    }),
+                    paymentAmount:  response.data.orderDetailInfo[0].order_details.reduce(((total: number, item: { PRICE: number; QUANTITY: number; }) => 
+                        total += item.PRICE * item.QUANTITY
+                    ), 0)
                 })
-                setIsLoading(false);
+                // setIsLoading(false);
+                console.log(response.data.orderDetailInfo[0].order_details, response.data.deliveryInfo[0].NAME, "orderDetailInfo")
             })
         }
         getAdress(); 
-    }, [array_itemListInCart])
+    }, [])
 
-    const saveOrder = () => {
-        console.log(orderInfo.productList[0].toppings, 'toppings22')
-        axios.post(baseURL + "/saveOrder", orderInfo)
-        .then((response) => {
-            console.log(response.data)
-        })
-    }
-   
-    const renderTopping = (toppings: any[], indexItem: number) => {
-        return toppings.map((item, index) => { 
+    useEffect(() => { console.log(orderInfo.productList, 'orderInfo') }, [orderInfo.productList])
+ 
+    const renderTopping = (itemProductList: any, indexItem: number) => {
+        console.log( '2222211dc1', itemProductList.toppings[0], 'cscsc222', itemProductList)
+        return itemProductList.toppings.map((item: ItemToppingProps, index: number) => { 
+            
+            // bởi vì trong list, khi axios trả dữ liệu về và set dữ liệu thì sẽ có một vài phần tử bị undefined 
+            // nên phải kiểm tra xem item có phải là undefined không
             return (
+                item !== undefined &&
                 <ItemInCartAndPayment
                     isCart={false}
                     isTopping={true}
                     isHaveAdjusting={true} 
+                    isOrderDetail={true}
                     quantity={0}           
                     item={item}
                     index={index}                     
@@ -284,68 +309,76 @@ export default function Payment() {
     }
 
     const renderItemListInCart = () => {
-        if(array_itemListInCart != null){ 
-            return array_itemListInCart.map((item, index) => {  
-                console.log(item.isCheckedForPayment, "checked")
-                if(item.isCheckedForPayment)
-                    return (
-                        <View style={styles.itemDivContainer} key={index}> 
-                            {/* checkbox */}
+        if(orderInfo.productList != null){ 
+            return orderInfo.productList.map((item, index) => {   
+                console.log(orderInfo.productList[0].toppings[0], 'orderInfo.productList111', item)
+                return (
+                    // bởi vì trong list, khi axios trả dữ liệu về và set dữ liệu thì sẽ có một vài phần tử bị undefined 
+                    // nên phải kiểm tra xem item có phải là undefined không
+                    item !== undefined &&
+                    <View style={styles.itemDivContainer} key={index}> 
+                        {/* checkbox */}
+                        <View style={{
+                                flexDirection: "row",
+                                alignItems: "center"
+                            }}
+                        >
+                            <CheckBox
+                                // checked={item.isCheckedForPayment}
+                                disabled={true}
+                                onPress={() => {}}
+                                containerStyle={{
+                                    padding: 0,
+                                    margin: 0,
+                                    opacity: 0
+                                }}
+                            />
+                        </View>
+                        {/* itemInfo */}
+                        <View style={styles.itemContainer}>
+                            {/* view đầu này là của item chính */} 
+                                {
+                    // bởi vì trong list, khi axios trả dữ liệu về và set dữ liệu thì sẽ có một vài phần tử bị undefined 
+                    // nên phải kiểm tra xem item có phải là undefined không
+                                    item !== undefined && 
+                                    <ItemInCartAndPayment
+                                        isCart={false}
+                                        isTopping={false}
+                                        isHaveAdjusting={true}
+                                        quantity={0}
+                                        item={item}
+                                        index={index}
+                                        setArray_itemListInCart={setArray_itemListInCart} indexItem={0}                                // indexItem={indexItem}       
+                                    ></ItemInCartAndPayment>
+                                }
+                            <Text style={[styles.textInCart, item.toppings.length === 0 ? {display: "none"} : {} ]}>
+                                Topping
+                            </Text>
+                            {/* view này là của item topping */} 
+                            
+                            { item !== undefined && renderTopping(item , index) } 
                             <View style={{
                                     flexDirection: "row",
-                                    alignItems: "center"
+                                    justifyContent: "space-between"
                                 }}
                             >
-                                <CheckBox
-                                    checked={item.isCheckedForPayment}
-                                    disabled={true}
-                                    onPress={() => {}}
-                                    containerStyle={{
-                                        padding: 0,
-                                        margin: 0,
-                                        opacity: 0
-                                    }}
-                                />
-                            </View>
-                            {/* itemInfo */}
-                            <View style={styles.itemContainer}>
-                                {/* view đầu này là của item chính */} 
-                                <ItemInCartAndPayment
-                                    isCart={false}
-                                    isTopping={false}
-                                    isHaveAdjusting={true}
-                                    quantity={0}
-                                    item={item}
-                                    index={index}
-                                    setArray_itemListInCart={setArray_itemListInCart} indexItem={0}                                // indexItem={indexItem}       
-                                ></ItemInCartAndPayment>
                                 <Text style={styles.textInCart}>
-                                    Topping
+                                    Tổng cộng
                                 </Text>
-                                {/* view này là của item topping */} 
-                                { renderTopping(item.toppings , index) } 
-                                <View style={{
-                                        flexDirection: "row",
-                                        justifyContent: "space-between"
-                                    }}
-                                >
-                                    <Text style={styles.textInCart}>
-                                        Tổng cộng
-                                    </Text>
-                                    <Text style={styles.textInCart}>
-                                        {item.totalOfItem}
-                                    </Text>
-                                </View>
-                            </View> 
-                        </View>
-                    )
+                                <Text style={styles.textInCart}>
+                                    {item.totalOfItem}
+                                </Text>
+                            </View>
+                        </View> 
+                    </View>
+                )
             })
         }
     }
 
-    return(
-        
+    return( 
         <SafeAreaView style={[{flex: 10}]}  >  
+        
             {
                 isLoading
                 ? <View style={{marginVertical: heightScreen * 0.045}}>
@@ -360,10 +393,8 @@ export default function Payment() {
                     >Sản phẩm mua</Text>
                 </View> 
             </View>
-            <ScrollView style={{flex: 7}} > 
-                {/* <View> */}
-                    {renderItemListInCart()} 
-                {/* </View> */}
+            <ScrollView style={{flex: 7}} >  
+                { renderItemListInCart() }  
             </ScrollView>
             <View style={{flex: 0.45}}>
                 <View style={styles.titleContainer}> 
@@ -462,7 +493,7 @@ export default function Payment() {
                     </View>
                 </View>
             </View>
-            <View style={{backgroundColor: "white", flex: 0.16 }}>
+            {/* <View style={{backgroundColor: "white", flex: 0.16 }}>
                 <View 
                     style={styles.taskBarPayment}
                 >
@@ -480,14 +511,9 @@ export default function Payment() {
                             opacity: 0.5,
                             color: "#e87823"
                         }}
-                    >{orderInfo.paymentAmount} </Text>
-                    <Button
-                        iconName="money-bill"
-                        buttonName="Đặt hàng"
-                        handlePress={saveOrder} 
-                    ></Button>
+                    >{orderInfo.paymentAmount} </Text> 
                 </View>
-            </View>  
+            </View>   */}
         </SafeAreaView>
     )
 }

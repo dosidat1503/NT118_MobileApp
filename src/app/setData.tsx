@@ -1,7 +1,9 @@
 import { Button, View, Text, TouchableOpacity } from "react-native";
 import axios from "axios";
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import React from "react";
+import { encode } from 'base-64';
 
 
 export default function setData() {
@@ -18,7 +20,7 @@ export default function setData() {
             console.log(error);
         });
     }
-
+ 
     return (
         <View>
             {/* <Button title="Set Data" onPress={() => handleSetData} /> */}
@@ -38,7 +40,7 @@ export default function setData() {
             {
                 isSuccess && 
                     <Text>Success</Text>
-            }
+            }  
         </View>
     );
 }

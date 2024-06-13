@@ -5,6 +5,10 @@ import Colors from "@/constants/Colors";
 import { useState } from "react";
 import axios from "axios";
 import { useCartContext } from "@/providers.tsx/CartProvider"; 
+import { LogBox } from 'react-native';
+import React from "react";
+
+LogBox.ignoreLogs(['Warning: ...']);
 
 export default function SearchPost(){ 
   const navigation = useNavigation(); 
@@ -55,17 +59,18 @@ export default function SearchPost(){
           <Stack.Screen
             name="index" 
             options={{
-                title: 'Home', 
+                title: 'Trang chủ', 
                 headerLeft: () => (<View></View>),
                 headerBackVisible: false,
                 headerBackButtonMenuEnabled: false, 
                 headerRight: renderHeaderRight,  
             }}
+            
           />  
           <Stack.Screen
             name="AddPost" 
             options={{
-                title: 'Add New Post',    
+                title: 'Thêm bài viết',    
             }}
           />
           <Stack.Screen

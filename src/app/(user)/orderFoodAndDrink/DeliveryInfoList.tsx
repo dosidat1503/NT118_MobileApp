@@ -13,6 +13,7 @@ import React, { useState, useEffect } from 'react';
 import { color } from "react-native-elements/dist/helpers";
 import { fonts } from "react-native-elements/dist/config";
 import ItemType1 from "@/components/orderFAD/Payment/ItemType1";
+import axios from "axios";
 
 // interface DeliveryInfo { 
 //     name: string,
@@ -23,6 +24,7 @@ import ItemType1 from "@/components/orderFAD/Payment/ItemType1";
 // }
 
 export default function DeliveryInfoList() {
+    const { heightScreen, widthScreen, mainColor, baseURL, userID } = useCartContext();
     const [deliveryInfoList, setDeliveryInfoList] = useState([
         {
             name: "Đỗ Phạm Hoàng Ân",
@@ -30,22 +32,37 @@ export default function DeliveryInfoList() {
             address: "Toà B4, KTX Khu B",
             isDefault: true,
             isChoose: true
-        },
-        {
-            name: "Đỗ Phạm Tri Ân",
-            phone: "0968795751",
-            address: "Toà B5, KTX Khu B",
-            isDefault: true,
-            isChoose: true
-        }
+        }, 
     ]);
+
+    useEffect(() => {
+        console.log(userID, "userIDâcsc")
+        getDeliveryInfoList()
+    }, [])
+
+    const getDeliveryInfoList = async () => {
+        console.log(userID, "userIDâcsc")
+        axios.get(baseURL + '/getDeliveryInfo', { params: { userID: userID } })
+        .then( (res) => {
+            console.log(res.data, "DeliveryInfo11")
+            setDeliveryInfoList(res.data.deliveryInfo.map((item) => {
+                return {
+                    name: item.NAME,
+                    phone: item.PHONE,
+                    address: item.DETAIL,
+                    isDefault: item.IS_DEFAULT === 1 ? true : false,
+                    isChoose: item.IS_DEFAULT === 1 ? true : false
+                }
+            }))
+        })
+    } 
+
     const renderDeliveryInfoList = () => {
         return  deliveryInfoList.map((item, index) => {
             return (
                 <ItemType1 deliveryInfo={item} isChangeAddress={true}></ItemType1>
             )
-        })
-    
+        }) 
     }
     return (
         <View>

@@ -51,7 +51,7 @@ export default function ReviewShop() {
             paddingHorizontal: widthScreen * 0.005
         },
         reviewText: {
-            fontWeight: 500,
+            fontWeight: "500",
             fontSize: heightScreen * 0.019,
             paddingLeft: widthScreen * 0.02,
             opacity: 0.9

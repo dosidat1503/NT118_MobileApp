@@ -12,33 +12,27 @@ import { useCartContext } from "@/providers.tsx/CartProvider";
 import { Link } from "expo-router"; 
 import axios from "axios";
 import LoadingDots from "react-native-loading-dots";
-
+import Loading from "@/components/Loading";
+import React from "react";
 
 
 export default function FoodStallShop() { 
-    const {heightScreen, widthScreen, mainColor, FADShop_ID, baseURL} = useCartContext();
-
-    const [isLoadingData, setIsLoadingData] = useState(true);
-    const [infoShop, setInfoShop] = useState({})
-    // const infoShop = {
-    //     cover: defaultPrizzaImage ,
-    //     avatar: defaultPrizzaImage,
-    //     name: "LẨU CHAY HỮU DUYÊN",
-    //     address: "18/3 Tô Vĩnh Diện, Đông Hoà, Dĩ An, Bình Dương"
-    // }  
-
+    const {heightScreen, widthScreen, mainColor, FADShop_ID, baseURL, isLoading, setIsLoading} = useCartContext();
+ 
+    const [infoShop, setInfoShop] = useState({}) 
     useEffect(() => {
         const backHandle = BackHandler.addEventListener("hardwareBackPress", handleBackPress) 
+        setIsLoading(true)
         getShopInfo();
         return backHandle.remove()
     }, [])
 
-    const getShopInfo = () => {
+    const getShopInfo = () => { 
         axios.get(baseURL + '/getFADShopDetailInfo', { params: { shop_id: FADShop_ID } })
         .then( (res) => {
             console.log(res.data, "FADShopDetailInfo")
             setInfoShop(res.data.shop[0])
-            setIsLoadingData(!isLoadingData)
+            setIsLoading(false)
         })
     }
 
@@ -67,7 +61,7 @@ export default function FoodStallShop() {
         },
         backIcon: { 
             backgroundColor: "white",
-            borderRadius: "50%"
+            // borderRadius: "50%"
         }, 
         touchableBack: { 
             position: "absolute",
@@ -116,7 +110,7 @@ export default function FoodStallShop() {
                         ), 
                      }}
                 ></Stack.Screen>  
-                <View style={isLoadingData ? [styles.displayNone] : {} }> 
+                <View style={isLoading ? [styles.displayNone] : {} }> 
                     {/* Hiển thị ảnh cover */}
                     <Image
                         source={{ uri: infoShop.COVER_IMAGE_URL }}
@@ -152,16 +146,13 @@ export default function FoodStallShop() {
                             </Link>
                         </TouchableOpacity> */}
                     {/* Thông tin shop */}
+                    
                     <InfoShop infoShop={infoShop}></InfoShop>
 
                     {/* Thông tin sản phẩm của shop */}
                     <InfoFADofShop></InfoFADofShop>
                 </View>
-                <View style={[styles.loadingScreen, isLoadingData ? {} : styles.displayNone]}>
-                    <View style={styles.dotsWrapper}>
-                        <LoadingDots />
-                    </View>
-                </View>
+                <Loading></Loading>
             </View>
         </ScrollView>
     )

@@ -5,6 +5,7 @@ import AdjustQuantity from "../../../app/(user)/orderFoodAndDrink/AdjustQuantity
 import { FontAwesome5 } from "@expo/vector-icons";
 import { color } from "react-native-elements/dist/helpers";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from "react";
 
 interface Topping {
     label: string;
@@ -15,8 +16,10 @@ interface ItemInCartAndPaymentProps {
     isCart: boolean,
     isTopping: boolean,
     isHaveAdjusting: boolean,
+    isOrderDetail: boolean,
     quantity: number,
     item: {
+        sizes: string;
         label: string,
         name: string,
         price: number,
@@ -27,7 +30,7 @@ interface ItemInCartAndPaymentProps {
     setArray_itemListInCart: (value: any) => void // Add the missing property
 }
 
-export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjusting, quantity, item, index, setArray_itemListInCart, indexItem}: ItemInCartAndPaymentProps){
+export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjusting, quantity, item, index, setArray_itemListInCart, indexItem, isOrderDetail}: ItemInCartAndPaymentProps){
     const { heightScreen, widthScreen, mainColor } = useCartContext();
 
     const avatarSize = widthScreen * 0.13;
@@ -140,10 +143,22 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
             return newArray_itemListInCart;
         })
     }
+    const renderAdjustQuantity = () => {
+        return isOrderDetail
+        ? null
+        : <AdjustQuantity 
+            quantity={isTopping ? item.quantity : quantity} 
+            handleAdjustQuantity={handleAdjustQuantity} 
+            index={isTopping ? index : indexItem}
+        />
+    }
 
     return (
         <View 
-            style={styles.item}
+            style={[
+                styles.item, 
+                isTopping && item.quantity === 0 ? styles.hidden : {}
+            ]}
         >
             <View 
                 style={{
@@ -163,7 +178,7 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                     <Text
                         style={styles.nameShopText}
                     >
-                        {isTopping ? item.label : item.name}
+                        {isTopping ? item.name : item.name}
                     </Text>
                     <View style={{
                         flexDirection: "row" 
@@ -178,7 +193,7 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                                 display: isTopping ? "none" : "flex"
                             }}
                         >
-                            Size: {!isTopping ? item.sizes.find(itemSize => itemSize.checked)?.label : ""}
+                            Size: {!isTopping ? item.sizes.find((itemSize: { checked: any; }) => itemSize.checked)?.label : ""}
                         </Text>
                     </View>
                 </View> 
@@ -203,11 +218,10 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                         }}
                     ></FontAwesome5>
                 </TouchableOpacity>
-                <AdjustQuantity
-                    index={index}
-                    quantity={item.quantity}
-                    handleAdjustQuantity={handleAdjustQuantity}
-                ></AdjustQuantity>
+                {
+                    renderAdjustQuantity()
+                }
+                
             </View>
             <View
                 style={{ 

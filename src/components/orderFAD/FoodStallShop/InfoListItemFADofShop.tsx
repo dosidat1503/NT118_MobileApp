@@ -4,6 +4,7 @@ import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native'; 
 import { Link, Stack } from "expo-router";
 import Colors from "@/constants/Colors"
+import React from "react";
 
 export default function InfoListItemFADofShop({item}: {item: any}) {
         const {heightScreen, widthScreen} = useCartContext()
@@ -35,7 +36,7 @@ export default function InfoListItemFADofShop({item}: {item: any}) {
             fontSize: imageSize * 0.15
         },
         price: {
-            fontWeight: 500,
+            fontWeight: "500",
             color: "red"
         },
         imageContainer: {

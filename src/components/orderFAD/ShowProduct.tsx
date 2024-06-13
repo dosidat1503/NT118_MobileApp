@@ -4,33 +4,54 @@ import { useCartContext } from '@/providers.tsx/CartProvider';
 import { Link } from "expo-router";
 
 import { useNavigation } from '@react-navigation/native'; 
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function ShowProduct({products}: {products: any[]}) { 
-    const { heightScreen, widthScreen } = useCartContext();
-    const navigation = useNavigation();
-    
-    const renderFADCategory = ({item}: {item: any}) => {
+    const { heightScreen, widthScreen, setDetailInfoOfFAD, baseURL, RD } = useCartContext();
+    const navigation = useNavigation();   
+
+    const renderFADCategory = ({item, index}: {item: any, index: number}) => {
         return( 
             // <Link href="/(user)/orderFoodAndDrink/FoodStallShop" asChild> 
             <TouchableOpacity 
-                onPress={() => navigation.navigate('DetailInfoOfFAD', { item })}
+                onPress={() => { 
+                    navigation.navigate('DetailInfoOfFAD', item)
+                    setDetailInfoOfFAD(item)
+                }}
+                key={index}
             >   
                 <View style={styles.FADCategoryContainer}>
                     <Image
-                    source={{uri: item.image}}
-                    style={styles.FADCategoryImage}
+                        source={{uri: item.FOOD_IMAGE_URL}}
+                        style={styles.FADCategoryImage}
                     ></Image>
                     <View>
                         <Text
                             style={styles.FADCategoryTitle}
                         >
-                            {item.name}
+                            {item.FAD_NAME}
                         </Text>
                         <Text 
-                            // style={styles}
+                            style={{
+                                fontSize: RD * 0.00004,
+                                fontWeight: 'bold',
+                                color: 'red'
+                            }}
                         >
-                            Giá: {item.price} k
+                            Giá: {item.FAD_PRICE} k
                         </Text>
+                        <View style={{flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
+                            <Image
+                                source={{uri: item.SHOP_IMAGE_URL}}
+                                style={{
+                                    width: RD * 0.00007,
+                                    height: RD * 0.00007,
+                                    borderRadius: RD * 0.000035,  
+                                }}
+                            /> 
+                            <Text style={{ fontWeight: "bold", marginLeft: widthScreen * 0.01 }}>{item.SHOP_NAME}</Text>
+                        </View>
                     </View>
                 </View> 
             </TouchableOpacity>
@@ -43,7 +64,8 @@ export default function ShowProduct({products}: {products: any[]}) {
             width: heightScreen * 0.1,
             aspectRatio: 1,
             marginVertical: 5,
-            marginHorizontal: 10
+            marginHorizontal: 10,
+            borderRadius: widthScreen * 0.04,
         },
         FADCategoryContainer: {
             flexDirection: 'row', 
@@ -55,8 +77,9 @@ export default function ShowProduct({products}: {products: any[]}) {
         },
         FADCategoryTitle: {
             fontWeight: 'bold', 
-            flex: 4, 
-            marginBottom: heightScreen * 0.009
+            fontSize: RD * 0.00005,
+            // flex: 4, 
+            // marginBottom: heightScreen * 0.009
         },
         FADCategoryDivContainer: {
             paddingVertical: 5,
@@ -68,11 +91,12 @@ export default function ShowProduct({products}: {products: any[]}) {
     return(
         <View style={styles.FADCategoryDivContainer}>
             <FlatList
-            data={products}
-            renderItem={renderFADCategory} 
-            showsVerticalScrollIndicator
-            bounces={false}
-            pagingEnabled 
+                data={products}
+                renderItem={renderFADCategory} 
+                showsVerticalScrollIndicator
+                bounces={false}
+                pagingEnabled 
+                keyExtractor={(item, index) => index.toString()} 
             >
             </FlatList> 
         </View>
