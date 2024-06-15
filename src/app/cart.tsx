@@ -12,6 +12,7 @@ import { Link, Stack, useNavigation } from 'expo-router';
 import axios from 'axios';
 import { CheckBox } from 'react-native-elements';
 import { FontAwesome5 } from '@expo/vector-icons';
+import React from 'react';
  
 
 export default function CartScreen() {
@@ -119,7 +120,7 @@ export default function CartScreen() {
         axios.post(baseURL + '/signup', signUpInfo)
         .then((response) => {
           console.log(response.data);
-          navigation.navigate('signUpSuccess');
+          navigation.navigate('signUpSuccess' as never);
         })
 
         console.log('Đăng ký thành công!', signUpInfo);

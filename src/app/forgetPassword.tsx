@@ -87,7 +87,7 @@ const index = () => {
       console.log(response.data);
       if(response.data.statusCode === 200) { 
         setIsLoading(false);
-        navigation.navigate('sendMailRecoverPasswordSuccess'); 
+        navigation.navigate('sendMailRecoverPasswordSuccess' as never); 
       } 
       else{ 
         if(response.data.message === errorText)
@@ -151,7 +151,7 @@ const index = () => {
             <FontAwesome5 name="sign-in-alt" size={widthScreen * 0.03} color="white" />
         {/* </Link> */}
           </Button> 
-        <TouchableOpacity onPress={() => { navigation.navigate('index') }}>
+        <TouchableOpacity onPress={() => { navigation.navigate('index' as never) }}>
           <View style={{flexDirection: 'row', alignItems: "center"}}>
             <Text
               style={{

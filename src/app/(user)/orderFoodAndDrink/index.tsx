@@ -51,19 +51,19 @@ export default function TabOneScreen() {
   
   return (  
         <ScrollView>  
-    <View>
-          {/* hiển thị slide show hình ảnh FAD */}
-          <SlideHeaderOrderFAD products={imageList}></SlideHeaderOrderFAD> 
+          <View>
+                {/* hiển thị slide show hình ảnh FAD */}
+                <SlideHeaderOrderFAD products={imageList}></SlideHeaderOrderFAD> 
 
-          {/* input search bạn muốn ăn gì */} 
-          <SearchFAD></SearchFAD>
+                {/* input search bạn muốn ăn gì */} 
+                <SearchFAD></SearchFAD>
 
-          {/* hiển thị thông tin của shop */}
-          <FADShop products={homeInfo.shopInfo}></FADShop> 
+                {/* hiển thị thông tin của shop */}
+                <FADShop products={homeInfo.shopInfo}></FADShop> 
 
-          {/* hiển thị thông tin sản phẩm */}
-          <ShowProduct products={homeInfo.FADInfo_eloquent}></ShowProduct> 
-    </View>
+                {/* hiển thị thông tin sản phẩm */}
+                <ShowProduct products={homeInfo.FADInfo_eloquent}></ShowProduct> 
+          </View>
         </ScrollView>
   );
   

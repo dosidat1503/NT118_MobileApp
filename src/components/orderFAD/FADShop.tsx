@@ -26,7 +26,7 @@ export default function FADShop({products}: {products: any}){
     }, [])
 
     const handleClickFADShop = (id: number) => {
-        navigation.navigate('FoodStallShop')
+        navigation.navigate('FoodStallShop' as never)
         setFADShop_ID(id)
     }
     

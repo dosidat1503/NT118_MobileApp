@@ -1,4 +1,4 @@
- import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View, Image, Text, Platform, Modal } from "react-native"
 // import { View } from "@/components/Themed"
 // import DatePicker from 'react-native-modern-datepicker' 
@@ -7,31 +7,41 @@ import { FindFilterAtHome } from "@/types";
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import axios from "axios";
 import React from "react";
+import PostList from "@/components/PostList";
+import { renderItemPostProp } from "@/types";
+import PostAtHome from "./PostAtHome"; 
+import { ScrollView } from "react-native-gesture-handler";
+import CollapsibleFilter from "./CollapsibleFilter";
+import { Stack } from "expo-router";
+export default function SearchPost() {
 
-export default function SearchPost() {  
-    const { baseURL, textQueryPost } = useCartContext();
+    const {setSelectedItem } = useCartContext()
+
+    const [reloadPost, setReloadPost] = useState(false) 
+    const handleReloadPost = () => {
+        setReloadPost(!reloadPost)
+        console.log("handleReloadPost")
+    }
+
     useEffect(() => {
-        const handleSearch = () => {
-            console.log(textQueryPost, "handleSearch")
-            axios.get(baseURL + '/searchPost', { params: {textQueryPost: textQueryPost} })
-            .then((response) => {
-              console.log(response.data, "handleSearch")
-              // navigation.navigate('SearchPost')
-            })
-        }
-        handleSearch()
-    })
+        setSelectedItem({
+            topicItem: [],
+            sortByItem: '',
+            startDate: "",
+            endDate: "", 
+        })
+    }, [])
 
-    return (
-        <View
-            style={ styles.container} 
-        >
-            <View>
-                <Text>SearchPost</Text>
-            </View>
-            <View>    
-            </View>
-        </View>
+    return ( 
+        <ScrollView>  
+            {/* <Stack.Screen
+                options={{
+                    title: "Tìm kiếm"
+                }}
+            ></Stack.Screen> */}
+            <CollapsibleFilter handleReloadPost= {handleReloadPost} ></CollapsibleFilter>
+            <PostAtHome reloadPost={reloadPost}></PostAtHome>
+        </ScrollView>  
     )
 }
 

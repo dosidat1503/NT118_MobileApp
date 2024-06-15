@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import axios from "axios"; 
 import Button from "@/app/(user)/orderFoodAndDrink/Button";
 import { useNavigation } from "expo-router";
+import RenderFooter from "@/components/RenderFooter";
 
 interface orderItem {
     ORDER_ID: number;
@@ -222,7 +223,7 @@ export default function OrderManagement() {
         const requestData = {
             orderStatusCode: orderStatusCode,
             startIndex: (itemQuantityEveryLoad * ( pageNumber - 1 )),
-            endIndex: orderStatusCode === 0 ? itemQuantityEveryLoad : itemQuantityEveryLoad * pageNumber, 
+            itemQuantityEveryLoad: itemQuantityEveryLoad, 
             userID: userID === 0 ? 1 : userID
         }
 
@@ -295,7 +296,7 @@ export default function OrderManagement() {
                     style={styles.detailInfoOfOderTextContainer} 
                     onPress={() => {
                         setOrderID(item.ORDER_ID)
-                        navigation.navigate("order/OrderDetail")
+                        navigation.navigate("order/OrderDetail" as never)
                     }}
                 >
                     <Text style={styles.detailInfoOfOderText}>Thông tin chi tiết đơn hàng &gt;</Text>
@@ -336,16 +337,7 @@ export default function OrderManagement() {
             </View>
         </View>
     )  
-
-    const renderFooter = () => {
-        return(
-            isLoading &&
-            <View style={{ marginTop: heightScreen * 0.002, marginBottom: heightScreen * 0.05, alignItems: "center" }}>
-                <ActivityIndicator size="large" color={mainColor} />
-            </View>
-        )
-    }
-
+ 
     const renderEveryStatus = () => {
         return infoManagementEveryOrderStatus.map((itemStatus, index) => {
             console.log(itemStatus.orderStatusName, itemStatus.isActive, "isActive");
@@ -354,7 +346,7 @@ export default function OrderManagement() {
                     <FlatList
                         data={itemStatus.orderItemList}
                         renderItem={({item}) => renderOrderList(item, itemStatus)} 
-                        ListFooterComponent={renderFooter}
+                        ListFooterComponent={ <RenderFooter isLoading={isLoading}></RenderFooter> }
                         onEndReached={() => getOrderInfo(itemStatus)}
                         onEndReachedThreshold={0.01} 
                     ></FlatList>

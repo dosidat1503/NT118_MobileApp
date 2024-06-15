@@ -131,10 +131,7 @@ const PostList = ({infoPostItem, infoPostList, setInfoPost } : PostListProps) =>
 
   });
 
-  useEffect(() => {
-    console.log("infoPostItem1", infoPostItem.post.image)
-  }, [])
-
+  
   const handleInteractPost = (type: type) => {
     console.log("handleInteractPost", type)
     setInfoPost(infoPostList.map((item: PostListProps["infoPostItem"]) => {

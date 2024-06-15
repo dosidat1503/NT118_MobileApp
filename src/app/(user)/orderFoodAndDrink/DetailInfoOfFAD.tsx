@@ -62,8 +62,7 @@ export default function DetailInfoOfFAD() {
     const widthPaddingNameFAD = widthScreen * 0.04 
       
     const route = useRoute<RouteProp<RootStackParamList, 'DetailInfoOfFAD'>>();
-    const product = route.params?.item; 
-    // const product = {}; 
+    const product = route.params?.item;  
 
     const [isAdding, setIsAdding] = useState(false);
 
@@ -530,7 +529,7 @@ export default function DetailInfoOfFAD() {
                     ? <Button
                         iconName="check-circle"
                         buttonName="Đã thêm vào giỏ" 
-                        color="green"
+                        color="green" 
                     ></Button>
                     : <Button
                         iconName="shopping-cart"

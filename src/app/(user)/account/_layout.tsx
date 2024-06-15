@@ -30,6 +30,18 @@ export default function MenuStack(){
             title: 'Chi tiết đơn hàng',    
           }}
         />
+        <Stack.Screen
+          name="AccountInfo" 
+          options={{
+            title: 'Thông tin tài khoản',    
+          }}
+        />
+        <Stack.Screen
+          name="Security" 
+          options={{
+            title: 'Bảo mật',    
+          }}
+        />
       </Stack>
     )
 }

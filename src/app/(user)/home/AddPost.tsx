@@ -199,7 +199,7 @@ export default function AddPost() {
     }
     
     const toogleExpand = () => {
-        navigation.navigate('AddPost')
+        navigation.navigate('AddPost' as never)
         // setExpandInputPostInfo(!expandInputPostInfo)
     }
     
@@ -459,7 +459,7 @@ export default function AddPost() {
                         href2="/(user)"
                         buttonIcon2="eye"
                         buttonName2="Bài Viết"
-                        buttonFunction2={() => { navigation.navigate('index', null)}}
+                        buttonFunction2={() => { navigation.navigate('index' as never)}}
                     ></Response>
                     : <Response
                         content="Đã có lỗi xảy ra khi đăng bài. Hãy đăng lại bài viết."

@@ -15,11 +15,14 @@ import LoadingDots from "react-native-loading-dots";
 import Loading from "@/components/Loading";
 import React from "react";
 
+type InfoShopProp = {
+    COVER_IMAGE_URL: string
+}
 
 export default function FoodStallShop() { 
     const {heightScreen, widthScreen, mainColor, FADShop_ID, baseURL, isLoading, setIsLoading} = useCartContext();
  
-    const [infoShop, setInfoShop] = useState({}) 
+    const [infoShop, setInfoShop] = useState<InfoShopProp | undefined>(undefined) 
     useEffect(() => {
         const backHandle = BackHandler.addEventListener("hardwareBackPress", handleBackPress) 
         setIsLoading(true)
@@ -113,7 +116,7 @@ export default function FoodStallShop() {
                 <View style={isLoading ? [styles.displayNone] : {} }> 
                     {/* Hiển thị ảnh cover */}
                     <Image
-                        source={{ uri: infoShop.COVER_IMAGE_URL }}
+                        source={{ uri: infoShop?.COVER_IMAGE_URL }}
                         style={styles.cover}
                     ></Image>  
 
@@ -151,6 +154,8 @@ export default function FoodStallShop() {
 
                     {/* Thông tin sản phẩm của shop */}
                     <InfoFADofShop></InfoFADofShop>
+
+                    {/* Xoan code hiển thị thông tin voucher ở đây */}
                 </View>
                 <Loading></Loading>
             </View>

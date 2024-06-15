@@ -11,12 +11,9 @@ import React from "react";
 LogBox.ignoreLogs(['Warning: ...']);
 
 export default function SearchPost(){ 
-  const navigation = useNavigation(); 
-  const [textQuery, setTextQuery] = useState('');
-  const { baseURL, setTextQueryPost } = useCartContext();
-
-    
-
+  const navigation = useNavigation();  
+  const { baseURL, setTextQueryPost, textQueryPost, mainColor, RD, widthScreen, heightScreen, selectedItem, setSelectedItem } = useCartContext();
+ 
   const renderHeaderRight = () => (
     <View style={{ 
       flexDirection: 'row', 
@@ -29,6 +26,7 @@ export default function SearchPost(){
         <TextInput
           placeholder="Search..."
           style={styles.inputSearch} 
+          value={textQueryPost}
           onChangeText={(text) => setTextQueryPost(text)}
         />  
         {/* <TouchableOpacity onPress={() => handleSearch}>    */}
@@ -41,7 +39,7 @@ export default function SearchPost(){
         </Link>
         {/* </TouchableOpacity> */}
       </View> 
-      <Link href="/home/filter" asChild>
+      {/* <Link href="/home/filter" asChild>
         <Pressable>
           {({ pressed }) => ( 
             <Image
@@ -50,7 +48,7 @@ export default function SearchPost(){
             ></Image>
           )}
         </Pressable>
-      </Link>  
+      </Link>   */}
     </View>
   )
 
@@ -74,12 +72,37 @@ export default function SearchPost(){
             }}
           />
           <Stack.Screen
-            name="SearchPost" 
-            options={{
-                title: 'Tìm kiếm',    
-            }}
-          />
-        </Stack>
+              name="SearchPost" 
+              options={{
+                  title: 'Tìm kiếm',    
+                  headerLeft: () => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setTextQueryPost(''); // Đặt setTextQuery về chuỗi rỗng
+                        setSelectedItem({
+                          topicItem: [],
+                          sortByItem: '',
+                          startDate: "",
+                          endDate: "", 
+                        }); // Đặt setSelectedItem về object rỗng
+                        // navigation.goBack(); // Điều hướng quay lại trang trước
+                        navigation.navigate('index' as never);
+                      }} 
+                    >
+                      <FontAwesome
+                        name="chevron-left"
+                        size={RD * 0.00005}
+                        color={mainColor} 
+                        style={{ 
+                          marginRight: widthScreen * 0.02, 
+                          paddingTop: heightScreen * 0.003
+                        }}
+                      />
+                    </TouchableOpacity>
+                  ),
+              }}
+            />
+          </Stack>
     )
 }
 

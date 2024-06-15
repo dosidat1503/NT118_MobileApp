@@ -116,7 +116,7 @@ const index = () => {
         AsyncStorage.setItem('email',  JSON.stringify(signInInfo.email)); 
         AsyncStorage.setItem('password',  JSON.stringify(signInInfo.password)); 
         setIsLoading(false);
-        navigation.navigate('(user)'); 
+        navigation.navigate('(user)' as never); 
       } 
       else{ 
         if(response.data.message === errorText)
@@ -206,7 +206,7 @@ const index = () => {
             >Ghi nhớ mật khẩu</Text>
           </View>
           <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity onPress={() => { navigation.navigate('forgetPassword') }}>
+            <TouchableOpacity onPress={() => { navigation.navigate('forgetPassword' as never) }}>
             {/* <Link href={"/(user)/home/"}> */}
                 <Text
                   style={{ textDecorationLine: 'underline', color: 'white', fontSize: widthScreen * 0.04}}
@@ -223,7 +223,7 @@ const index = () => {
             <FontAwesome5 name="sign-in-alt" size={widthScreen * 0.03} color="white" />
         {/* </Link> */}
           </Button> 
-        <TouchableOpacity onPress={() => { navigation.navigate('signUp') }}>
+        <TouchableOpacity onPress={() => { navigation.navigate('signUp' as never) }}>
           <View style={{flexDirection: 'row', alignItems: "center"}}>
             <Text
               style={{
@@ -242,7 +242,7 @@ const index = () => {
               />
           </View>
         </TouchableOpacity> 
-        <TouchableOpacity onPress={() => { navigation.navigate('setData') }}>
+        <TouchableOpacity onPress={() => { navigation.navigate('setData' as never) }}>
           <View style={{flexDirection: 'row', alignItems: "center"}}>
             <Text
               style={{

@@ -16,7 +16,7 @@ export default function ShowProduct({products}: {products: any[]}) {
             // <Link href="/(user)/orderFoodAndDrink/FoodStallShop" asChild> 
             <TouchableOpacity 
                 onPress={() => { 
-                    navigation.navigate('DetailInfoOfFAD', item)
+                    navigation.navigate('DetailInfoOfFAD' as never)
                     setDetailInfoOfFAD(item)
                 }}
                 key={index}

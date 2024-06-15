@@ -67,9 +67,9 @@ export default function TabOneScreen() {
 
   const listItem = {
     account: [
-      { icon: "user", title: "Thông tin tài khoản", size: widthScreen * 0.07, linkHref: "/(user)/account/accountInfo"}, 
+      { icon: "user", title: "Thông tin tài khoản", size: widthScreen * 0.07, linkHref: "AccountInfo"}, 
       { icon: "lock", title: "Quyền riêng tư", size: widthScreen * 0.06,  linkHref: "/(user)/account/privacy"},
-      { icon: "shield-alt", title: "Bảo mật", size: widthScreen * 0.055,  linkHref: "/(user)/account/security"}
+      { icon: "shield-alt", title: "Bảo mật", size: widthScreen * 0.055,  linkHref: "Security"}
     ],
     featureManagement: [
       { icon: "file-invoice", title: "Đơn hàng", size: widthScreen * 0.06, linkHref: "OrderManagement"},
@@ -104,6 +104,7 @@ export default function TabOneScreen() {
               return(
                 <TouchableOpacity
                   key={index}
+                  onPress={ () => { navigation.navigate(item.linkHref as never) } }
                 >
                   <View style={styles.itemContainerInBody}>
                     <View style={{width: widthScreen * 0.06, flexDirection: 'row', justifyContent: 'center'}}>
@@ -122,7 +123,7 @@ export default function TabOneScreen() {
             listItem.featureManagement.map((item, index) => {
               return(
                 <TouchableOpacity
-                  onPress={() => { navigation.navigate('order/OrderManagement')} }
+                  onPress={() => { navigation.navigate('order/OrderManagement' as never)} }
                   key={index}
                 >
                   {/* <Link href={item.linkHref} > */}
@@ -142,7 +143,7 @@ export default function TabOneScreen() {
         <TouchableOpacity
           onPress={() => {  
             axios.get(baseURL + '/logout')
-            navigation.navigate('index')
+            navigation.navigate('index' as never)
           }}
         >
           <View style={styles.itemContainerInBody}>

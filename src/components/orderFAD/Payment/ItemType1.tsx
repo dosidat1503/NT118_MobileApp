@@ -9,13 +9,14 @@ import { useNavigation } from "expo-router";
  
 interface ItemType1Props {
     deliveryInfo: {
+        id: number,
         name: string,
         phone: string,
         address: string,
-        isDefault: boolean,
-        isChoose: boolean
+        isDefault?: boolean,
+        isChoose?: boolean
     },
-    isChangeAddress: boolean
+    isChangeAddress?: boolean
 }
 
 export default function ItemType1({deliveryInfo, isChangeAddress = false}: ItemType1Props) {
@@ -200,7 +201,7 @@ export default function ItemType1({deliveryInfo, isChangeAddress = false}: ItemT
                         </Link>
                         : 
                         // <Link href={"/(user)/orderFoodAndDrink/DeliveryInfoList"}>
-                        <TouchableOpacity onPress={() => navigation.navigate("DeliveryInfoList")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("DeliveryInfoList" as never)}>
                             <FontAwesome5 
                                 name="chevron-right" 
                                 size={widthScreen * 0.05}

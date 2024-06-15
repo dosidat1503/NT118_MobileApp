@@ -15,7 +15,7 @@ import { fonts } from "react-native-elements/dist/config";
 import ItemType1 from "@/components/orderFAD/Payment/ItemType1";
 import axios from "axios";
 import Loading from "@/components/Loading";
-
+import { useNavigation } from 'expo-router';
 
 export default function Payment() {
     const { heightScreen, widthScreen, mainColor, baseURL, userID, setIsLoading, isLoading } = useCartContext(); 
@@ -214,7 +214,9 @@ export default function Payment() {
         voucherID: 1,
         paymentAmount: 0,
         userID: userID
-    })
+    }) 
+
+    const navigation = useNavigation();
 
     useEffect(() => {
         setIsLoading(true);
@@ -260,10 +262,13 @@ export default function Payment() {
 
     const saveOrder = () => {
         console.log(orderInfo.productList[0].toppings, 'toppings22')
-        axios.post(baseURL + "/saveOrder", orderInfo)
-        .then((response) => {
-            console.log(response.data)
-        })
+        // axios.post(baseURL + "/saveOrder", orderInfo)
+        // .then((response) => {
+        //     // xoan navigation đến trang thanh toán thành công
+
+        //     console.log(response.data)
+        // })
+        navigation.navigate("OrderSuccess" as never);
     }
    
     const renderTopping = (toppings: any[], indexItem: number) => {

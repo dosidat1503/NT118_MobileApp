@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View, Text, Image, TextInput, Button, ScrollView, Pressable, SectionList, Linking } from 'react-native';
+import { FlatList, StyleSheet, View, Text, Image, TextInput, Button,  Pressable, SectionList, Linking } from 'react-native';
 import { Stack, Link } from 'expo-router';
 import ProductListItem from '@/components/PostList'; 
 import products from '@assets/data/products';
@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 // import Carousel from 'react-native-snap-carousel';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 import { SelectList } from 'react-native-dropdown-select-list';
-import { filters } from './filter';  
+import Filter, { filters } from './filter';  
 import { useNavigation } from 'expo-router';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,24 +22,20 @@ import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
+import { renderItemPostProp } from '@/types';
+import PostAtHome from './PostAtHome';
+import Collapsible from 'react-native-collapsible';
+import { ScrollView } from 'react-native-gesture-handler';
+import CollapsibleFilter from './CollapsibleFilter';
+import SearchPost from './SearchPost';
+
 LogBox.ignoreLogs(['Warning: ...']);
 
-type renderItemPostProp = {
-  item: any,
-  segment?: any,
-}
+// type renderItemPostProp = {
+//   item: any,
+//   segment?: any,
+// }
 
-interface itemInfoPost {
-  LIKE_QUANTITY: number;
-  CONTENT: string;
-  POST_ID: number;
-  NAME: string;
-  IMG_URL: string;
-  USER_ID: number; 
-  TIME: string; 
-  id: any; 
-  body: any; 
-}
 
 export default function TabOneScreen() {  
 
@@ -126,7 +122,31 @@ export default function TabOneScreen() {
       justifyContent: 'flex-start',
       width: '100%',
       paddingLeft: '3%'
-    }
+    },
+    filterIcon: {
+      width: RD * 0.00006,
+      height: RD * 0.00006,
+      color: 'green', 
+    },
+    collapseBarText: {
+      fontWeight: "bold",
+      fontSize: widthScreen * 0.04, 
+      color: mainColor,
+      marginLeft: widthScreen * 0.02,
+
+    },
+    collapseBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      // alignSelf: "center"
+      width: widthScreen * 0.23,
+      borderColor: 'green',
+      borderWidth: 1,
+      marginLeft: widthScreen * 0.05,
+      borderRadius: RD * 0.00002,
+      paddingVertical: heightScreen * 0.006,
+      marginTop: heightScreen * 0.01,
+    },
   });
 
   const navigation = useNavigation();
@@ -136,6 +156,8 @@ export default function TabOneScreen() {
  
   const [expandInputPostInfo, setExpandInputPostInfo] = useState(false)
   const [topicSelectedToPost, setTopicSelectedToPost] = useState("")
+
+  const [isShowFilter, setIsShowFilter] = useState(false);
   
   const dataToSelectTopic = [
     {key:'1', value:'Chọn chủ đề', disabled:true},
@@ -147,91 +169,10 @@ export default function TabOneScreen() {
     // {key:'7', value:'Drinks'},
   ]
 
-  const [infoPost, setInfoPost] = useState([{
-    user: {
-      ID:  0,
-      avatarImage: '',
-      Name: '',
-    },
-    post: {
-      ID: 0,
-      content: '',
-      time: '',
-      image: '',
-      likeQuantity: 0,
-    },
-    interact: {
-      isLiked: false,
-      isSaved: false,
-    }
-  }])
-
-  useEffect(() => { 
-    const getUserID = async () => {
-      const userID = await AsyncStorage.getItem("userID");
-      return userID; 
-    }
-
-    setUserID(1)
-
-    const getInforPost = () => {
-      // axios.get(baseURL + '/getInfoPost')
-      axios.get(baseURL + '/getInfoPost')
-      .then((response) => {
-        console.log(response.data, "getInforPost")
-        const updateInfoPost = [...infoPost]
-        console.log(
-          response.data.infoPostImage, 
-          'response.data.infoPostImage1', 
-          response.data.infoUser[0].NAME,
-          response.data.infoPostImage.filter((item: any) => {
-            if(1 === item.POST_ID) return item.URL
-          })
-        )
-        response.data.infoPost.map((item: itemInfoPost, index: any) => {
-          const imageUrls: any = []; // Khởi tạo một mảng để chứa các URL
-          response.data.infoPostImage.forEach((itemImage: any) => {
-            if (itemImage.POST_ID === item.POST_ID) {
-              imageUrls.push(itemImage.URL); // Thêm URL vào mảng nếu POST_ID khớp
-            }
-          });
-          updateInfoPost.push({
-            user: {
-              ID:  item.USER_ID,
-              avatarImage: response.data.infoAvatarImage[0].URL,
-              Name: response.data.infoUser[0].NAME,
-            },
-            post: {
-              ID: item.POST_ID,
-              time: item.TIME,
-              content: item.CONTENT,
-              image: imageUrls,
-              likeQuantity: response.data.infoPost[index].LIKE_QUANTITY,
-            },
-            interact: {
-              isLiked: false,
-              isSaved: false,
-            }
-          })
-        })
-
-        setInfoPost(updateInfoPost) 
-        
-        console.log(updateInfoPost[2].post.image, "setInfoPo1st")
-      })
-    }
-
-    getInforPost()
- 
-  }, [])
-
-  useEffect(() => {
-    console.log(infoPost, 'infoPost')
-  }, [infoPost])
-
+   
   const importDataFromFilters = () => { 
     filters[1].list.forEach((item, index) => {
-        console.log(index, 'ok')
+        // console.log(index, 'ok')
         return(
           dataToSelectTopic.push({
             key: `${index + 2}`,
@@ -244,47 +185,17 @@ export default function TabOneScreen() {
   }
 
   const toogleExpand = () => {
-    navigation.navigate('AddPost')
+    navigation.navigate('AddPost' as never)
     // setExpandInputPostInfo(!expandInputPostInfo)
   }
   
- 
-
-  // useEffect(() => {
-  //   const pickImageAfterPermission = async () => {
-  //       // No permissions request is necessary for launching the image library
-  //     let result = await ImagePicker.launchImageLibraryAsync({
-  //       mediaTypes: ImagePicker.MediaTypeOptions.All, 
-  //       allowsMultipleSelection: true,
-  //       aspect: [4, 3],
-  //       quality: 1,
-  //       orderedSelection: true,
-  //     });
-
-  //     console.log(result, 'result');
-
-  //     if (!result.canceled) {
-  //       setImage(result.assets[0].uri as string); // Update the type of the value passed to setImage
-  //     }
-  //   }
-  //   pickImageAfterPermission()
-  // }, [hasGalleryPermission])
-
-  const renderItemPost = ({item}: renderItemPostProp) => 
-    (
-      <PostList 
-        infoPostItem = {item} 
-        infoPostList = {infoPost} 
-        setInfoPost = {setInfoPost} 
-        segments={[]}
-      ></PostList>
-    )
+  const toogleCollapseFilter = () => {
+    setIsShowFilter(!isShowFilter)
+  }
   
   importDataFromFilters(); // Call the function here
 
-  return (  
-    // <ScrollView>  
-      
+  return (   
       <View style={{backgroundColor: "white"}}>  
         {
           image 
@@ -343,16 +254,9 @@ export default function TabOneScreen() {
               onPress={toogleExpand}
             ></FontAwesome>  
           </View>
-        </View>  
-        <FlatList
-          data={infoPost}
-          renderItem={renderItemPost}
-          numColumns={1}
-          contentContainerStyle={{gap: 10}}
-          // columnWrapperStyle={{gap: 10}}
-        />  
-      </View> 
-    // {/* </ScrollView> */}
+        </View>   
+        <SearchPost></SearchPost>
+      </View>  
   );
 }
 

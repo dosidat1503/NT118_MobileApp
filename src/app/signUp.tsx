@@ -130,7 +130,7 @@ export default function SignUp () {
           }
           else{
             setIsLoading(false);
-            navigation.navigate('signUpSuccess');
+            navigation.navigate('signUpSuccess' as never);
           }
         })
 
@@ -295,7 +295,7 @@ export default function SignUp () {
             text='Đăng ký' 
             onPress={handleRegistration}
           ></Button>
-          <TouchableOpacity onPress={() => { navigation.navigate('index') }}>
+          <TouchableOpacity onPress={() => { navigation.navigate('index' as never) }}>
             <View style={{flexDirection: 'row', alignItems: "center", alignContent: 'center'}}>
               <Text
                 style={{

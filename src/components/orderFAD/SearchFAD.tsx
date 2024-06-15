@@ -50,7 +50,7 @@ export default function SearchFAD() {
     const navigation = useNavigation();
 
     const handleSearch = () => {
-        navigation.navigate('ShowFADSearchInfo')
+        navigation.navigate('ShowFADSearchInfo' as never)
     }
     return(
     // {/* input search bạn muốn ăn gì */}

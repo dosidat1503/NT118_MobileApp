@@ -270,7 +270,7 @@ export default function Cart() {
                         <Button
                             iconName="money-bill-alt"
                             buttonName="THANH TOÁN"
-                            handlePress={() => { navigation.navigate('Payment', null)}}
+                            handlePress={() => { navigation.navigate('Payment' as never)}}
                         ></Button>
                     {/* </Link> */}
                 </View>

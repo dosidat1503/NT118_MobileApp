@@ -53,3 +53,20 @@ export type Profile = {
   id: string;
   group: string;
 };
+
+export type renderItemPostProp = {
+  item: any,
+  segment?: any,
+}
+
+export interface itemInfoPost {
+  LIKE_QUANTITY: number;
+  CONTENT: string;
+  POST_ID: number;
+  NAME: string;
+  IMG_URL: string;
+  USER_ID: number; 
+  TIME: string; 
+  id: any; 
+  body: any; 
+}

@@ -77,7 +77,7 @@ export default function SignUpSuccess() {
                             <Button
                                 iconName="sign-in-alt"
                                 buttonName="Đăng nhập"
-                                handlePress={() => { navigation.navigate('index', null)}}
+                                handlePress={() => { navigation.navigate('index' as never)}}
                             ></Button> 
                         </Link>
                     </View>
