@@ -1,6 +1,8 @@
+
+
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Dimensions, Image } from 'react-native';
-import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 
 const { width: widthScreen } = Dimensions.get('window');
 const mainColor = '#DFEBF4'; // Bạn có thể đổi màu sắc theo ý muốn
@@ -12,29 +14,28 @@ export default function AccountInfo() {
       { icon: 'phone', library: FontAwesome, title: 'Số điện thoại' },
       { icon: 'facebook', library: FontAwesome, title: 'Link Facebook' },
       { icon: 'school', library: Ionicons, title: 'Tên trường đang theo học' },
-      { icon: 'map-marker-alt', library: FontAwesome, title: 'Địa chỉ' },
+      { icon: 'place', library: MaterialIcons, title: 'Địa chỉ' },
     ],
     personalInfo: {
-      birthDate: '25/01/2003',
+      birthDate: '20/08/1995',
       phoneNumber: '+84 123 456 789',
       facebookLink: 'https://www.facebook.com/yourfacebook',
-      schoolName: 'Đại học Công Nghệ Thông Tin',
-      address: '123 Đường ABC, Quận XYZ, Thành phố HCM',
+      schoolName: 'Đại học CÔNG NGHỆ THÔNG TIN ĐẠI HỌC QUỐC GIA THÀNH PHỐ HỒ CHÍ MINH ',
+      address: 'KTX TRƯƠNG UIT, DĨ AN, BÌNH DƯƠNG',
     },
   };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
-        <Image source={{ uri: 'https://th.bing.com/th/id/R.fb4d1b2177b64dfb1e5e71328957ddb0?rik=RBkplrzaBp3YOw&riu=http%3a%2f%2fhdwpro.com%2fwp-content%2fuploads%2f2016%2f01%2fPink-Tulip.jpeg&ehk=Vl09RxT9pco7eBLNgWO%2fMsR4xJwWr%2bHQIgSJlCEqDHM%3d&risl=&pid=ImgRaw&r=0' }} style={styles.avatar} />
+        <Image source={{ uri: 'https://stickerly.pstatic.net/sticker_pack/BQnofyFGrZaoEtNwJxtJ0A/UTBNZQ/9/01fe3390-e2a8-4a24-87d2-1447775025e3.png' }} style={styles.avatar} />
         <Text style={styles.name}>Trần Thị Mỹ Xoan</Text>
         <TouchableOpacity style={styles.editButton}>
-          <FontAwesome name="pencil" size={20} color="black" style={styles.editIcon} />
+          <FontAwesome name="pencil" size={20} color="#6495ED" backgroundColor="white" style={styles.editIcon} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.bodyContainer}>
-        {/* Các thông tin cá nhân */}
         <View style={styles.itemContainer}>
           <FontAwesome name="birthday-cake" size={30} color="#6495ED" style={styles.icon} />
           <Text style={styles.itemText}>{listItem.personalInfo.birthDate}</Text>
@@ -52,7 +53,7 @@ export default function AccountInfo() {
           <Text style={styles.itemText}>{listItem.personalInfo.schoolName}</Text>
         </View>
         <View style={styles.itemContainer}>
-          <FontAwesome name="map-marker-alt" size={30} color="#6495ED" style={styles.icon} />
+          <MaterialIcons name="place" size={30} color="#6495ED" style={styles.icon} />
           <Text style={styles.itemText}>{listItem.personalInfo.address}</Text>
         </View>
       </View>
@@ -82,12 +83,18 @@ const styles = StyleSheet.create({
   },
   editButton: {
     position: 'absolute',
-    top: 20,
+    top: 40,
     right: 20,
   },
   editIcon: {
-    width: 20,
-    height: 20,
+    width: 30, // To ra thêm 10 units
+    height: 30, // To ra thêm 10 units
+    borderRadius: 15, // Đổi thành hình tròn
+    backgroundColor: 'white', // Đổi màu nền thành màu trắng
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    padding: 5,
   },
   bodyContainer: {
     paddingHorizontal: 20,
@@ -112,5 +119,8 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 18,
+    flexShrink: 1,
   },
 });
+
+
