@@ -55,7 +55,8 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
         }
     })
     const getInforPost = () => { 
-        setIsLoading(true)
+        setIsLoading(true) 
+        setQueryNotHaveResult("")
         let pathAPI;
         textQueryPost === '' ? pathAPI = '/getInfoPost' : pathAPI = '/getInfoPost'
 
@@ -156,7 +157,7 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
     )
 
     return (
-        <ScrollView style={{ 
+        <View style={{ 
             marginBottom: heightScreen * 0.14,  
         }}>
             <FlatList
@@ -171,6 +172,6 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
             {
                 queryNotHaveResult && <Text style={ styles.queryNotHaveResultText }>{queryNotHaveResult}</Text>
             } 
-        </ScrollView>
+        </View>
     )
 }

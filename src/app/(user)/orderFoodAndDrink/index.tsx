@@ -42,7 +42,7 @@ export default function TabOneScreen() {
     const getHomeInfo = async () => {
       axios.get(baseURL + '/getFADInfoAtHome')
       .then( (res) => {
-        console.log(res.data, "getFADInfoAtHome") 
+        // console.log(res.data, "getFADInfoAtHome") 
         setHomeInfo(res.data)
       })
     }
@@ -50,23 +50,38 @@ export default function TabOneScreen() {
   }, [])
   
   return (  
-        <ScrollView>  
+    // Sử dụng ScrollView mà trong ShowProduct lại có tag <FlatList> thì sẽ bị lỗi Vitualist. Nên dùng FlatList thay thế ở dưới
+    // <ScrollView>  
+    //   <View>
+    //     {/* hiển thị slide show hình ảnh FAD */}
+    //     <SlideHeaderOrderFAD products={imageList}></SlideHeaderOrderFAD> 
+
+    //     {/* input search bạn muốn ăn gì */} 
+    //     <SearchFAD></SearchFAD>
+
+    //     {/* hiển thị thông tin của shop */}
+    //     <FADShop products={homeInfo.shopInfo}></FADShop> 
+
+    //     {/* hiển thị thông tin sản phẩm */}
+    //     <ShowProduct products={homeInfo.FADInfo_eloquent}></ShowProduct> 
+    //   </View>
+    // </ScrollView>
+
+      <FlatList
+        data={[]}  // Không có dữ liệu cụ thể cho danh sách này
+        renderItem={(item) => null}
+        keyExtractor={(item, index) => index.toString()}
+        ListHeaderComponent={
           <View>
-                {/* hiển thị slide show hình ảnh FAD */}
-                <SlideHeaderOrderFAD products={imageList}></SlideHeaderOrderFAD> 
-
-                {/* input search bạn muốn ăn gì */} 
-                <SearchFAD></SearchFAD>
-
-                {/* hiển thị thông tin của shop */}
-                <FADShop products={homeInfo.shopInfo}></FADShop> 
-
-                {/* hiển thị thông tin sản phẩm */}
-                <ShowProduct products={homeInfo.FADInfo_eloquent}></ShowProduct> 
+            <SlideHeaderOrderFAD products={imageList} />
+            <SearchFAD/>
+            <FADShop products={homeInfo.shopInfo} />
           </View>
-        </ScrollView>
-  );
-  
-
+        }
+        ListFooterComponent={
+          <ShowProduct products={homeInfo.FADInfo_eloquent} />
+        } 
+      /> 
+  ); 
 }
 

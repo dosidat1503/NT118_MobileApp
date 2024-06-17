@@ -1,4 +1,4 @@
-import { View, TextInput, StyleSheet, Text, Animated  } from "react-native";
+import { View, TextInput, StyleSheet, Text, Animated, FlatList  } from "react-native";
 import {Picker} from '@react-native-picker/picker';
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useCartContext } from "@/providers.tsx/CartProvider";
@@ -7,12 +7,14 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { fonts } from "react-native-elements/dist/config";
 import { color } from "react-native-elements/dist/helpers";
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
-import React, { SetStateAction, useRef, useState } from "react";
+import React, { SetStateAction, useEffect, useRef, useState } from "react";
 import { SelectList } from "react-native-dropdown-select-list"; 
-
+import Collapsible from 'react-native-collapsible';
+import axios from "axios";
+import ShowProduct from "@/components/orderFAD/ShowProduct";
 
 export default function ShowFADSearchInfo() {
-    const { heightScreen, widthScreen, mainColor } = useCartContext();
+    const { heightScreen, widthScreen, mainColor, textToSearchFAD, setTextToSearchFAD, baseURL } = useCartContext();
     
     const heightSearchFAD = heightScreen * 0.06;
     const widthSearchFAD = widthScreen * 0.7;
@@ -27,7 +29,7 @@ export default function ShowFADSearchInfo() {
             fontSize: heightScreen * 0.02,
         },
         showFADSearchContainer: {  
-            flexDirection: 'row',
+            flexDirection: 'column',
             borderRadius: 10,
             overflow: 'hidden',
             borderWidth: 1, 
@@ -37,6 +39,8 @@ export default function ShowFADSearchInfo() {
             paddingVertical: heightScreen * 0.006,
             marginHorizontal: widthScreen * 0.02,
             marginVertical: heightScreen * 0.006,
+            // width: widthScreen,
+            // flexShrink: 1, 
         },
         searchFADInput: {
             height: "100%",
@@ -63,10 +67,13 @@ export default function ShowFADSearchInfo() {
         filterButtonContainer: {
             flexDirection: "row",
             paddingHorizontal: widthScreen * 0.02,
-            paddingVertical: heightScreen * 0.006,
+            paddingVertical: heightScreen * 0.01,
             backgroundColor: "white",
             borderRadius: widthScreen * 0.02,
             height: heightScreen * 0.06,
+            // flex: 2
+            width: "27%",
+            // marginBottom: heightScreen * 0.007,
         },
         filterIcon: {
             paddingVertical: heightScreen * 0.006,
@@ -84,6 +91,8 @@ export default function ShowFADSearchInfo() {
             backgroundColor: "white",
             borderRadius: widthScreen * 0.02,
             marginHorizontal: widthScreen * 0.02,
+            marginVertical: heightScreen * 0.006,
+            paddingBottom: heightScreen * 0.006
         },
         everyFilterElementContainer: {
             flexDirection: "row",
@@ -93,23 +102,92 @@ export default function ShowFADSearchInfo() {
     })
     const [range, setRange] = useState([20, 180]); // Khoảng giá
     const [showFilterElement, setShowFilterElement] = useState(false); // Hiển thị bộ lọc
- 
-    const [topicSelectedToPost, setTopicSelectedToPost] = useState("")
-  
-    const dataToSelectFADType = [
-    //   {key:'1', value:'Chọn chủ đề', disabled:true}, 
-      {key:'1', value:'Đồ ăn'},
-      {key:'2', value:'Nước uống'}, 
-    ]
-    const dataToSelectDeliveryLocation = [
-        //   {key:'1', value:'Chọn chủ đề', disabled:true}, 
-        {key:'1', value:'Giao toà'},
-        {key:'2', value:'Giao rào'}, 
+    const [dataHadChosenToFilter, setDataHadChosenToFilter] = useState({
+        range: [5, 400],
+        FADtype: 0,
+        deliveryType: 0,
+        sortType: 0,
+    });
+
+    const [FADInfo, setFADInfo] = useState<any>({})
+
+    const filterList =  [
+        {
+            propertyName: "Phân loại:",
+            valueList: [
+                {
+                    key: 1,
+                    value: "Đồ ăn"
+                },
+                {
+                    key: 2,
+                    value: "Nước uống"
+                },
+            ]
+        },
+        {
+            propertyName: "Vị trí:",
+            valueList: [
+                {
+                    key: 1,
+                    value: "Giao toà"
+                },
+                {
+                    key: 2,
+                    value: "Giao rào"
+                },
+            ]
+        },
+        {
+            propertyName: "Sắp xếp theo:",
+            valueList: [
+                {
+                    key: 1,
+                    value: "Bán chạy"
+                },
+                {
+                    key: 2,
+                    value: "Mới nhất"
+                },
+            ]
+        },
     ]
 
-    const handleRangeChange = (values: SetStateAction<number[]>) => {
-        setRange(values);
+    
+    useEffect(() => {
+        const getFADInfo = async () => {
+            let data = {
+                textToSearchFAD: textToSearchFAD,
+                range: dataHadChosenToFilter.range,
+                FADtype: dataHadChosenToFilter.FADtype,
+                deliveryType: dataHadChosenToFilter.deliveryType,
+                sortType: dataHadChosenToFilter.sortType,
+            }
+            axios.get(baseURL + '/searchFAD', {params: data})
+            .then( (res) => {
+                // console.log(res.data, "searchFAD") 
+                setFADInfo(res.data)
+            })
+        }
+        getFADInfo()
+    }, [])
+
+    const handleRangeChange = (values: number[]) => {
+        setDataHadChosenToFilter({...dataHadChosenToFilter, range: values}); 
     };
+
+    const handleChooseValue = (value: string, itemFilter: any) => {
+        if(itemFilter.propertyName === filterList[0].propertyName) {
+            setDataHadChosenToFilter({...dataHadChosenToFilter, FADtype: parseInt(value)})
+        }
+        else if(itemFilter.propertyName === filterList[1].propertyName) {
+            setDataHadChosenToFilter({...dataHadChosenToFilter, deliveryType: parseInt(value)})
+        }
+        else if(itemFilter.propertyName === filterList[2].propertyName) {
+            setDataHadChosenToFilter({...dataHadChosenToFilter, deliveryType: parseInt(value)})
+        }
+        console.log(dataHadChosenToFilter, "dataHadChosenToFilter", itemFilter.propertyName)
+    }
 
     const renderFilterElement = () => {
         const slideAnimaed = useRef(new Animated.Value(0)).current;
@@ -131,13 +209,22 @@ export default function ShowFADSearchInfo() {
             }}> 
                 <View style={styles.filterElementDivContainer}>
                     <View style={styles.everyFilterElementContainer}>
-                        <Text style={styles.filterText}>Giá: </Text> 
-                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}> 
+                        <View>
+                            <Text style={styles.filterText}>Giá: </Text> 
+                        </View>
+                        <View style={{ 
+                            flex: 1, 
+                            alignItems: 'center', 
+                            justifyContent: 'space-between', 
+                            // height: heightScreen * 0.02,
+                            flexDirection: 'row',  
+                        }}> 
+                            <Text style={styles.filterText}>{dataHadChosenToFilter.range[0]}</Text>
                             <MultiSlider
-                                values={[range[0], range[1]]}
-                                sliderLength={widthScreen * 0.5}
-                                min={0}
-                                max={200}
+                                values={[dataHadChosenToFilter.range[0], dataHadChosenToFilter.range[1]]}
+                                sliderLength={widthScreen * 0.57}
+                                min={5}
+                                max={400}
                                 step={1}
                                 allowOverlap={false}
                                 snapped={true}
@@ -150,92 +237,65 @@ export default function ShowFADSearchInfo() {
                                 markerStyle={{
                                     backgroundColor: '#b8b6b0',
                                 }}
-                                onValuesChange={handleRangeChange} 
+                                onValuesChange={handleRangeChange}  
+                                // touchDimensions={{height: 100,width: 50,borderRadius: 15,slipDisplacement: 200}}
+                                // sliderLength={350}
                             />
+                            <Text style={[styles.filterText, {marginRight: widthScreen * 0.0001}]}>{dataHadChosenToFilter.range[1]}</Text>
                         </View> 
                     </View>
-                    <View style={styles.everyFilterElementContainer}> 
-                        <Text style={styles.filterText}>Phân loại: </Text> 
-                        <SelectList
-                            setSelected={setTopicSelectedToPost}
-                            data={dataToSelectFADType}
-                            placeholder='Chọn chủ đề'
-                            defaultOption={dataToSelectFADType[0]}
-                            boxStyles={{ 
-                                paddingVertical: heightScreen * 0.006,
-                                paddingHorizontal: widthScreen * 0.04,
-                                borderColor: "#89CFF0",
-                                marginBottom: 5,   
-                            }}
-                            dropdownItemStyles={{
-                                paddingVertical: 2
-                            }}
-                            dropdownStyles={{
-                                paddingVertical: 0,
-                                marginVertical: 2, 
-                                width: widthScreen * 0.4,
-                            }} 
-                            inputStyles={{
-                                width: widthScreen * 0.2, 
-                            }} 
-                            dropdownTextStyles={{ 
-                                // paddingRight: widthScreen * 0.02,
-                                // paddingVertical: heightScreen * 0.01,
-                                fontSize: widthScreen * 0.035,
-                                fontWeight: "bold",
-                                color: "#787877",
-                                // borderWidth: 1,
-                                borderColor: '#b3b3a8',
-                                backgroundColor: "white",
-                                borderRadius: widthScreen * 0.02,
-                            }}
-                            search={false}  
-                        ></SelectList>
-                        
-                    </View>
-                    <View style={styles.everyFilterElementContainer}>
-                        <Text style={styles.filterText}>Vị trí giao: </Text> 
-                        <SelectList
-                            setSelected={setTopicSelectedToPost}
-                            data={dataToSelectDeliveryLocation}
-                            placeholder='Chọn chủ đề'
-                            defaultOption={dataToSelectDeliveryLocation[0]}
-                            boxStyles={{ 
-                                paddingVertical: heightScreen * 0.006,
-                                paddingHorizontal: widthScreen * 0.04,
-                                borderColor: "#89CFF0",
-                                marginBottom: 5,   
-                            }}
-                            dropdownItemStyles={{
-                                paddingVertical: 2
-                            }}
-                            dropdownStyles={{
-                                paddingTop: 0,
-                                marginTop: 2, 
-                                width: widthScreen * 0.4,
-                            }} 
-                            inputStyles={{
-                                width: widthScreen * 0.2, 
-                            }} 
-                            dropdownTextStyles={{ 
-                                // paddingRight: widthScreen * 0.02,
-                                // paddingVertical: heightScreen * 0.01,
-                                fontSize: widthScreen * 0.035,
-                                fontWeight: "bold",
-                                color: "#787877",
-                                // borderWidth: 1,
-                                borderColor: '#b3b3a8',
-                                backgroundColor: "white",
-                                borderRadius: widthScreen * 0.02,
-                            }}
-                            search={false}  
-                        ></SelectList>
-                    </View>
+                    {
+                        filterList.map((itemFilter, index) => {
+                            return (
+                                <View style={styles.everyFilterElementContainer} key={index}>
+                                    <Text style={styles.filterText}>{itemFilter.propertyName}</Text>
+                                    <SelectList
+                                        setSelected={(value: string) => handleChooseValue(value, itemFilter)}
+                                        // onSelect={() => {}}
+                                        data={itemFilter.valueList}
+                                        // placeholder='Chọn chủ đề'
+                                        defaultOption={itemFilter.valueList[0]}
+                                        boxStyles={{ 
+                                            paddingVertical: heightScreen * 0.006,
+                                            paddingHorizontal: widthScreen * 0.04,
+                                            borderColor: "#89CFF0",
+                                            marginBottom: 5,
+                                        }}
+                                        dropdownItemStyles={{
+                                            paddingVertical: 1
+                                        }}
+                                        dropdownStyles={{
+                                            paddingTop: 0,
+                                            marginTop: 2, 
+                                            marginBottom: heightScreen * 0.01, 
+                                            width: widthScreen * 0.4,
+                                        }} 
+                                        inputStyles={{
+                                            width: widthScreen * 0.2, 
+                                            fontSize: widthScreen * 0.035,
+                                            fontWeight: "bold",
+                                            color: "#787877",
+                                        }} 
+                                        dropdownTextStyles={{ 
+                                            // paddingRight: widthScreen * 0.02,
+                                            // paddingVertical: heightScreen * 0.01,
+                                            fontSize: widthScreen * 0.035,
+                                            fontWeight: "bold",
+                                            color: "#787877",
+                                            // borderWidth: 1,
+                                            borderColor: '#b3b3a8',
+                                            backgroundColor: "white",
+                                            borderRadius: widthScreen * 0.02,
+                                        }}
+                                        search={false}  
+                                    ></SelectList>
+                                </View>
+                            ) 
+                        })
+                    } 
                 </View>
-            </Animated.View>
-
-        )
-
+            </Animated.View> 
+        ) 
     }
   
 
@@ -255,11 +315,23 @@ export default function ShowFADSearchInfo() {
                         /> 
                     </TouchableOpacity>
                 </View>
-                {  renderFilterElement() }
-            </View>
-            <View>
-
-            </View>
+                <Collapsible 
+                    collapsed={!showFilterElement} 
+                    style={{
+                        // marginVertical: heightScreen * 0.01, 
+                    }}
+                >
+                    { renderFilterElement() }
+                </Collapsible>
+            </View> 
+            <FlatList
+                data={[]}  // Không có dữ liệu cụ thể cho danh sách này
+                renderItem={(item) => null}
+                keyExtractor={(item, index) => index.toString()}
+                ListHeaderComponent={
+                    <ShowProduct products={FADInfo.FADInfo_eloquent}/>
+                } 
+            /> 
         </View>
     )
 }

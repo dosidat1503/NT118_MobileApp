@@ -312,6 +312,7 @@ export default function DetailInfoOfFAD() {
         return ( 
             <View 
                 style={styles.sizeItem}
+                key={index}
             > 
                 <View>
                     <Text style={styles.subTextSelect}>{item.label}</Text>
@@ -331,21 +332,21 @@ export default function DetailInfoOfFAD() {
     })
  
     const renderListTopping = orderInfoOfItem.toppings.map((item, index) => {
-    return ( 
-        <View 
-        key={index} 
-        style={styles.sizeItem}
-        > 
-            <View>
-                <Text style={styles.subTextSelect}>{item.label}</Text>
+        return ( 
+            <View 
+                key={index} 
+                style={styles.sizeItem}
+            > 
+                <View>
+                    <Text style={styles.subTextSelect}>{item.label}</Text>
+                </View>
+                <AdjustQuantity
+                    index={index}
+                    quantity={item.quantity}
+                    handleAdjustQuantity={handleAdjustQuantityTopping}
+                ></AdjustQuantity>
             </View>
-            <AdjustQuantity
-                index={index}
-                quantity={item.quantity}
-                handleAdjustQuantity={handleAdjustQuantityTopping}
-            ></AdjustQuantity>
-        </View>
-    );
+        );
     });
 
     const addToCart = async () => { 
@@ -406,8 +407,8 @@ export default function DetailInfoOfFAD() {
     }
 
     return(
-            <ScrollView> 
-        <View>
+        <ScrollView> 
+            <View>
                 <Stack.Screen 
                     options={{ 
                         title: "Chi tiết sản phẩm",
@@ -543,7 +544,7 @@ export default function DetailInfoOfFAD() {
                         handlePress={() => {}}
                     ></Button>
                 </View>
-        </View>
-            </ScrollView> 
+            </View>
+        </ScrollView> 
     )
 }

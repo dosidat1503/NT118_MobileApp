@@ -4,6 +4,7 @@ import products from '@assets/data/products';
 import { Product } from '@/types';
 import Button from '@/components/Button';
 import { useCartContext } from '@/providers.tsx/CartProvider';
+import React from 'react';
 
 export default function TabOneScreen() {  
   return (  
