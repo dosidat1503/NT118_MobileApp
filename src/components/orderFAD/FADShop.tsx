@@ -17,7 +17,7 @@ export default function FADShop({products}: {products: any}){
     useEffect(() => {
         axios.get(baseURL + '/getFADShop')
         .then((res) => {
-            console.log(res.data.shop)
+            // console.log(res.data.shop)
             setFADShopList(res.data.shop)
         })
         .catch((err) => {
