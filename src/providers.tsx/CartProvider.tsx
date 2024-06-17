@@ -50,6 +50,8 @@ type CartType = {
     setOrderID: any, 
     selectedItem: selectedItemProp,
     setSelectedItem: any,
+    textToSearchFAD: string,
+    setTextToSearchFAD: any,
 }
 
 const CartContext = createContext<CartType>({
@@ -63,7 +65,7 @@ const CartContext = createContext<CartType>({
     products: [],
     itemListInCart: [],
     setItemListInCart: () => {},
-    baseURL: "http://tcp.ap.ngrok.io:16026/api",
+    baseURL: "http://tcp.ap.ngrok.io:10640/api",
     emailPattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
     phoneNumberPattern: /^0\d{9}$/,
     fullNamePattern: /^[\p{L}\s]+$/u, 
@@ -89,6 +91,8 @@ const CartContext = createContext<CartType>({
         endDate: "" 
     },
     setSelectedItem: () => {},
+    textToSearchFAD: "",
+    setTextToSearchFAD: ()=> {},
 });
 
 const CartProvider = ({children} : PropsWithChildren) => {
@@ -118,7 +122,7 @@ const CartProvider = ({children} : PropsWithChildren) => {
     const widthScreen = Dimensions.get("window").width
     const heightScreen = Dimensions.get("window").height
     const mainColor = "#89CFF0"
-    const baseURL = "http://tcp.ap.ngrok.io:16026/api"
+    const baseURL = "http://tcp.ap.ngrok.io:10640/api"
     const emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
     const phoneNumberPattern = /^0\d{9}$/
     const fullNamePattern = /^[\p{L}\s]+$/u
@@ -130,6 +134,7 @@ const CartProvider = ({children} : PropsWithChildren) => {
     const [isLoading, setIsLoading] = useState(false)
     const RD = widthScreen * heightScreen;//rectangular diagonal
     const [orderID, setOrderID] = useState(1) // Fix: Update the type of orderDetailID to number 
+    const [textToSearchFAD, setTextToSearchFAD] = useState("")
     
     const products = [
         {
@@ -228,7 +233,6 @@ const CartProvider = ({children} : PropsWithChildren) => {
         { id: 5, name: "Đã hủy", icon: "window-close" }
     ]
     
-    
     const [selectedItem, setSelectedItem] = useState({
         topicItem: [],
         sortByItem: '',
@@ -247,7 +251,8 @@ const CartProvider = ({children} : PropsWithChildren) => {
             setFADShop_ID, FADShop_ID,
             DetailInfoOfFAD, setDetailInfoOfFAD,
             isLoading, setIsLoading, RD, 
-            selectedItem, setSelectedItem, orderID, setOrderID
+            selectedItem, setSelectedItem, orderID, setOrderID,
+            textToSearchFAD, setTextToSearchFAD
         }}> 
             {children}
         </CartContext.Provider>

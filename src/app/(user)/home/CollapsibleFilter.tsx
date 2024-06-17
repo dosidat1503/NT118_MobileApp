@@ -54,8 +54,8 @@ export default function CollapsibleFilter({handleReloadPost}: CollapsibleFilterP
                     style={styles.collapseBarText}
                     >Bộ lọc: </Text> 
                     <Image
-                    source={require('@assets/images/filter_home_2.png')}
-                    style={styles.filterIcon}
+                        source={require('@assets/images/filter_home_2.png')}
+                        style={styles.filterIcon}
                     ></Image>
                 </View> 
             </TouchableOpacity>

@@ -194,7 +194,7 @@ export default function Filter({handleReloadPost}: FilterProps ) {
             textAlign: "center"
         },
         sortByIcon: {
-            color: '#6495ED',
+            // color: '#6495ED',
             width: 20,
             height: 20,
         },
@@ -325,7 +325,7 @@ export default function Filter({handleReloadPost}: FilterProps ) {
             }
             
             return (
-                <View style={{width: "50%", justifyContent: "center", flexDirection: "row"}}>
+                <View style={{width: "50%", justifyContent: "center", flexDirection: "row"}} key={index}>
                     { 
                         // Nếu là bộ lọc "Sắp xếp theo" và "Chọn chủ đề" thì render ra các item trong list còn "Khoảng thời gian" thì render ra DateTimePicker
                         item.name !== "Khoảng thời gian" 
@@ -373,10 +373,10 @@ export default function Filter({handleReloadPost}: FilterProps ) {
                     title: "Bộ lọc"
                 }}
             ></Stack.Screen> */}
-            <ScrollView>
+            <View>
                 {
-                    filters.map((item) => (
-                        <View style={ styles.chooseTopic }> 
+                    filters.map((item, index) => (
+                        <View style={ styles.chooseTopic } key={ index }> 
                             <View> 
                                 <Text style={ styles.titleChooseTopic }>
                                     {item.name}
@@ -431,7 +431,7 @@ export default function Filter({handleReloadPost}: FilterProps ) {
                         />
                     </TouchableOpacity>
                 </View>
-            </ScrollView>
+            </View>
         </SafeAreaView>
     )
 }

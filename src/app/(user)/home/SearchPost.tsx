@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View, Image, Text, Platform, Modal } from "react-native"
+import { StyleSheet, TouchableOpacity, View, Image, Text, Platform, Modal, FlatList } from "react-native"
 // import { View } from "@/components/Themed"
 // import DatePicker from 'react-native-modern-datepicker' 
 import DateTimePicker from '@react-native-community/datetimepicker'
@@ -33,15 +33,29 @@ export default function SearchPost() {
     }, [])
 
     return ( 
-        <ScrollView>  
-            {/* <Stack.Screen
-                options={{
-                    title: "Tìm kiếm"
-                }}
-            ></Stack.Screen> */}
-            <CollapsibleFilter handleReloadPost= {handleReloadPost} ></CollapsibleFilter>
-            <PostAtHome reloadPost={reloadPost}></PostAtHome>
-        </ScrollView>  
+        <FlatList
+            data={[]}  // Nếu không có dữ liệu cụ thể, bạn có thể để trống hoặc truyền dữ liệu phù hợp
+            renderItem={({ item }) => null}
+            keyExtractor={(item, index) => index.toString()}
+            // sử dụng listHeaderComponent và ListFooterComponent để thêm các thành phần vào đầu và cuối danh sách
+            ListHeaderComponent={
+                <CollapsibleFilter handleReloadPost={handleReloadPost} />
+            }
+            ListFooterComponent={
+                <PostAtHome reloadPost={reloadPost} />
+            }
+            // contentContainerStyle={styles.contentContainer}
+        />
+
+        // <ScrollView>  
+        //     {/* <Stack.Screen
+        //         options={{
+        //             title: "Tìm kiếm"
+        //         }}
+        //     ></Stack.Screen> */}
+        //     <CollapsibleFilter handleReloadPost= {handleReloadPost} ></CollapsibleFilter>
+        //     <PostAtHome reloadPost={reloadPost}></PostAtHome>
+        // </ScrollView>  
     )
 }
 

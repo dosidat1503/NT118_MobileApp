@@ -416,7 +416,7 @@ export default function AddPost() {
                             {
                                 showWarning && <Text style={{color: 'red', fontSize: 12}}>Bạn cần nhập nội dung và chọn chủ đề trước khi đăng bài</Text>
                             }
-                            <ScrollView style={styles.scrollViewForPreviewImage}> 
+                            <View style={styles.scrollViewForPreviewImage}> 
                                 <FlatList
                                     data={imageList}
                                     renderItem={renderCarouselProduct}  
@@ -427,7 +427,7 @@ export default function AddPost() {
                                     style={styles.imagePreview} 
                                     decelerationRate="fast" 
                                 ></FlatList>
-                            </ScrollView>
+                            </View>
                         </View>
                         <View>
                             <FontAwesome5 

@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, Tex
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import { CheckBox } from "react-native-elements";
 import Button from "./Button";
+import React from "react";
 
 export default function EditDeliveryAddress() {
     const { heightScreen, widthScreen, mainColor } = useCartContext();
