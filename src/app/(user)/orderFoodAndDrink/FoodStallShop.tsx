@@ -14,6 +14,7 @@ import axios from "axios";
 import LoadingDots from "react-native-loading-dots";
 import Loading from "@/components/Loading";
 import React from "react";
+import Voucherdetail from "./VoucherDetail";
 
 type InfoShopProp = {
     COVER_IMAGE_URL: string
@@ -156,6 +157,7 @@ export default function FoodStallShop() {
                     <InfoFADofShop></InfoFADofShop>
 
                     {/* Xoan code hiển thị thông tin voucher ở đây */}
+                    <Voucherdetail></Voucherdetail>
                 </View>
                 <Loading></Loading>
             </View>
