@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, TextInput, ImageBackground, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
-import { Link, Stack, useNavigation } from 'expo-router';
-import { useCartContext } from '@/providers.tsx/CartProvider'; 
+import { Link, Redirect, Stack, useNavigation } from 'expo-router';
+import { useCartContext } from '@/providers.tsx/CartProvider';
 import { CheckBox } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -16,30 +16,30 @@ LogBox.ignoreLogs(['Warning: ...']);
 
 const index = () => {
   const [users, setUsers] = useState<any[]>([]);
-  const {heightScreen, widthScreen, mainColor, baseURL, isLoading, setIsLoading} = useCartContext();
+  const { heightScreen, widthScreen, mainColor, baseURL, isLoading, setIsLoading } = useCartContext();
   const styles = StyleSheet.create({
-      divContainer: {
-          width: widthScreen,
-          height: heightScreen,
-          justifyContent: "center",
-          alignItems: "center",
-          // backgroundImage: "url('https://www.w3schools.com/css/img_lights.jpg')"
-      },
-      input: {
-          width: '90%',
-          height: heightScreen * 0.06,
-          borderRadius: widthScreen * 0.02,
-          borderColor: 'gray',
-          borderWidth: 1,
-          marginTop: 10,
-          paddingHorizontal: 10,
-          backgroundColor: 'white'
-      },
-      
+    divContainer: {
+      width: widthScreen,
+      height: heightScreen,
+      justifyContent: "center",
+      alignItems: "center",
+      // backgroundImage: "url('https://www.w3schools.com/css/img_lights.jpg')"
+    },
+    input: {
+      width: '90%',
+      height: heightScreen * 0.06,
+      borderRadius: widthScreen * 0.02,
+      borderColor: 'gray',
+      borderWidth: 1,
+      marginTop: 10,
+      paddingHorizontal: 10,
+      backgroundColor: 'white'
+    },
+
   })
-  const [signInInfo, setSignInInfo] = useState({ 
-    email: '', 
-    password: '', 
+  const [signInInfo, setSignInInfo] = useState({
+    email: '',
+    password: '',
   }); 
 
   const [rememberPassword, setRememberPassword] = useState(false);
@@ -94,8 +94,9 @@ const index = () => {
     });
   }
 
-  const handleRememberPassword = () => { 
-    setRememberPassword(!rememberPassword); 
+  const handleRememberPassword = () => {
+    AsyncStorage.setItem('rememberPassword', JSON.stringify(!rememberPassword));
+    setRememberPassword(!rememberPassword);
   }
 
   useEffect(() => {
