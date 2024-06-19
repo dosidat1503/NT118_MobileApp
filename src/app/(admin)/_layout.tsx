@@ -24,7 +24,7 @@ function TabBarIcon1(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
+  // Al alo alo alo alo alo alo alo alo alo alo alo 
   return (
     <Tabs
       screenOptions={{
