@@ -17,7 +17,7 @@ export default function CollapsibleFilter({handleReloadPost}: CollapsibleFilterP
         filterIcon: {
             width: RD * 0.00006,
             height: RD * 0.00006,
-            color: 'green', 
+            // color: 'green', 
         },
         collapseBarText: {
             fontWeight: "bold",
