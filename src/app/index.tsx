@@ -16,7 +16,7 @@ LogBox.ignoreLogs(['Warning: ...']);
 
 const index = () => {
   const [users, setUsers] = useState<any[]>([]);
-  const { heightScreen, widthScreen, mainColor, baseURL, isLoading, setIsLoading } = useCartContext();
+  const { heightScreen, widthScreen, mainColor, baseURL, isLoading, setIsLoading, setUserID } = useCartContext();
   const styles = StyleSheet.create({
     divContainer: {
       width: widthScreen,
@@ -112,7 +112,8 @@ const index = () => {
       if(response.data.statusCode === 200) {
         AsyncStorage.setItem('token', response.data.token);
         AsyncStorage.setItem('userID', JSON.stringify(response.data.userID));  
-        
+        setUserID(response.data.userID);
+        console.log(response.data.userID, "userID");
         AsyncStorage.setItem('rememberPassword', JSON.stringify(rememberPassword)); 
         AsyncStorage.setItem('email',  JSON.stringify(signInInfo.email)); 
         AsyncStorage.setItem('password',  JSON.stringify(signInInfo.password)); 

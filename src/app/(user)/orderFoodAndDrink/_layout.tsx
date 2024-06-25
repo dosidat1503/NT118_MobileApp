@@ -1,5 +1,5 @@
-import { Stack, Link } from "expo-router"
-import { Pressable, View } from "react-native"
+import { Stack, Link, useNavigation } from "expo-router"
+import { Pressable, TouchableOpacity, View } from "react-native"
 import { FontAwesome } from "@expo/vector-icons"
 import Colors from "@/constants/Colors"
 import DetailProduct from "./[id]"
@@ -8,8 +8,10 @@ import { useCartContext } from "@/providers.tsx/CartProvider"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function MenuStack(){
-  const { heightScreen, widthScreen, mainColor } = useCartContext();
+  const { heightScreen, widthScreen, mainColor, setTextToSearchFAD, setSelectedItem, RD } = useCartContext();
   const [array_itemListInCart, setArray_itemListInCart] = useState<any[]>([]);
+
+  const navigation = useNavigation();
   
   const getitemListInCart = async () => {
     try {
@@ -57,8 +59,34 @@ export default function MenuStack(){
           <Stack.Screen
             name="ShowFADSearchInfo" 
             options={{
-                title: 'Tìm món',   
+                title: 'Tìm món',
+                // headerLeft: () => (
+                //   <TouchableOpacity
+                //     onPress={() => {
+                //       setTextToSearchFAD(''); // Đặt setTextQuery về chuỗi rỗng
+                //       setSelectedItem({
+                //         topicItem: [],
+                //         sortByItem: '',
+                //         startDate: "",
+                //         endDate: "", 
+                //       }); // Đặt setSelectedItem về object rỗng
+                //       // navigation.goBack(); // Điều hướng quay lại trang trước
+                //       navigation.navigate('index' as never);
+                //     }} 
+                //   >
+                //     <FontAwesome
+                //       name="chevron-left"
+                //       size={RD * 0.00005}
+                //       color={mainColor} 
+                //       style={{ 
+                //         marginRight: widthScreen * 0.02, 
+                //         paddingTop: heightScreen * 0.003
+                //       }}
+                //     />
+                //   </TouchableOpacity>
+                // ),   
             }}
+            
           > 
           </Stack.Screen>
           <Stack.Screen

@@ -24,7 +24,7 @@ interface ItemInCartAndPaymentProps {
         name: string,
         price: number,
         quantity: number,
-        uri: string
+        uri?: string
     },
     index: number,// index này thì có thể là indexItem hoặc indexTopping tuỳ thuộc vào câu lệnh gọi ItemInCartAndPayment là ở Item hay Topping
     indexItem: number,// cái này luôn là indexItem nó sẽ được gọi ở câu lệnh gọi ItemInCartAndPayment ở Topping, dùng để xác định index của Item

@@ -1,6 +1,6 @@
 import index from "@/app";
 import { Stack } from "expo-router"
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View, Image, Text, Platform, Modal, Button, Pressable, TextInput, SafeAreaView, ScrollView } from "react-native"
 // import { View } from "@/components/Themed"
 // import DatePicker from 'react-native-modern-datepicker' 
@@ -14,6 +14,7 @@ import DatePicker from 'react-native-date-picker';
 import DateTimePicker from 'react-native-ui-datepicker';
 import dayjs from 'dayjs'; 
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
+import FilterButton from "./FilterButton";
  
 
 type FilterProps  = { 
@@ -123,21 +124,7 @@ export const filters = [
 export default function Filter({handleReloadPost}: FilterProps ) {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState(""); 
-
-    const handleDateChange = ({ startDate, endDate } : {startDate: any, endDate: any}) => { 
-        const formattedStartDate = startDate ? dayjs(startDate).format('YYYY-MM-DD HH:mm:ss') : null;
-        const formattedEndDate = endDate ? dayjs(endDate).format('YYYY-MM-DD HH:mm:ss') : null;
-
-        setStartDate(startDate);
-        setEndDate(endDate);
-        // console.log(formattedStartDate, formattedEndDate, 'ok')
-        setSelectedItem({
-            ...selectedItem,
-            startDate: formattedStartDate || "",
-            endDate: formattedEndDate || ""
-        })
-    };    
- 
+  
     const { mainColor, heightScreen, widthScreen, RD, selectedItem, setSelectedItem } = useCartContext();
     
     const styles = StyleSheet.create({
@@ -232,7 +219,7 @@ export default function Filter({handleReloadPost}: FilterProps ) {
             width: "80%",
             
             marginLeft: "10%",
-            borderColor: "mainColor", 
+            borderColor: mainColor, 
             justifyContent: 'space-around',
             flexDirection: 'row',
         },
@@ -262,18 +249,24 @@ export default function Filter({handleReloadPost}: FilterProps ) {
         }
     }) 
     
-    const compareWithFiltersName = {
-        sortBy: "Sắp xếp theo",
-        topic: "Chọn chủ đề",
-        intervalTime: "Khoảng thời gian",
-        startDate: "Từ ngày",
-        endDate: "Đến ngày"
-    }   
+    const handleDateChange = useCallback(({ startDate, endDate } : {startDate: any, endDate: any}) => { 
+        const formattedStartDate = startDate ? dayjs(startDate).format('YYYY-MM-DD HH:mm:ss') : null;
+        const formattedEndDate = endDate ? dayjs(endDate).format('YYYY-MM-DD HH:mm:ss') : null;
 
+        setStartDate(startDate);
+        setEndDate(endDate);
+        console.log(formattedStartDate, formattedEndDate, 'ok', selectedItem)
+        setSelectedItem({
+            ...selectedItem,
+            startDate: formattedStartDate || "",
+            endDate: formattedEndDate || ""
+        })
+    }, [ selectedItem ])
+    
     // ===== CÁC BỘ LỌC THU NHỎ PHẠM VI HIỂN THỊ BÀI ĐĂNG =====
     // Bộ lọc thay đổi khoảng thời gian 
     // Bộ lọc chọn chủ đề (topic)
-    const handleChooseFilterItem = (item: any, filterType: string | undefined) => {  
+    const handleChooseFilterItem = useCallback((item: any, filterType: string | undefined) => {  
         //filterType là sortByItem hoặc topicItem
         if(filterType === filters[1].propertyNameOfSlectedItem) 
         {
@@ -297,9 +290,9 @@ export default function Filter({handleReloadPost}: FilterProps ) {
             }) 
         }   
         console.log(selectedItem, 'selectedItemFilter')
-    }
+    }, [selectedItem]) 
     
-    const renderFiltersList = ( item: itemInFilterProps ) => {
+    const renderFiltersList = useCallback(( item: itemInFilterProps ) => {
         let isSlected = false;
         let mainStyle = {};
         let styleIcon = {};
@@ -307,15 +300,17 @@ export default function Filter({handleReloadPost}: FilterProps ) {
         return item.list.map((itemInList, index) => {
             isSlected = false
             selectedStyle = {}
-
+            // console.log(selectedItem, 'selectedItem22')
             //Điều chỉnh các thuộc tính trong style cho từng loại bộ lọc là sortBy hay topic
-            if(compareWithFiltersName.sortBy === item.name){
-                itemInList.name === selectedItem.sortByItem ? isSlected = true : isSlected = false  
+            
+            
+            if(filters[0].name === item.name){//sắp xếp theo
+                itemInList.id === selectedItem.sortByItem ? isSlected = true : isSlected = false  
                 mainStyle = styles.chooseTopicItem;
                 styleIcon = styles.sortByIcon;
                 selectedStyle = isSlected && styles.topicIsSelected; 
             }
-            else if(compareWithFiltersName.topic === item.name){
+            else if(filters[1].name === item.name){// chọn chủ đề
                 mainStyle = styles.chooseTopicItem;
 
                 isSlected = selectedItem.topicItem.includes(itemInList.id);
@@ -362,7 +357,7 @@ export default function Filter({handleReloadPost}: FilterProps ) {
                 </View>
             )
         })
-    } 
+    }, [ handleChooseFilterItem,  handleDateChange])
 
     return (
         <SafeAreaView
@@ -388,49 +383,7 @@ export default function Filter({handleReloadPost}: FilterProps ) {
                         </View> 
                     ))
                 }  
-                <View style={ styles.applyFilterButtonContainer } >
-                    <TouchableOpacity 
-                        style={ styles.applyFilterButtonTouchable }
-                        onPress={() => {
-                            handleReloadPost()
-                        }}
-                    > 
-                        <Text style={ styles.applyFilterButtonText} >Áp Dụng Bộ Lọc</Text>
-                        <FontAwesome
-                            name="search"
-                            size={RD * 0.00004} 
-                            color={"yellow"}
-                            style={{
-                                marginLeft: widthScreen * 0.02,
-                                opacity: 0.7
-                            }}
-                        />
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                        style={ styles.applyFilterButtonTouchable }
-                        onPress={() => { 
-                            setSelectedItem({
-                                topicItem: [],
-                                sortByItem: '',
-                                startDate: "",
-                                endDate: "", 
-                            })
-                            handleReloadPost()
-                        }}
-                    > 
-                        <Text style={ styles.applyFilterButtonText} >Đặt lại</Text>
-                        <FontAwesome5
-                            name="sync-alt"
-                            size={RD * 0.00004} 
-                            color={"yellow"}
-                            style={{
-                                marginLeft: widthScreen * 0.02,
-                                opacity: 0.7
-                            }}
-                        />
-                    </TouchableOpacity>
-                </View>
+                <FilterButton handleReloadPost={ handleReloadPost }></FilterButton>
             </View>
         </SafeAreaView>
     )

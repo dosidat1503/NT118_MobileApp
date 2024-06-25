@@ -11,7 +11,8 @@ export default function Loading() {
         },
         dotsWrapper: {
             width: widthScreen * 0.25,
-            marginVertical: heightScreen * 0.4
+            marginVertical: heightScreen * 0.4,
+            height: heightScreen * 0.06,
         },
         loadingScreen: {
             flex: 1,

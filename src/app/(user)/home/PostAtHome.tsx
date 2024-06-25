@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FlatList, ScrollView, StyleSheet } from "react-native";
 import PostList from "@/components/PostList";
@@ -10,8 +10,7 @@ import { View, Text } from "react-native";
 import RenderFooter from "@/components/RenderFooter";
 
 type PostAtHomeProp = {
-    reloadPost: boolean
-
+    reloadPost: boolean 
 }
 
 export default function PostAtHome({reloadPost}: PostAtHomeProp) {
@@ -78,7 +77,7 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
             let updateInfoPost = [...infoPost]
             if(
                 selectedItem.topicItem.length !== 0 
-                || selectedItem.sortByItem !== '' 
+                || selectedItem.sortByItem !== 0 
                 || selectedItem.startDate !== '' 
                 || selectedItem.endDate !== ''
             ) {
@@ -132,7 +131,7 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
             ++pageNumber;
             // console.log(updateInfoPost[2].post.image, "setInfoPo1st")
         })
-    }
+    } 
     
     useEffect(() => { 
         const getUserID = async () => {
@@ -167,7 +166,7 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
                 contentContainerStyle={{gap: 10}} 
                 ListFooterComponent={ <RenderFooter isLoading={isLoading}></RenderFooter> } 
                 onEndReached={() => getInforPost()}
-                onEndReachedThreshold={0.01}
+                onEndReachedThreshold={0.005}
             />
             {
                 queryNotHaveResult && <Text style={ styles.queryNotHaveResultText }>{queryNotHaveResult}</Text>

@@ -46,16 +46,7 @@ export default function SearchPost() {
             }
             // contentContainerStyle={styles.contentContainer}
         />
-
-        // <ScrollView>  
-        //     {/* <Stack.Screen
-        //         options={{
-        //             title: "Tìm kiếm"
-        //         }}
-        //     ></Stack.Screen> */}
-        //     <CollapsibleFilter handleReloadPost= {handleReloadPost} ></CollapsibleFilter>
-        //     <PostAtHome reloadPost={reloadPost}></PostAtHome>
-        // </ScrollView>  
+ 
     )
 }
 

@@ -12,6 +12,7 @@ import com.facebook.react.config.ReactFeatureFlags;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
+import com.github.droibit.android.reactnative.customtabs.CustomTabsPackage;
 
 import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
@@ -78,5 +79,11 @@ public class MainApplication extends Application implements ReactApplication {
   public void onConfigurationChanged(@NonNull Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
     ApplicationLifecycleDispatcher.onConfigurationChanged(this, newConfig);
+  }
+  protected List<ReactPackage> getPackages() {
+    return Arrays.asList(
+            ...,
+            new CustomTabsPackage()
+    );
   }
 }

@@ -26,7 +26,7 @@ export default function SearchPost(){
         <TextInput
           placeholder="Search..."
           style={styles.inputSearch} 
-          value={textQueryPost}
+          // value={textQueryPost}
           onChangeText={(text) => setTextQueryPost(text)}
         />  
         {/* <TouchableOpacity onPress={() => handleSearch}>    */}

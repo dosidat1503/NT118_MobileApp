@@ -1,6 +1,7 @@
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { TouchableOpacity, StyleSheet, Text } from "react-native";
 import { useCartContext } from "@/providers.tsx/CartProvider";
+import React from "react";
 
 interface ButtonProps {
     iconName?: string;
