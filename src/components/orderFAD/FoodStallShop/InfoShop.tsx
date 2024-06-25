@@ -87,13 +87,13 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                 {/* avatar & name shop */}
                 <View style={styles.infoShopItem}>
                     <Image
-                        source={{uri: infoShop.AVT_IMAGE_URL}}
+                        source={{uri: infoShop?.AVT_IMAGE_URL}}
                         style={styles.avatar}
                     />
                     <Text
                         style={styles.nameShopText}
                     >
-                        {infoShop.SHOP_NAME}
+                        {infoShop?.SHOP_NAME}
                     </Text>
                 </View> 
 
@@ -103,7 +103,7 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                         <FontAwesome
                             name="star"
                             style={styles.star}
-                        />
+                        /> 
                         <Text
                             style={styles.reviewText}
                         >Đánh giá và nhận xét</Text>
@@ -124,11 +124,11 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                         style={styles.address}
                     >
                         {
-                            Object.keys(infoShop).length !== 0 ? 
-                                infoShop.ADDRESS.DETAIL + ", " +
-                                infoShop.ADDRESS.COMMUNE + ", " +
-                                infoShop.ADDRESS.DISTRICT + ", " +
-                                infoShop.ADDRESS.PROVINCE
+                            infoShop?.ADDRESS.DETAIL !== undefined ? 
+                                infoShop?.ADDRESS.DETAIL + ", " +
+                                infoShop?.ADDRESS.COMMUNE + ", " +
+                                infoShop?.ADDRESS.DISTRICT + ", " +
+                                infoShop?.ADDRESS.PROVINCE
                             : ""
                         }
                     </Text>
@@ -142,7 +142,7 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                     />
                     <Text
                         style={styles.address}
-                    >{infoShop.PHONE}</Text>
+                    >{infoShop?.PHONE}</Text>
                 </View> 
             </View>
         </View>

@@ -13,7 +13,7 @@ type productsProp = {
 
 type selectedItemProp = {
     topicItem: any[],
-    sortByItem: string,
+    sortByItem: number,
     startDate: string,
     endDate: string 
 }
@@ -52,6 +52,10 @@ type CartType = {
     setSelectedItem: any,
     textToSearchFAD: string,
     setTextToSearchFAD: any,
+    dataHadChosenToFilter: any,
+    setDataHadChosenToFilter: any,
+    tagIDToGetFADInfo: number, 
+    setTagIDToGetFADInfo: any,
 }
 
 const CartContext = createContext<CartType>({
@@ -65,7 +69,7 @@ const CartContext = createContext<CartType>({
     products: [],
     itemListInCart: [],
     setItemListInCart: () => {},
-    baseURL: "http://tcp.ap.ngrok.io:10640/api",
+    baseURL: "http://26.85.40.176:8000/api",
     emailPattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
     phoneNumberPattern: /^0\d{9}$/,
     fullNamePattern: /^[\p{L}\s]+$/u, 
@@ -79,20 +83,24 @@ const CartContext = createContext<CartType>({
     setFADShop_ID: () => {},
     DetailInfoOfFAD: {},
     setDetailInfoOfFAD: () => {},
-    isLoading: false,
+    isLoading: true,
     setIsLoading: () => {},
     RD: 0,
     orderID: 1,
     setOrderID: () => {},  
     selectedItem: {
         topicItem: [],
-        sortByItem: "",
+        sortByItem: 0,
         startDate: "",
         endDate: "" 
     },
     setSelectedItem: () => {},
     textToSearchFAD: "",
     setTextToSearchFAD: ()=> {},
+    dataHadChosenToFilter: {},
+    setDataHadChosenToFilter: () => {},
+    tagIDToGetFADInfo: 0, 
+    setTagIDToGetFADInfo: () => {},
 });
 
 const CartProvider = ({children} : PropsWithChildren) => {
@@ -122,7 +130,7 @@ const CartProvider = ({children} : PropsWithChildren) => {
     const widthScreen = Dimensions.get("window").width
     const heightScreen = Dimensions.get("window").height
     const mainColor = "#89CFF0"
-    const baseURL = "http://tcp.ap.ngrok.io:10640/api"
+    const baseURL = "http://26.85.40.176:8000/api"
     const emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
     const phoneNumberPattern = /^0\d{9}$/
     const fullNamePattern = /^[\p{L}\s]+$/u
@@ -235,10 +243,18 @@ const CartProvider = ({children} : PropsWithChildren) => {
     
     const [selectedItem, setSelectedItem] = useState({
         topicItem: [],
-        sortByItem: '',
+        sortByItem: 0,
         startDate: "",
         endDate: "", 
     }) 
+
+    const [dataHadChosenToFilter, setDataHadChosenToFilter] = useState({
+        range: [5, 400],
+        FADtype: 0,
+        deliveryType: 0,
+        sortType: 0,
+    });
+    const [tagIDToGetFADInfo, setTagIDToGetFADInfo] = useState(0)
  
     return (
         <CartContext.Provider value={{
@@ -252,7 +268,9 @@ const CartProvider = ({children} : PropsWithChildren) => {
             DetailInfoOfFAD, setDetailInfoOfFAD,
             isLoading, setIsLoading, RD, 
             selectedItem, setSelectedItem, orderID, setOrderID,
-            textToSearchFAD, setTextToSearchFAD
+            textToSearchFAD, setTextToSearchFAD, 
+            dataHadChosenToFilter, setDataHadChosenToFilter,
+            tagIDToGetFADInfo, setTagIDToGetFADInfo,
         }}> 
             {children}
         </CartContext.Provider>

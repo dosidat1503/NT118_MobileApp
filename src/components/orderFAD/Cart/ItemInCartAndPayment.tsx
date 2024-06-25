@@ -16,7 +16,7 @@ interface ItemInCartAndPaymentProps {
     isCart: boolean,
     isTopping: boolean,
     isHaveAdjusting: boolean,
-    isOrderDetail: boolean,
+    isOrderDetail?: boolean,
     quantity: number,
     item: {
         sizes: string;
@@ -24,6 +24,7 @@ interface ItemInCartAndPaymentProps {
         name: string,
         price: number,
         quantity: number,
+        uri: string
     },
     index: number,// index này thì có thể là indexItem hoặc indexTopping tuỳ thuộc vào câu lệnh gọi ItemInCartAndPayment là ở Item hay Topping
     indexItem: number,// cái này luôn là indexItem nó sẽ được gọi ở câu lệnh gọi ItemInCartAndPayment ở Topping, dùng để xác định index của Item
@@ -147,12 +148,28 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
         return isOrderDetail
         ? null
         : <AdjustQuantity 
-            quantity={isTopping ? item.quantity : quantity} 
+            quantity={isTopping ? item.quantity : item.quantity} 
             handleAdjustQuantity={handleAdjustQuantity} 
             index={isTopping ? index : indexItem}
         />
     }
 
+    const renderSize = () => {
+        let size = !isTopping 
+                    ? item.sizes.length === 0 
+                        ? ""
+                        : item.sizes.find((itemSize: { checked: any; }) => itemSize.checked)?.label 
+                    : ""
+                    
+        return (
+            size !== ""
+            ? <Text>
+                Size: {size}
+            </Text>
+            : ""
+        )
+    }
+ 
     return (
         <View 
             style={[
@@ -169,7 +186,7 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                 }}
             >
                 <Image
-                    source={{uri: defaultPrizzaImage}}
+                    source={{uri: item.uri || ""}}
                     style={styles.avatar}
                 /> 
                 <View style={{
@@ -178,7 +195,7 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                     <Text
                         style={styles.nameShopText}
                     >
-                        {isTopping ? item.name : item.name}
+                        {isTopping ? item.label : item.name}
                     </Text>
                     <View style={{
                         flexDirection: "row" 
@@ -188,13 +205,9 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                         >
                             Giá: {item.price}
                         </Text>
-                        <Text
-                            style={{
-                                display: isTopping ? "none" : "flex"
-                            }}
-                        >
-                            Size: {!isTopping ? item.sizes.find((itemSize: { checked: any; }) => itemSize.checked)?.label : ""}
-                        </Text>
+                        {
+                            renderSize()
+                        }
                     </View>
                 </View> 
             </View>
@@ -214,7 +227,7 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                         style={{
                             marginBottom: heightScreen * 0.013,
                             marginRight: widthScreen * 0.03,
-                            color: "mainColor"
+                            color: mainColor
                         }}
                     ></FontAwesome5>
                 </TouchableOpacity>

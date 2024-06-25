@@ -6,7 +6,7 @@ import React from "react";
 
 
 export default function SearchFAD() {
-    const { heightScreen, widthScreen, mainColor } = useCartContext();
+    const { heightScreen, widthScreen, mainColor, textToSearchFAD, setTextToSearchFAD, setTagIDToGetFADInfo } = useCartContext();
     
     const heightSearchFAD = heightScreen * 0.06;
     const widthSearchFAD = widthScreen * 0.7;
@@ -50,6 +50,7 @@ export default function SearchFAD() {
     const navigation = useNavigation();
 
     const handleSearch = () => {
+        setTagIDToGetFADInfo(0)
         navigation.navigate('ShowFADSearchInfo' as never)
     }
     return(
@@ -71,7 +72,8 @@ export default function SearchFAD() {
                 <TextInput 
                     placeholder='Bạn muốn ăn gì?'
                     style={styles.searchFADInput}
-                    onSubmitEditing={handleSearch}
+                    value={ textToSearchFAD }
+                    onChangeText={ (value) => setTextToSearchFAD(value) }
                 ></TextInput>
             </View>
         </View>

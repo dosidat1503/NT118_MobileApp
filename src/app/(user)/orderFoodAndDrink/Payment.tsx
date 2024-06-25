@@ -1,24 +1,61 @@
 import { Link, Stack } from "expo-router";
-import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, TextInput } from "react-native";
+import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, TextInput, Linking  } from "react-native";
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/PostList";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
-import Colors from "@/constants/Colors"
 import { CheckBox } from 'react-native-elements'; 
-import AdjustQuantity from "./AdjustQuantity";
 import ItemInCartAndPayment from "@/components/orderFAD/Cart/ItemInCartAndPayment";
 import Button from "./Button";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect } from 'react';
-import { color } from "react-native-elements/dist/helpers";
-import { fonts } from "react-native-elements/dist/config";
+import React, { useState, useEffect, useCallback } from 'react'; 
 import ItemType1 from "@/components/orderFAD/Payment/ItemType1";
 import axios from "axios";
 import Loading from "@/components/Loading";
 import { useNavigation } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+// import * as Linking from 'expo-linking';
+
+
+type toppingType = {
+    id: number,
+    name: string,
+    price: number,
+    quantity: number
+}
+
+type productListType = {
+    id: number,
+    name: string,
+    price: number,
+    size: string,
+    toppings: toppingType[], 
+    quantity: number,
+    totalOfItem: number 
+}
+
+type orderInforType = {
+    deliveryInfo: { 
+        id: number,
+        name: string,
+        phone: string,
+        address: string,
+        isDefault: boolean,
+        isChoose: boolean
+    },
+    productList: productListType[],
+    paymentMethod: string,
+    paymentStatus: number,
+    voucherID: number,
+    paymentAmount: number,
+    userID: number 
+}
 
 export default function Payment() {
-    const { heightScreen, widthScreen, mainColor, baseURL, userID, setIsLoading, isLoading } = useCartContext(); 
+    const { heightScreen, widthScreen, 
+        mainColor, baseURL, userID, 
+        setIsLoading, isLoading, 
+        setVnpURL, vnpURL, orderInfo, 
+        setOrderInfo 
+    } = useCartContext(); 
     const avatarSize = widthScreen * 0.13;
 
     const styles = StyleSheet.create({
@@ -183,53 +220,69 @@ export default function Payment() {
             alignItems: "center",
         }
     })
-    const [array_itemListInCart, setArray_itemListInCart] = useState<any[]>([]);
-    const [deliveryInfo, setDeliveryInfo] = useState<any>({}); 
-    const [isCash, setIsCash] = useState(true);
-    const [orderInfo, setOrderInfo] = useState({
-        deliveryInfo: {
-            id: 1,
-            name: "Đỗ Phạm Hoàng Ân",
-            phone: "0968795750",
-            address: "Toà B4, KTX Khu B",
-            isDefault: true,
-            isChoose: true
-        },
-        productList: [
-            {
-                id: 1,
-                name: "trà sữa ô long",
-                price: 30000,
-                sizes: "M",
-                toppings: [
-                    { id: 1, name: 'Thạch', price: 5000, quantity: 0 },
-                    { id: 2, name: 'Trân châu trắng', price: 5000, quantity: 0}, 
-                ],
-                note: "",
-                quantity: 1, 
-                totalOfItem: 30000
-            } 
-        ], 
-        paymentMethod: "COD",
-        voucherID: 1,
-        paymentAmount: 0,
-        userID: userID
-    }) 
+    const [array_itemListInCart, setArray_itemListInCart] = useState<any[]>([]);  
+    const paymentType = {
+        cash: "Tiền mặt",
+        paymentOnline: "Chuyển khoản"
+    }
+    // const [orderInfo, setOrderInfo] = useState<orderInforType>({
+    //     deliveryInfo: {
+    //         id: 1,
+    //         name: "Đỗ Phạm Hoàng Ân",
+    //         phone: "0968795750",
+    //         address: "Toà B4, KTX Khu B",
+    //         isDefault: true,
+    //         isChoose: true
+    //     },
+    //     productList: [
+    //         {
+    //             id: 1,
+    //             name: "trà sữa ô long",
+    //             price: 30000,
+    //             size: "M",
+    //             toppings: [
+    //                 { id: 1, name: 'Thạch', price: 5000, quantity: 0 },
+    //                 { id: 2, name: 'Trân châu trắng', price: 5000, quantity: 0}, 
+    //             ], 
+    //             quantity: 1, 
+    //             totalOfItem: 30000
+    //         } 
+    //     ], 
+    //     paymentMethod: "Tiền mặt",
+    //     paymentStatus: 0,
+    //     voucherID: 1,
+    //     paymentAmount: 0,
+    //     userID: userID
+    // }) 
 
     const navigation = useNavigation();
 
+    // const handleDeepLink = (event: any) => {
+    //     let data = Linking.parse(event.url);
+    //     // Xử lý URL và lấy dữ liệu từ event.url nếu cần
+    //     console.log(data);
+    //     // Thực hiện hành động sau khi trở về từ thanh toán
+    // };
+    
+
     useEffect(() => {
-        setIsLoading(true);
+        // const subscription = Linking.addEventListener('url', handleDeepLink);
+
         const getitemListInCart = async () => {
             try {
                 const jsonValue = await AsyncStorage.getItem('array_itemListInCart')
                 setArray_itemListInCart(jsonValue != null ? JSON.parse(jsonValue) : null); 
-                console.log(JSON.parse(jsonValue)[0], 'JSON.parse(jsonValue)');
+                // console.log(JSON.parse(jsonValue || null)[0], 'JSON.parse(jsonValue)');
             } catch (error) {
                 console.log(error)
             }
-        }
-        getitemListInCart(); 
+        } 
+
+        getitemListInCart();  
+        
+        // return () => {
+        //     subscription.remove();
+        // };    
     }, []) 
     
     useEffect(() => {  
@@ -252,7 +305,8 @@ export default function Payment() {
                         isChoose: true,
                     }, 
                     productList: array_itemListInCart,
-                    paymentAmount: totalChecked
+                    paymentAmount: totalChecked,
+                    userID: userID
                 })
                 setIsLoading(false);
             })
@@ -260,16 +314,36 @@ export default function Payment() {
         getAdress(); 
     }, [array_itemListInCart])
 
-    const saveOrder = () => {
-        console.log(orderInfo.productList[0].toppings, 'toppings22')
-        // axios.post(baseURL + "/saveOrder", orderInfo)
-        // .then((response) => {
-        //     // xoan navigation đến trang thanh toán thành công
-
-        //     console.log(response.data)
+    const openInBrowser = async () => {
+        // Linking.openURL(vnpURL)
+        // .catch(err => {
+        //     console.error("An error occurred", err); 
         // })
-        navigation.navigate("OrderSuccess" as never);
-    }
+        await WebBrowser.openBrowserAsync(vnpURL );
+    };
+
+    useEffect(() => {
+        if(vnpURL != "")
+            openInBrowser();
+    }, [vnpURL])
+
+    const saveOrder = useCallback(() => {
+        setIsLoading(true)
+        console.log(orderInfo.productList[0].toppings, 'toppings22', orderInfo)
+        axios.post(baseURL + "/saveOrder", orderInfo)
+        .then((response) => {
+            // xoan navigation đến trang thanh toán thành công
+            orderInfo.paymentMethod === paymentType.paymentOnline ? setVnpURL(response.data.data.vnp_Url) : {};    
+            setIsLoading(false);
+            navigation.navigate("OrderSuccess" as never);
+            console.log(response.data, 'kksks')
+            // openInBrowser();
+        })
+        .catch((error) => {
+            console.log(error)
+        })
+        // navigation.navigate("OrderSuccess" as never);
+    }, [orderInfo])
    
     const renderTopping = (toppings: any[], indexItem: number) => {
         return toppings.map((item, index) => { 
@@ -348,16 +422,16 @@ export default function Payment() {
         }
     }
 
-    return(
-        
-        <SafeAreaView style={[{flex: 10}]}  >  
-            {
-                isLoading
-                ? <View style={{marginVertical: heightScreen * 0.045}}>
-                    <Loading></Loading>
-                </View> 
-                : <ItemType1 deliveryInfo={orderInfo.deliveryInfo}></ItemType1>  
-            } 
+    return(  
+        isLoading 
+        ? <Loading/>
+        : <SafeAreaView style={[{flex: 10}]}  >    
+            <Stack.Screen
+                options={{
+                    title: "Thanh toán",
+                }}
+            ></Stack.Screen>
+            <ItemType1 deliveryInfo={orderInfo.deliveryInfo}></ItemType1>   
             <View style={styles.titleContainer}> 
                 <View>
                     <Text  
@@ -430,8 +504,10 @@ export default function Payment() {
                     >
                         <View style={{ flexDirection: "row" }}>
                             <CheckBox
-                                checked={isCash} 
-                                onPress={() => { setIsCash(!isCash) }}
+                                checked={orderInfo.paymentMethod === paymentType.cash} 
+                                onPress={
+                                    () => { setOrderInfo({...orderInfo, paymentMethod: paymentType.cash}) }
+                                }
                                 containerStyle={{
                                     padding: 0,
                                     margin: 0, 
@@ -444,12 +520,16 @@ export default function Payment() {
                                     opacity: 0.5,
                                     alignSelf: "center"
                                 }}
-                            >Tiền mặt</Text>
+                            >
+                                { paymentType.cash }
+                            </Text>
                         </View> 
                         <View style={{ flexDirection: "row" }}>
                             <CheckBox
-                                checked={!isCash} 
-                                onPress={() => {setIsCash(!isCash)}}
+                                checked={orderInfo.paymentMethod === paymentType.paymentOnline} 
+                                onPress={
+                                    () => { setOrderInfo({...orderInfo, paymentMethod: paymentType.paymentOnline}) }
+                                }
                                 containerStyle={{
                                     padding: 0,
                                     margin: 0, 
@@ -462,7 +542,7 @@ export default function Payment() {
                                     opacity: 0.5,
                                     alignSelf: "center"
                                 }}
-                            >Chuyển khoản</Text>
+                            >{paymentType.paymentOnline}</Text>
                         </View> 
                     </View>
                 </View>
@@ -490,7 +570,7 @@ export default function Payment() {
                         iconName="money-bill"
                         buttonName="Đặt hàng"
                         handlePress={saveOrder} 
-                    ></Button>
+                    ></Button> 
                 </View>
             </View>  
         </SafeAreaView>

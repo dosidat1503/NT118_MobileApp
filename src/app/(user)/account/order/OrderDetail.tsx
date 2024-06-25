@@ -16,7 +16,7 @@ interface ItemProductProps {
     QUANTITY: any; 
     ID_PARENT_OD_OF_THIS_OD: any, 
     ORDER_DETAIL_ID: any; 
-    fad: { FAD_NAME: any; FAD_PRICE: any; }; 
+    fad: { FAD_NAME: any; FAD_PRICE: any; IMAGE_ID: any }; 
 }
 
 interface ItemToppingProps {
@@ -208,6 +208,7 @@ export default function Payment() {
                 id: 1,
                 name: "trà sữa ô long",
                 price: 30000,
+                uri: "",
                 sizes: [
                     { label: 'M', checked: true },
                     { label: 'L', checked: false }, 
@@ -233,6 +234,8 @@ export default function Payment() {
             console.log(orderID, "orderID")
             axios.get(baseURL + "/getOrderDetailInfo", {params: { orderID: orderID}})
             .then((response) => {  
+                console.log(response.data.imagesURL, 'imagesURL')
+                let indexURL = 0;
                 setOrderInfo({  
                     ...orderInfo,
                     deliveryInfo: {
@@ -246,11 +249,20 @@ export default function Payment() {
                         totalOfItem += itemMainFAD.fad.FAD_PRICE * itemMainFAD.QUANTITY;
                         if(itemMainFAD.ID_PARENT_OD_OF_THIS_OD === null)
                         {
-                            console.log(itemMainFAD.ORDER_DETAIL_ID, itemMainFAD, 'itemMainFAD.ORDER_DETAIL_ID')
+                            console.log(
+                                itemMainFAD.ORDER_DETAIL_ID, 
+                                itemMainFAD, 
+                                'itemMainFAD.ORDER_DETAddIL_ID', 
+                                response.data.imagesURL,
+                                itemMainFAD.fad.IMAGE_ID
+                            )
+                            let imageObject = response.data.imagesURL.find((item: { IMAGE_ID: any; URL: any; }) => item.IMAGE_ID === itemMainFAD.fad.IMAGE_ID);
+                            console.log(imageObject, 'imageObject')
                             return {
                                 id: itemMainFAD.ORDER_DETAIL_ID, 
                                 name: itemMainFAD.fad.FAD_NAME,
                                 price: itemMainFAD.fad.FAD_PRICE,
+                                uri: imageObject.URL || "",
                                 sizes: [
                                     { label: 'M', checked: true },
                                     { label: 'L', checked: false }, 
@@ -260,7 +272,7 @@ export default function Payment() {
                                 toppings: response.data.orderDetailInfo[0].order_details.filter((itemSubFAD: ItemProductProps) => {
                                         return itemMainFAD.ORDER_DETAIL_ID === itemSubFAD.ID_PARENT_OD_OF_THIS_OD && itemMainFAD.ORDER_DETAIL_ID !== null;
                                     }).map((itemSubFAD: ItemProductProps) => {
-                                        console.log(itemMainFAD.ORDER_DETAIL_ID, itemSubFAD.ID_PARENT_OD_OF_THIS_OD, 'itemSubFAD.ID_PARENT_OD_OF_THIS_OD', itemSubFAD.QUANTITY, 'total', totalOfItem);
+                                        console.log(itemMainFAD.ORDER_DETAIL_ID, itemSubFAD.fad.FAD_NAME, 'itemSubFAD.ID_PARENT_OD_OF_THIS_OD', itemSubFAD, 'total', totalOfItem);
                                         totalOfItem += itemSubFAD.PRICE * itemSubFAD.QUANTITY;
                                         return {
                                             name: itemSubFAD.fad.FAD_NAME,
@@ -277,7 +289,7 @@ export default function Payment() {
                     ), 0)
                 })
                 // setIsLoading(false);
-                console.log(response.data.orderDetailInfo[0].order_details, response.data.deliveryInfo[0].NAME, "orderDetailInfo")
+                console.log(response.data.imagesURL, response.data.deliveryInfo[0].NAME, "orderDetailI22nfo")
             })
         }
         getAdress(); 
@@ -384,7 +396,10 @@ export default function Payment() {
                 ? <View style={{marginVertical: heightScreen * 0.045}}>
                     <Loading></Loading>
                 </View> 
-                : <ItemType1 deliveryInfo={orderInfo.deliveryInfo}></ItemType1>  
+                : <ItemType1 
+                    deliveryInfo={orderInfo.deliveryInfo}
+                    isWatchOrderDetail={true}
+                ></ItemType1>  
             } 
             <View style={styles.titleContainer}> 
                 <View>

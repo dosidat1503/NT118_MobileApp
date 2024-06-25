@@ -210,7 +210,7 @@ export default function OrderManagement() {
 
     useEffect(() => {
         getOrderListFromServe(orderStatusList[0].id, 1);
-        console.log(infoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus useeffect")
+        // console.log(infoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus useeffect")
     }, [initialLoad])
 
     //orderStatusName = "" thì có nghĩa là load lần đầu. mà load lần đầu thì load 10 trạng thái đơn hàng đầu tiên của mỗi trạng thái đơn hàng
@@ -227,7 +227,7 @@ export default function OrderManagement() {
             userID: userID === 0 ? 1 : userID
         }
 
-        console.log(requestData, "requestData", orderStatusCode)
+        // console.log(requestData, "requestData", orderStatusCode)
 
         axios.get( baseURL + "/getOrderInfoOfUser", { params: requestData })
         .then((response) => {
@@ -248,7 +248,7 @@ export default function OrderManagement() {
                     };
                 }) 
                 setInfoManagementEveryOrderStatus(newInfoManagementEveryOrderStatus)
-                console.log(newInfoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus")
+                // console.log(newInfoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus")
             }
             setIsLoading(false);
         })
@@ -341,17 +341,20 @@ export default function OrderManagement() {
     const renderEveryStatus = () => {
         return infoManagementEveryOrderStatus.map((itemStatus, index) => {
             console.log(itemStatus.orderStatusName, itemStatus.isActive, "isActive");
-            if (itemStatus.isActive) {
+            if (itemStatus.isActive && itemStatus.orderItemList.length !== 0) {
+                console.log(itemStatus.orderItemList, "itemStatus.orderItemList2f2ss")
                 return (
                     <FlatList
                         data={itemStatus.orderItemList}
-                        renderItem={({item}) => renderOrderList(item, itemStatus)} 
+                        renderItem={({item}) => renderOrderList(item, itemStatus) } 
                         ListFooterComponent={ <RenderFooter isLoading={isLoading}></RenderFooter> }
                         onEndReached={() => getOrderInfo(itemStatus)}
                         onEndReachedThreshold={0.01} 
+                        key={index}
                     ></FlatList>
                 );
-            } else return null;
+            } 
+            else return null;
         });
  
     }

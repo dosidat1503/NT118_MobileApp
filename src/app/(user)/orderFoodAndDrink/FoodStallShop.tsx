@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Pressable } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Pressable, FlatList } from "react-native";
 import SlideHeaderOrderFAD from "@/components/orderFAD/SlideHeaderOrderFAD";
 import { defaultPrizzaImage } from "@/components/PostList"; 
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";  
@@ -24,13 +24,6 @@ export default function FoodStallShop() {
     const {heightScreen, widthScreen, mainColor, FADShop_ID, baseURL, isLoading, setIsLoading} = useCartContext();
  
     const [infoShop, setInfoShop] = useState<InfoShopProp | undefined>(undefined) 
-    useEffect(() => {
-        const backHandle = BackHandler.addEventListener("hardwareBackPress", handleBackPress) 
-        setIsLoading(true)
-        getShopInfo();
-        return backHandle.remove()
-    }, [])
-
     const getShopInfo = () => { 
         axios.get(baseURL + '/getFADShopDetailInfo', { params: { shop_id: FADShop_ID } })
         .then( (res) => {
@@ -39,6 +32,13 @@ export default function FoodStallShop() {
             setIsLoading(false)
         })
     }
+    useEffect(() => {
+        const backHandle = BackHandler.addEventListener("hardwareBackPress", handleBackPress) 
+        setIsLoading(true)
+        getShopInfo();
+        return backHandle.remove()
+    }, [])
+
 
     useEffect(() => {
         console.log(infoShop, "infoShop")
@@ -85,82 +85,92 @@ export default function FoodStallShop() {
             width: widthScreen
         }
     })
-    return (
-        <ScrollView>
-            <View> 
-                <Stack.Screen 
-                    options={{ 
-                        headerRight: () => (
-                            <Link href="/(user)/orderFoodAndDrink/Cart" asChild>
-                                <Pressable>
-                                    {({ pressed }) => (
-                                        <FontAwesome
-                                            name="shopping-cart"
-                                            size={25}
-                                            color={mainColor}
-                                            style={{ 
-                                                marginRight: widthScreen * 0.04, 
-                                                opacity: pressed ? 0.5 : 1, 
-                                                borderWidth: 1,
-                                                borderColor: mainColor,
-                                                borderRadius: widthScreen * 0.03,
-                                                paddingHorizontal: widthScreen * 0.015,
-                                                paddingVertical: heightScreen * 0.008
-                                            }}
-                                        />
-                                    )}
-                                </Pressable>
-                            </Link>
-                        ), 
-                     }}
-                ></Stack.Screen>  
-                <View style={isLoading ? [styles.displayNone] : {} }> 
-                    {/* Hiển thị ảnh cover */}
-                    <Image
-                        source={{ uri: infoShop?.COVER_IMAGE_URL }}
-                        style={styles.cover}
-                    ></Image>  
+    return ( 
+        <FlatList
+            data={[]}  // Không có dữ liệu cụ thể cho danh sách này
+            renderItem={(item) => null}
+            keyExtractor={(item, index) => index.toString()}
+            ListHeaderComponent={
+                <View>
+                    <Stack.Screen 
+                        options={{ 
+                            headerRight: () => (
+                                <Link href="/(user)/orderFoodAndDrink/Cart" asChild>
+                                    <Pressable>
+                                        {({ pressed }) => (
+                                            <FontAwesome
+                                                name="shopping-cart"
+                                                size={25}
+                                                color={mainColor}
+                                                style={{ 
+                                                    marginRight: widthScreen * 0.04, 
+                                                    opacity: pressed ? 0.5 : 1, 
+                                                    borderWidth: 1,
+                                                    borderColor: mainColor,
+                                                    borderRadius: widthScreen * 0.03,
+                                                    paddingHorizontal: widthScreen * 0.015,
+                                                    paddingVertical: heightScreen * 0.008
+                                                }}
+                                            />
+                                        )}
+                                    </Pressable>
+                                </Link>
+                            ), 
+                        }}
+                    ></Stack.Screen>  
+                    {
+                        isLoading 
+                        ? ""
+                        : <View> 
+                            {/* Hiển thị ảnh cover */}
+                            <Image
+                                source={{ uri: infoShop?.COVER_IMAGE_URL }}
+                                style={styles.cover}
+                            ></Image>  
 
-                    {/* Nút back */}
-                    {/* <TouchableOpacity 
-                        onPress={handleBackPress}
-                        style={styles.touchableBack}
-                    >
-                        <FontAwesome5 
-                        name="arrow-circle-left"
-                        color="#89CFF0"
-                        size={30}
-                        style={styles.backIcon}
-                        />
-                    </TouchableOpacity> */}
-
-                    {/* Nút giỏ hàng */}
-                        {/* <TouchableOpacity 
-                            onPress={handleBackPress}
-                            style={styles.touchableCart}
-                        >
-                            
-                            <Link href="/(user)/orderFoodAndDrink/Cart"> 
+                            {/* Nút back */}
+                            {/* <TouchableOpacity 
+                                onPress={handleBackPress}
+                                style={styles.touchableBack}
+                            >
                                 <FontAwesome5 
-                                name="shopping-cart"
+                                name="arrow-circle-left"
                                 color="#89CFF0"
                                 size={30}
-                                // style={styles.cartIcon}
+                                style={styles.backIcon}
                                 />
-                            </Link>
-                        </TouchableOpacity> */}
-                    {/* Thông tin shop */}
-                    
-                    <InfoShop infoShop={infoShop}></InfoShop>
+                            </TouchableOpacity> */}
 
-                    {/* Thông tin sản phẩm của shop */}
-                    <InfoFADofShop></InfoFADofShop>
+                            {/* Nút giỏ hàng */}
+                                {/* <TouchableOpacity 
+                                    onPress={handleBackPress}
+                                    style={styles.touchableCart}
+                                >
+                                    
+                                    <Link href="/(user)/orderFoodAndDrink/Cart"> 
+                                        <FontAwesome5 
+                                        name="shopping-cart"
+                                        color="#89CFF0"
+                                        size={30}
+                                        // style={styles.cartIcon}
+                                        />
+                                    </Link>
+                                </TouchableOpacity> */}
+                            {/* Thông tin shop */}
+                            
+                            <InfoShop infoShop={infoShop}></InfoShop>
 
-                    {/* Xoan code hiển thị thông tin voucher ở đây */}
-                    <Voucherdetail></Voucherdetail>
+                            {/* Thông tin sản phẩm của shop */}
+                            <InfoFADofShop></InfoFADofShop>
+
+                            {/* Xoan code hiển thị thông tin voucher ở đây */}
+                            <Voucherdetail></Voucherdetail>
+                        </View> 
+                    }
+                    <Loading></Loading>
                 </View>
-                <Loading></Loading>
-            </View>
-        </ScrollView>
+            }
+            // ListFooterComponent={} 
+        />
     )
 }
