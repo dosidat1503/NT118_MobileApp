@@ -9,11 +9,11 @@ import AdjustQuantity from "./AdjustQuantity";
 import ItemInCartAndPayment from "@/components/orderFAD/Cart/ItemInCartAndPayment";
 import Button from "./Button";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Cart() {
-    const { heightScreen, widthScreen, mainColor } = useCartContext(); 
+    const { heightScreen, widthScreen, mainColor, setIsLoading } = useCartContext(); 
     const avatarSize = widthScreen * 0.13; 
 
     const styles = StyleSheet.create({   
@@ -73,8 +73,7 @@ export default function Cart() {
     })
     const navigation = useNavigation();
     const [array_itemListInCart, setArray_itemListInCart] = useState<any[]>([]);
-    const [isCheckedForPaymentAll, setIsCheckedForPaymentAll] = useState(false);
-    const [totalForPayment, setTotalForPayment] = useState(0);
+    const [isCheckedForPaymentAll, setIsCheckedForPaymentAll] = useState(false); 
 
     useEffect(() => {
         const getitemListInCart = async () => {
@@ -101,7 +100,7 @@ export default function Cart() {
         updateArray_itemListInCart();
     }, [array_itemListInCart])
 
-    const handleCheckedForPayment = (item: any) => {
+    const handleCheckedForPayment = useCallback((item: any) => {
         // setArray_itemListInCart((prevArray_itemListInCart) => {
         //     const newArray_itemListInCart = [...prevArray_itemListInCart];
         //     newArray_itemListInCart[item.index].isCheckedForPayment = !newArray_itemListInCart[item.index].isCheckedForPayment;
@@ -128,13 +127,9 @@ export default function Cart() {
                     return itemNeedFind
             }
         ))
-    }
-    const handleCheckedForPaymentAll = () => {
-        // setArray_itemListInCart((prevArray_itemListInCart) => {
-        //     const newArray_itemListInCart = [...prevArray_itemListInCart];
-        //     newArray_itemListInCart[item.index].isCheckedForPayment = !newArray_itemListInCart[item.index].isCheckedForPayment;
-        //     return newArray_itemListInCart;
-        // });
+    }, [array_itemListInCart])
+
+    const handleCheckedForPaymentAll = useCallback(() => { 
         setArray_itemListInCart(
             array_itemListInCart.map((itemNeedFind) => { 
                 return {
@@ -144,8 +139,9 @@ export default function Cart() {
             }
         ))
         setIsCheckedForPaymentAll(!isCheckedForPaymentAll)
-    }
-    const handleDeleteAllItemInCart = async () => {
+    }, [array_itemListInCart])
+
+    const handleDeleteAllItemInCart = useCallback(async () => {
         setArray_itemListInCart([])
         try {
             // Remove the item from AsyncStorage
@@ -155,7 +151,7 @@ export default function Cart() {
             console.error('Error removing value from AsyncStorage:', error);
         }
         setIsCheckedForPaymentAll(false)
-    } 
+    } , [array_itemListInCart])
     const renderTopping = (toppings: any[], indexItem: number) => {
         return toppings.map((item, index) => { 
             return (
@@ -168,6 +164,7 @@ export default function Cart() {
                     index={index}                     
                     setArray_itemListInCart={setArray_itemListInCart}
                     indexItem={indexItem}
+                    key={index}
                 ></ItemInCartAndPayment>  
             ) 
         })
@@ -177,7 +174,7 @@ export default function Cart() {
         if(array_itemListInCart != null){
             return array_itemListInCart.map((item, index) => { 
                 return (
-                    <View style={styles.itemDivContainer} >
+                    <View style={styles.itemDivContainer} key={index} >
                         {/* checkbox */}
                         <View style={{
                                 flexDirection: "row",
@@ -204,7 +201,7 @@ export default function Cart() {
                                 item={item}
                                 index={index}             
                                 setArray_itemListInCart={setArray_itemListInCart}
-                                // indexItem={indexItem}       
+                                indexItem={index}       
                             ></ItemInCartAndPayment>
                             <Text style={[
                                 styles.textInCart,
@@ -237,6 +234,12 @@ export default function Cart() {
 
     return(
         <SafeAreaView style={{flex: 1}}>  
+            <Stack.Screen
+                options={{
+                    title: "Giỏ hàng",
+                }}
+            >
+            </Stack.Screen>
             <ScrollView style={{flex: 1, marginBottom: heightScreen * 0.05}}> 
                 {/* đây là view của một item */} 
                 {renderItemListInCart()} 
@@ -270,7 +273,10 @@ export default function Cart() {
                         <Button
                             iconName="money-bill-alt"
                             buttonName="THANH TOÁN"
-                            handlePress={() => { navigation.navigate('Payment' as never)}}
+                            handlePress={() => {
+                                setIsLoading(true);
+                                navigation.navigate('Payment' as never)
+                            }}
                         ></Button>
                     {/* </Link> */}
                 </View>

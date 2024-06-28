@@ -3,11 +3,12 @@ import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, Tou
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import { defaultPrizzaImage } from "@/components/PostList";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons"; 
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect, useCallback } from 'react'; 
 import axios from "axios"; 
 import Button from "@/app/(user)/orderFoodAndDrink/Button";
 import { useNavigation } from "expo-router";
 import RenderFooter from "@/components/RenderFooter";
+import Response from "../../Response";
 
 interface orderItem {
     ORDER_ID: number;
@@ -37,7 +38,7 @@ interface infoManagementEveryOrderStatus {
 
 export default function OrderManagement() {
 
-    const {heightScreen, widthScreen, mainColor, orderStatusList, baseURL, userID, setOrderID} = useCartContext();
+    const {heightScreen, widthScreen, mainColor, orderStatusList, baseURL, userID, setOrderID, RD} = useCartContext();
 
     const avatarSize = widthScreen * 0.13;
 
@@ -80,11 +81,11 @@ export default function OrderManagement() {
             borderColor: "#cdcdcd",
             paddingVertical: heightScreen * 0.02,
             paddingHorizontal: widthScreen * 0.03,
-            shadowColor: '#000',
-            shadowOffset: { width: 5, height: 7 }, 
-            shadowOpacity: 0.1, 
-            shadowRadius: 10,  
-            elevation: 70,
+            // shadowColor: '#000',
+            // shadowOffset: { width: 5, height: 7 }, 
+            // shadowOpacity: 0.1, 
+            // shadowRadius: 10,  
+            // elevation: 70,
             backgroundColor: "white"
         }, 
         imgOfItem: { 
@@ -157,30 +158,14 @@ export default function OrderManagement() {
         }
     });
 
-    const orderStatus = [
-        { name: "Đang chuẩn bị", icon: "clock" },
-        { name: "Đang giao", icon: "motorcycle" },
-        { name: "Đã nhận", icon: "clipboard-check" },
-        { name: "Đã huỷ", icon: "window-close" },
+    const itemButtonList = [
+        { orderStatusCode: 1, icon: "window-close", name: "Huỷ đơn"},
+        { orderStatusCode: 2, icon: "phone-square-alt", name: "Liên hệ" },
+        { orderStatusCode: 3, icon: "phone-square-alt", name: "Liên hệ" },
+        { orderStatusCode: 4, icon: "star", name: "Đánh giá" },
+        { orderStatusCode: 5, icon: "undo-alt", name: "Đặt lại" },
     ]   
-
-    const [orderList, setOrderList] = useState([
-        {
-            FADFirst: {
-                imgURL: defaultPrizzaImage,
-                name: "Pizza hải sản",
-                quantity: 1,
-                price: 100000,
-            },
-            necessaryInfo: {
-                FADQuantityHaveOrder: 3,
-                time: "2021-09-01 12:00:00",
-                paymentMethod: "Thanh toán khi nhận hàng",
-                voucherID: "C_NQ_D20"
-            },
-            paymentToTal: 300000
-        } 
-    ]); 
+    const [parameterForChangeOrderStatus, setParameterForChangeOrderStatus] = useState({ orderStatusCode: 0, item: {}, itemStatus: {}});
 
     const [infoManagementEveryOrderStatus, setInfoManagementEveryOrderStatus] = useState<infoManagementEveryOrderStatus[]>([]);
     const [dataLoadFromServe, setDataLoadFromServe] = useState([]);
@@ -188,6 +173,8 @@ export default function OrderManagement() {
     const itemQuantityEveryLoad = 4;
     const [initialLoad, setInitialLoad] = useState(false);
     const [isLoading, setIsLoading] = useState(false); 
+    const [isShowConfirmPopup, setIsShowConfirmPopup] = useState(false);
+    const [isShowPopupAfterCancelOrder, setIsShowPopupAfterCancelOrder] = useState(false);
 
     useEffect(() => {   
         let newInfoManagementEveryOrderStatus: infoManagementEveryOrderStatus[] = []
@@ -215,50 +202,122 @@ export default function OrderManagement() {
 
     //orderStatusName = "" thì có nghĩa là load lần đầu. mà load lần đầu thì load 10 trạng thái đơn hàng đầu tiên của mỗi trạng thái đơn hàng
     //orderStatusName = "Đang chuẩn bị" (có thể là tên các trạng thái khác) thì load 10 trạng thái đơn hàng tiếp theo của trạng thái đơn hàng "Đang chuẩn bị"
-    const getOrderListFromServe = (orderStatusCode: number, pageNumber: number) => { 
+    const getOrderListFromServe = useCallback((orderStatusCode: number, pageNumber: number) => { 
 
-        // nếu mà load theo một trạng thái thì startIndexLoadOneStatus = số lượng đơn hàng muốn load thêm * (số trang - 1) + 1
-        // ví dụ load thêm 10 đơn hàng của trạng thái "Đang chuẩn bị" thì startIndexLoadOneStatus = 10 * (2 - 1) + 1 = 11 
-        setIsLoading(true);
-        const requestData = {
-            orderStatusCode: orderStatusCode,
-            startIndex: (itemQuantityEveryLoad * ( pageNumber - 1 )),
-            itemQuantityEveryLoad: itemQuantityEveryLoad, 
-            userID: userID === 0 ? 1 : userID
-        }
-
-        // console.log(requestData, "requestData", orderStatusCode)
-
-        axios.get( baseURL + "/getOrderInfoOfUser", { params: requestData })
-        .then((response) => {
-            console.log(response.data.infoOrder, "response.data âccs")
-            if(response.data.infoOrder.length !== 0) {
-                const newInfoManagementEveryOrderStatus =  infoManagementEveryOrderStatus.map((itemInList) => {
-                    if (itemInList.orderStatusCode === orderStatusCode) {
-                        return {
-                            ...itemInList,
-                            orderItemList: itemInList.orderItemList.concat(response.data.infoOrder),
-                            pageNumber: ++pageNumber,
-                            isActive: true
-                        };
-                    }
-                    return {
-                        ...itemInList, 
-                        isActive: false
-                    };
-                }) 
-                setInfoManagementEveryOrderStatus(newInfoManagementEveryOrderStatus)
-                // console.log(newInfoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus")
+            // nếu mà load theo một trạng thái thì startIndexLoadOneStatus = số lượng đơn hàng muốn load thêm * (số trang - 1) + 1
+            // ví dụ load thêm 10 đơn hàng của trạng thái "Đang chuẩn bị" thì startIndexLoadOneStatus = 10 * (2 - 1) + 1 = 11 
+            setIsLoading(true);
+            const requestData = {
+                orderStatusCode: orderStatusCode,
+                startIndex: (itemQuantityEveryLoad * ( pageNumber - 1 )),
+                itemQuantityEveryLoad: itemQuantityEveryLoad, 
+                userID: userID === 0 ? 1 : userID
             }
-            setIsLoading(false);
-        })
-    }
+    
+            // console.log(requestData, "requestData", orderStatusCode)
+    
+            axios.get( baseURL + "/getOrderInfoOfUser", { params: requestData })
+            .then((response) => {
+                console.log(response.data.infoOrder, "response.data âccs")
+                if(response.data.infoOrder.length !== 0) {
+                    const newInfoManagementEveryOrderStatus =  infoManagementEveryOrderStatus.map((itemInList) => {
+                        if (itemInList.orderStatusCode === orderStatusCode) {
+                            return {
+                                ...itemInList,
+                                orderItemList: itemInList.orderItemList.concat(response.data.infoOrder),
+                                pageNumber: ++pageNumber,
+                                isActive: true
+                            };
+                        }
+                        return {
+                            ...itemInList, 
+                            isActive: false
+                        };
+                    }) 
+                    setInfoManagementEveryOrderStatus(newInfoManagementEveryOrderStatus)
+                    // console.log(newInfoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus")
+                }
+                setIsLoading(false);
+            })
+        }
+    , [infoManagementEveryOrderStatus])
 
     const getOrderInfo = (item: infoManagementEveryOrderStatus) => {
         getOrderListFromServe(item.orderStatusCode, item.pageNumber);
         // console.log(item, "item") 
     }
+
     const navigation = useNavigation();
+ 
+    const handleChangeOrderStatus = useCallback(() => {
+        console.log(  "orderStatusCode")
+        if(parameterForChangeOrderStatus.orderStatusCode === itemButtonList[0].orderStatusCode){
+            let newOrderItemList = parameterForChangeOrderStatus.itemStatus.orderItemList.filter((itemInList) => itemInList.ORDER_ID !== parameterForChangeOrderStatus.item.ORDER_ID)
+            setInfoManagementEveryOrderStatus(
+                infoManagementEveryOrderStatus.map((itemInList) => {
+                    if (itemInList.orderStatusCode === parameterForChangeOrderStatus.itemStatus.orderStatusCode) {
+                        return {
+                            ...itemInList,
+                            orderItemList: newOrderItemList
+                        };
+                    }
+                    return itemInList;
+                })
+            )
+            setIsShowConfirmPopup(false)
+            setIsShowPopupAfterCancelOrder(true)
+            setParameterForChangeOrderStatus({ orderStatusCode: 0, item: {}, itemStatus: {}})
+            axios.post(baseURL + "/changeOrderStatusToCancel", { orderID: parameterForChangeOrderStatus.item.ORDER_ID })
+            .then((response) => {
+                console.log(response.data.statusCode, "response.data.statusCode")
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        } 
+    }, [parameterForChangeOrderStatus])
+
+    const buttonPressCaseInEveryOrderStatus = (item: orderItem, itemButton: any, itemStatus: infoManagementEveryOrderStatus ) => {
+        if(itemStatus.orderStatusCode === itemButtonList[0].orderStatusCode){ 
+            setIsShowConfirmPopup(true)
+            setParameterForChangeOrderStatus({
+                orderStatusCode: itemButton.orderStatusCode, 
+                item: item, 
+                itemStatus: itemStatus 
+            }) 
+        }
+    }
+
+    const renderShowConfirmPopup = () => {
+        // isShowConfirmPopup && (
+        //     <Response 
+        //         content="Bạn chắc chắn huỷ đơn hàng này chứ"
+        //         buttonIcon1="check-circle"
+        //         buttonFunction1={() => handleChangeOrderStatus(orderStatusCode, item, itemStatus)}
+        //         buttonName1="Huỷ"
+        //         buttonIcon2="window-close"
+        //         buttonFunction2={() => setIsShowConfirmPopup(false)}
+        //         buttonName2="Thoát"
+        //     ></Response>
+        // )
+        return (
+            <View style={{ position: "absolute", top: -(heightScreen * 0.1), width: widthScreen, height: heightScreen }}>
+                
+                <Response 
+                    content="Bạn chắc chắn huỷ đơn hàng này không?"
+                    buttonIcon1="check-circle"
+                    buttonFunction1={() => handleChangeOrderStatus()}
+                    buttonName1="Huỷ đơn"
+                    buttonColor1="red"
+                    buttonIcon2="window-close"
+                    buttonFunction2={() => setIsShowConfirmPopup(false)}
+                    buttonName2="Thoát"
+                    buttonColor2="green"
+                    confirmPopup={true}
+                ></Response> 
+            </View>
+        )
+    }
 
     const renderOrderList = (item: orderItem, itemStatus: infoManagementEveryOrderStatus) =>  (
         <View  style={styles.itemOrderContainer} key={item.ORDER_ID}>
@@ -303,33 +362,22 @@ export default function OrderManagement() {
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.footerOfItemOder}>
-                {/* <Button
-                    title=
-                    color={mainColor}
-                > 
-                </Button>  */}
-                <Button
-                    iconName={
-                        itemStatus.orderStatusName === "Chờ xác nhận" 
-                        ? "window-close" 
-                        : itemStatus.orderStatusName === "Đang chuẩn bị" || itemStatus.orderStatusName === "Đang giao"
-                            ? "phone-square-alt"
-                            :  itemStatus.orderStatusName === "Đã giao" 
-                                ? "star"
-                                :  "undo-alt"
-                    }
-                    buttonName={
-                        itemStatus.orderStatusName === "Chờ xác nhận" 
-                        ? "Huỷ đơn" 
-                        : itemStatus.orderStatusName === "Đang chuẩn bị" || itemStatus.orderStatusName === "Đang giao"
-                            ? "Liên hệ"
-                            : itemStatus.orderStatusName === "Đã giao" 
-                                ? "Đánh giá"
-                                :  "Đặt lại"
-                    }
-                    handlePress={() => {}}
-                ></Button> 
+            <View style={styles.footerOfItemOder}> 
+                {
+                    itemButtonList.map((itemButton, index) => {
+                        if(itemButton.orderStatusCode === itemStatus.orderStatusCode)
+                            return (
+                                <View key={index}>
+                                    <Button
+                                        iconName={itemButton.icon}
+                                        buttonName={itemButton.name}
+                                        handlePress={() =>  buttonPressCaseInEveryOrderStatus(item, itemButton, itemStatus) }
+                                    ></Button> 
+                                </View>
+                            ) 
+                    })
+                }
+                
                 <View style={{flexDirection: "row"}}>
                     <Text style={styles.headerNormalTextOfItemOder}>Tổng tiền: </Text>
                     <Text style={styles.footerTextMoneyOfItemOder}>{item.TOTAL_PAYMENT}</Text>
@@ -359,6 +407,16 @@ export default function OrderManagement() {
  
     }
 
+    useEffect(() => {
+        let timer: any;
+        if (isShowPopupAfterCancelOrder) {
+            timer = setTimeout(() => {
+                setIsShowPopupAfterCancelOrder(false);
+            }, 1000); 
+        }
+        return () => clearTimeout(timer);
+    }, [isShowPopupAfterCancelOrder]);
+
     return (
         <SafeAreaView style={{flex: 1}}>
             <Stack.Screen
@@ -366,8 +424,7 @@ export default function OrderManagement() {
                     title: 'Quản lý đơn hàng',
                 }}
             ></Stack.Screen>  
-            <View style={styles.headerContainer}>
-                {/* <View style={{paddingTop: heightScreen * 0.2}}></View> */}
+            <View style={styles.headerContainer}> 
                 {
                     infoManagementEveryOrderStatus.map((item, index) => { 
                         return(
@@ -385,13 +442,40 @@ export default function OrderManagement() {
                     })
                 }
             </View>
-            <View style={{borderBottomWidth: 1, marginHorizontal: widthScreen * 0.01, borderBottomColor: "#cdcdcd", marginBottom: heightScreen * 0.009}}/>
-            {/* <ScrollView >   */}
-                {/* body */}
-                <View style={{ marginTop: heightScreen * 0.128}}>
-                    { renderEveryStatus() }
-                </View>
-            {/* </ScrollView> */}
+            <View style={{
+                borderBottomWidth: 1, 
+                marginHorizontal: widthScreen * 0.01, 
+                borderBottomColor: "#cdcdcd", 
+                marginBottom: heightScreen * 0.009
+            }}/> 
+            <View style={{ marginTop: heightScreen * 0.128}}>
+                {
+                    isShowPopupAfterCancelOrder && (
+                        <View style={{ 
+                            backgroundColor: "red", 
+                            paddingHorizontal: widthScreen * 0.02, 
+                            paddingVertical: heightScreen * 0.02,
+                            marginTop: heightScreen * 0.01,
+                            width: widthScreen * 0.95,
+                            borderRadius: RD * 0.05,
+                            marginHorizontal: widthScreen * 0.025,
+                        }}>
+                            <Text style={{ color: "white", fontWeight: "bold", alignItems: "center", textAlign: "center" }} >Đơn hàng của bạn đã bị huỷ</Text>
+                        </View>
+                    )
+                }
+                { renderEveryStatus() }
+            </View> 
+            {
+                isShowConfirmPopup && ( 
+                    <View style={{ position: "absolute", top: 0, height: heightScreen, width: widthScreen, backgroundColor: "gray" , opacity: 0.6 }}>
+                        
+                    </View>
+                )
+            }
+            {
+                isShowConfirmPopup && renderShowConfirmPopup()
+            }
         </SafeAreaView>
     )
 }

@@ -10,21 +10,28 @@ import React from "react";
 
 interface ResponseProps {
     content: string,
-    statusIcon: string
+    statusIcon?: string
     href1?: string,
     buttonIcon1?: string,
     buttonName1?: string,
+    buttonColor1?: string,
     buttonFunction1?: () => void,
     href2?: string,
     buttonIcon2?: string,
     buttonName2?: string,
+    buttonColor2?: string,
     buttonFunction2?: () => void,
-}
-
-export default function Response({content, statusIcon, href1, buttonIcon1, buttonFunction1, buttonName1, href2, buttonIcon2, buttonName2, buttonFunction2}: ResponseProps) {
+    confirmPopup?: boolean,
+} 
+export default function Response({
+        content, statusIcon, 
+        href1, buttonIcon1, buttonName1, buttonFunction1, buttonColor1 = "#89CFF0",
+        href2, buttonIcon2, buttonName2, buttonFunction2, buttonColor2 = "#89CFF0",
+        confirmPopup,
+    }: ResponseProps) {
 
     const {heightScreen, widthScreen, mainColor, baseURL, emailPattern, phoneNumberPattern, fullNamePattern} = useCartContext();
-    const navigation = useNavigation();
+    console.log(" color: ", mainColor);
 
     const styles = StyleSheet.create({
         divContainer: {
@@ -54,11 +61,15 @@ export default function Response({content, statusIcon, href1, buttonIcon1, butto
                 borderWidth: 1,
                 borderColor: mainColor,
             }}> 
-                <FontAwesome5 
-                    name={statusIcon}
-                    size={20}
-                    style={styles.checkCircle}
-                ></FontAwesome5>
+                {
+                    confirmPopup 
+                    ? ""
+                    : <FontAwesome5 
+                        name={statusIcon}
+                        size={20}
+                        style={styles.checkCircle}
+                    ></FontAwesome5>
+                }
                 <View style={{justifyContent: "center", alignItems: "center", marginBottom: heightScreen * 0.03}}>
                     <Text
                         style={{
@@ -84,22 +95,24 @@ export default function Response({content, statusIcon, href1, buttonIcon1, butto
                     }}
                 >
                     {
-                        href1 && buttonName1 && buttonIcon1 &&
+                        buttonName1 && buttonIcon1 &&
                         // <Link href={href1} asChild> 
                             <Button
                                 iconName={buttonIcon1}
                                 buttonName={buttonName1}
                                 handlePress={buttonFunction1}
+                                color={buttonColor1}
                             ></Button> 
                         //{/* </Link> */}
                     }
                     {
-                        href2 && buttonName2 && buttonIcon2 &&
+                        buttonName2 && buttonIcon2 &&
                         // <Link href={href2} asChild> 
                             <Button
                                 iconName={buttonIcon2}
                                 buttonName={buttonName2}
                                 handlePress={buttonFunction2}
+                                color={buttonColor2}
                             ></Button> 
                         //</Link>{/* </Link> */}
                     }
