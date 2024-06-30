@@ -40,15 +40,6 @@ export default function ShopScreen() {
           <Text style={styles.headerResname}>Lẩu chay Hữu Duyên</Text>
         </View>
       </View>
-      {/* 
-      <View>
-        <View>
-          <Text>Có sẵn</Text>
-        </View>
-        <View>
-          <Text>Số liệu</Text>
-        </View>
-      </View> */}
 
       <View style={styles.filterRow}>
         <Image

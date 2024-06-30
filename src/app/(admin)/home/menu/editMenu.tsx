@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 export default function editMenu() {
   return (
     <View style={styles.homeContainer}>
-      <View style={styles.headerBar}>
+      {/* <View style={styles.headerBar}>
         <Pressable
           onPress={() => router.back()} // Navigate back to the previous screen
           style={{ padding: 10 }} // Add padding to make the button easier to press
@@ -21,7 +21,15 @@ export default function editMenu() {
           fontSize: 18,
           fontWeight: 'bold',
         }}>Thiết lập thực đơn</Text>
-      </View>
+        <Pressable
+          onPress={() => router.back()} // Navigate back to the previous screen
+          style={{ padding: 10 }} // Add padding to make the button easier to press
+        >
+          <View style={styles.backButton}>
+            <FontAwesome name="angle-left" size={24} color="white" />
+          </View>
+        </Pressable>
+      </View> */}
 
       <View style={styles.whiteContainer}>
         <View style={styles.containerItem}>
