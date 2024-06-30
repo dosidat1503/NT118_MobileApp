@@ -1,7 +1,7 @@
 import { Link } from "expo-router";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/ProductListItem";
+import { defaultPrizzaImage } from "@/components/PostList";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 
 export default function ReviewShop() {
@@ -51,7 +51,7 @@ export default function ReviewShop() {
             paddingHorizontal: widthScreen * 0.005
         },
         reviewText: {
-            fontWeight: 500,
+            fontWeight: "500",
             fontSize: heightScreen * 0.019,
             paddingLeft: widthScreen * 0.02,
             opacity: 0.9

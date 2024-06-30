@@ -3,7 +3,7 @@ import React from 'react';
 import Colors from '../constants/Colors';
 import { CartItem } from '../types';
 import { Link } from 'expo-router';
-import { defaultPrizzaImage } from './ProductListItem';
+import { defaultPrizzaImage } from './PostList';
 import { FontAwesome } from '@expo/vector-icons';
 import { useCartContext } from '@/providers.tsx/CartProvider';
 

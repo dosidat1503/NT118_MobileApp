@@ -1,10 +1,11 @@
 import { View, Text, Image, StyleSheet, ScrollView, Pressable, TouchableOpacity } from "react-native"; 
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/ProductListItem";
+import { defaultPrizzaImage } from "@/components/PostList";
 import AdjustQuantity from "../../../app/(user)/orderFoodAndDrink/AdjustQuantity";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { color } from "react-native-elements/dist/helpers";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from "react";
 
 interface Topping {
     label: string;
@@ -15,19 +16,22 @@ interface ItemInCartAndPaymentProps {
     isCart: boolean,
     isTopping: boolean,
     isHaveAdjusting: boolean,
+    isOrderDetail?: boolean,
     quantity: number,
     item: {
+        sizes: string;
         label: string,
         name: string,
         price: number,
         quantity: number,
+        uri?: string
     },
     index: number,// index này thì có thể là indexItem hoặc indexTopping tuỳ thuộc vào câu lệnh gọi ItemInCartAndPayment là ở Item hay Topping
     indexItem: number,// cái này luôn là indexItem nó sẽ được gọi ở câu lệnh gọi ItemInCartAndPayment ở Topping, dùng để xác định index của Item
     setArray_itemListInCart: (value: any) => void // Add the missing property
 }
 
-export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjusting, quantity, item, index, setArray_itemListInCart, indexItem}: ItemInCartAndPaymentProps){
+export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjusting, quantity, item, index, setArray_itemListInCart, indexItem, isOrderDetail}: ItemInCartAndPaymentProps){
     const { heightScreen, widthScreen, mainColor } = useCartContext();
 
     const avatarSize = widthScreen * 0.13;
@@ -140,10 +144,38 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
             return newArray_itemListInCart;
         })
     }
+    const renderAdjustQuantity = () => {
+        return isOrderDetail
+        ? null
+        : <AdjustQuantity 
+            quantity={isTopping ? item.quantity : item.quantity} 
+            handleAdjustQuantity={handleAdjustQuantity} 
+            index={isTopping ? index : indexItem}
+        />
+    }
 
+    const renderSize = () => {
+        let size = !isTopping 
+                    ? item.sizes.length === 0 
+                        ? ""
+                        : item.sizes.find((itemSize: { checked: any; }) => itemSize.checked)?.label 
+                    : ""
+                    
+        return (
+            size !== ""
+            ? <Text>
+                Size: {size}
+            </Text>
+            : ""
+        )
+    }
+ 
     return (
         <View 
-            style={styles.item}
+            style={[
+                styles.item, 
+                isTopping && item.quantity === 0 ? styles.hidden : {}
+            ]}
         >
             <View 
                 style={{
@@ -154,7 +186,7 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                 }}
             >
                 <Image
-                    source={{uri: defaultPrizzaImage}}
+                    source={{uri: item.uri || ""}}
                     style={styles.avatar}
                 /> 
                 <View style={{
@@ -173,13 +205,9 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                         >
                             Giá: {item.price}
                         </Text>
-                        <Text
-                            style={{
-                                display: isTopping ? "none" : "flex"
-                            }}
-                        >
-                            Size: {!isTopping ? item.sizes.find(itemSize => itemSize.checked)?.label : ""}
-                        </Text>
+                        {
+                            renderSize()
+                        }
                     </View>
                 </View> 
             </View>
@@ -199,15 +227,14 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                         style={{
                             marginBottom: heightScreen * 0.013,
                             marginRight: widthScreen * 0.03,
-                            color: "mainColor"
+                            color: mainColor
                         }}
                     ></FontAwesome5>
                 </TouchableOpacity>
-                <AdjustQuantity
-                    index={index}
-                    quantity={item.quantity}
-                    handleAdjustQuantity={handleAdjustQuantity}
-                ></AdjustQuantity>
+                {
+                    renderAdjustQuantity()
+                }
+                
             </View>
             <View
                 style={{ 

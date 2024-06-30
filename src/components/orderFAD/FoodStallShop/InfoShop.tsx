@@ -1,9 +1,11 @@
 import { View, TextInput, StyleSheet, Text, Image, TouchableOpacity } from "react-native";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/ProductListItem";
+import { defaultPrizzaImage } from "@/components/PostList";
 import { Link } from "expo-router";
 import { useNavigation } from '@react-navigation/native'; 
+import { useEffect } from "react";
+import React from "react";
 
 export default function InfoShop({infoShop}: {infoShop: any}) {
     const { heightScreen, widthScreen } = useCartContext();
@@ -11,6 +13,10 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
     const heightInfoShop = heightScreen * 0.08; 
     const avatarSize = heightScreen * 0.05;
     const navigation = useNavigation(); 
+
+    useEffect(() => {
+        console.log(infoShop, "infoShop")
+    }, [])
 
     const styles = StyleSheet.create({  
         infoShopDivContainer: {
@@ -58,7 +64,7 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
             paddingHorizontal: widthScreen * 0.03
         },
         reviewText: {
-            fontWeight: 500,
+            fontWeight: "500",
             fontSize: heightScreen * 0.019,
             paddingLeft: widthScreen * 0.02,
             opacity: 0.7
@@ -70,7 +76,8 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
             fontSize: widthScreen * 0.05
         },
         address: {
-            marginHorizontal: widthScreen * 0.03
+            marginHorizontal: widthScreen * 0.03,
+            width: widthScreen * 0.45,
         }
     })
     return(
@@ -80,13 +87,13 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                 {/* avatar & name shop */}
                 <View style={styles.infoShopItem}>
                     <Image
-                        source={{uri: infoShop.avatar}}
+                        source={{uri: infoShop?.AVT_IMAGE_URL}}
                         style={styles.avatar}
                     />
                     <Text
                         style={styles.nameShopText}
                     >
-                        {infoShop.name}
+                        {infoShop?.SHOP_NAME}
                     </Text>
                 </View> 
 
@@ -96,7 +103,7 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                         <FontAwesome
                             name="star"
                             style={styles.star}
-                        />
+                        /> 
                         <Text
                             style={styles.reviewText}
                         >Đánh giá và nhận xét</Text>
@@ -115,7 +122,27 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                     />
                     <Text
                         style={styles.address}
-                    >{infoShop.address}</Text>
+                    >
+                        {
+                            infoShop?.ADDRESS.DETAIL !== undefined ? 
+                                infoShop?.ADDRESS.DETAIL + ", " +
+                                infoShop?.ADDRESS.COMMUNE + ", " +
+                                infoShop?.ADDRESS.DISTRICT + ", " +
+                                infoShop?.ADDRESS.PROVINCE
+                            : ""
+                        }
+                    </Text>
+                </View> 
+
+                {/* address shop */}
+                <View style={styles.infoShopItem}>
+                    <FontAwesome5
+                        name="phone-square-alt"
+                        style={styles.star}
+                    />
+                    <Text
+                        style={styles.address}
+                    >{infoShop?.PHONE}</Text>
                 </View> 
             </View>
         </View>

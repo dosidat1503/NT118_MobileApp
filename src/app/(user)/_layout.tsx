@@ -1,8 +1,10 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable, useColorScheme } from 'react-native';
+import { Link, Tabs, useNavigation } from 'expo-router';
+import { Pressable, TouchableOpacity, useColorScheme } from 'react-native';
 
 import Colors from '../../constants/Colors';
+import React, { useContext } from 'react';
+import { useCartContext } from '@/providers.tsx/CartProvider';
 
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
@@ -16,7 +18,8 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-
+  const navigation = useNavigation();
+  const { isLoading, setIsLoading } = useCartContext();
   return (
     <Tabs
       screenOptions={{
@@ -39,7 +42,9 @@ export default function TabLayout() {
           title: 'Order Food & Drink',
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
-          tabBarLabel: () => null
+          tabBarLabel: () => null,
+          
+          
         }}
       />
  
@@ -73,7 +78,10 @@ export default function TabLayout() {
         name='two' 
         options={{href: null}}
       ></Tabs.Screen> 
-
+      <Tabs.Screen 
+        name='Response' 
+        options={{href: null}}
+      ></Tabs.Screen> 
     </Tabs>
   );
 }

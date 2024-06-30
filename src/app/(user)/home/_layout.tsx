@@ -1,61 +1,108 @@
-import { Stack, Link } from "expo-router"
-import { Pressable, View, TextInput, Image, StyleSheet } from "react-native"
-import { FontAwesome } from "@expo/vector-icons"
-import Colors from "@/constants/Colors"
-import DetailProduct from "./[id]"
+import { Stack, Link, useNavigation } from "expo-router"
+import { Pressable, View, TextInput, Image, StyleSheet, TouchableOpacity } from "react-native"  
+import { FontAwesome } from "@expo/vector-icons";
+import Colors from "@/constants/Colors";
+import { useState } from "react";
+import axios from "axios";
+import { useCartContext } from "@/providers.tsx/CartProvider"; 
+import { LogBox } from 'react-native';
+import React from "react";
 
-export default function MenuStack(){
-    return (
+LogBox.ignoreLogs(['Warning: ...']);
+
+export default function SearchPost(){ 
+  const navigation = useNavigation();  
+  const { baseURL, setTextQueryPost, textQueryPost, mainColor, RD, widthScreen, heightScreen, selectedItem, setSelectedItem } = useCartContext();
+ 
+  const renderHeaderRight = () => (
+    <View style={{ 
+      flexDirection: 'row', 
+      marginRight: 15, 
+      justifyContent: "center", 
+      alignItems: "center", 
+      // paddingBottom: 20
+    }}> 
+      <View style={styles.comboSearch}>
+        <TextInput
+          placeholder="Search..."
+          style={styles.inputSearch} 
+          // value={textQueryPost}
+          onChangeText={(text) => setTextQueryPost(text)}
+        />  
+        {/* <TouchableOpacity onPress={() => handleSearch}>    */}
+        <Link href="/home/SearchPost" asChild>
+          <FontAwesome
+            name="search"
+            size={25}
+            color={Colors.light.tint} 
+          />    
+        </Link>
+        {/* </TouchableOpacity> */}
+      </View> 
+      {/* <Link href="/home/filter" asChild>
+        <Pressable>
+          {({ pressed }) => ( 
+            <Image
+              source={require('@assets/images/filter_home_2.png')}
+              style={styles.filterIcon}
+            ></Image>
+          )}
+        </Pressable>
+      </Link>   */}
+    </View>
+  )
+
+    return (  
         <Stack>
           <Stack.Screen
             name="index" 
             options={{
-                title: 'Home', 
+                title: 'Trang chủ', 
                 headerLeft: () => (<View></View>),
                 headerBackVisible: false,
                 headerBackButtonMenuEnabled: false, 
-                headerRight: () => (
-                    <View style={{ 
-                      flexDirection: 'row', 
-                      marginRight: 15, 
-                      justifyContent: "center", 
-                      alignItems: "center", 
-                      // paddingBottom: 20
-                    }}> 
-                      <View style={styles.comboSearch}>
-                        <TextInput
-                          placeholder="Search..."
-                          style={styles.inputSearch} 
-                        /> 
-                        <Link href="/cart" asChild>
-                          <Pressable>
-                            {({ pressed }) => (
-                              <FontAwesome
-                                name="search"
-                                size={25}
-                                color={Colors.light.tint} 
-                              />
-                            )}
-                          </Pressable>
-                        </Link> 
-                      </View> 
-                      <Link href="/home/filter" asChild>
-                        <Pressable>
-                          {({ pressed }) => ( 
-                            <Image
-                              source={require('@assets/images/filter_home_2.png')}
-                              style={styles.filterIcon}
-                            ></Image>
-                          )}
-                        </Pressable>
-                      </Link> 
-                      
-                    </View>
-                ),  
+                headerRight: renderHeaderRight,  
             }}
+            
           />  
-          
-        </Stack>
+          <Stack.Screen
+            name="AddPost" 
+            options={{
+                title: 'Thêm bài viết',    
+            }}
+          />
+          <Stack.Screen
+              name="SearchPost" 
+              options={{
+                  title: 'Tìm kiếm',    
+                  headerLeft: () => (
+                    <TouchableOpacity
+                      onPress={() => {
+                        setTextQueryPost(''); // Đặt setTextQuery về chuỗi rỗng
+                        setSelectedItem({
+                          topicItem: [],
+                          sortByItem: '',
+                          startDate: "",
+                          endDate: "", 
+                        }); // Đặt setSelectedItem về object rỗng
+                        // navigation.goBack(); // Điều hướng quay lại trang trước
+                        navigation.navigate('index' as never);
+                      }} 
+                    >
+                      <FontAwesome
+                        name="chevron-left"
+                        size={RD * 0.00005}
+                        color={mainColor} 
+                        style={{ 
+                          marginRight: widthScreen * 0.02, 
+                          paddingTop: heightScreen * 0.003
+                        }}
+                      />
+                    </TouchableOpacity>
+                  ),
+              }}
+            />
+          </Stack>
     )
 }
 

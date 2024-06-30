@@ -1,5 +1,5 @@
 import { Stack, Link } from "expo-router"
-import { Pressable } from "react-native"
+import { Pressable, View } from "react-native"
 import { FontAwesome } from "@expo/vector-icons"
 import Colors from "@/constants/Colors"
 import DetailProduct from "./[id]"
@@ -10,7 +10,10 @@ export default function MenuStack(){
           <Stack.Screen
             name="index" 
             options={{
-                title: 'Dating', 
+                title: 'Hẹn hò', 
+                headerLeft: () => (<View></View>),
+                headerBackVisible: false,
+                headerBackButtonMenuEnabled: false,
                 // headerRight: () => (
                 //     <Link href="/cart" asChild>
                 //       <Pressable>

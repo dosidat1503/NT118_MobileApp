@@ -1,28 +1,22 @@
 
 import { Link, Stack } from "expo-router";
-import { View, Text, Image, StyleSheet, ScrollView, Pressable, SafeAreaView, TouchableOpacity } from "react-native";
-import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/ProductListItem";
-import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
-import Colors from "@/constants/Colors"
-import { CheckBox } from 'react-native-elements'; 
-import AdjustQuantity from "./AdjustQuantity";
-import ItemInCartAndPayment from "@/components/orderFAD/Cart/ItemInCartAndPayment";
-import Button from "./Button";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect } from 'react';
-import { color } from "react-native-elements/dist/helpers";
-import { fonts } from "react-native-elements/dist/config";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { useCartContext } from "@/providers.tsx/CartProvider"; 
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons"; 
+import { CheckBox } from 'react-native-elements';  
+import React, { useState, useEffect } from 'react'; 
+import { useNavigation } from "expo-router";
  
 interface ItemType1Props {
     deliveryInfo: {
+        id: number,
         name: string,
         phone: string,
         address: string,
-        isDefault: boolean,
-        isChoose: boolean
+        isDefault?: boolean,
+        isChoose?: boolean
     },
-    isChangeAddress: boolean
+    isChangeAddress?: boolean
 }
 
 export default function ItemType1({deliveryInfo, isChangeAddress = false}: ItemType1Props) {
@@ -137,9 +131,10 @@ export default function ItemType1({deliveryInfo, isChangeAddress = false}: ItemT
             opacity: 0.7
         }
     })
+    const navigation = useNavigation();
 
     return (
-        <View style={[{flex: 2}, styles.deliveryDivContainer]}>
+        <View style={[{flex: 0.4}, styles.deliveryDivContainer]}>
             {/* // có sử dụng display: none khi mà isChangeAddress = true thì sẽ ẩn đi */}
             <View style={styles.titleTextForDeliveryContainer}>
                 <Text style={styles.titleTextForDelivery}>Địa chỉ giao hàng</Text>
@@ -204,7 +199,9 @@ export default function ItemType1({deliveryInfo, isChangeAddress = false}: ItemT
                                 }} 
                             />
                         </Link>
-                        : <Link href={"/(user)/orderFoodAndDrink/DeliveryInfoList"}>
+                        : 
+                        // <Link href={"/(user)/orderFoodAndDrink/DeliveryInfoList"}>
+                        <TouchableOpacity onPress={() => navigation.navigate("DeliveryInfoList" as never)}>
                             <FontAwesome5 
                                 name="chevron-right" 
                                 size={widthScreen * 0.05}
@@ -213,7 +210,8 @@ export default function ItemType1({deliveryInfo, isChangeAddress = false}: ItemT
                                     color: mainColor,  
                                 }} 
                             />
-                        </Link>
+                        </TouchableOpacity>
+                        // </Link>
                     }
                     {/* </TouchableOpacity> */}
                 </View>

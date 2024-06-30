@@ -1,4 +1,4 @@
-import { defaultPrizzaImage } from "@/components/ProductListItem";
+import { defaultPrizzaImage } from "@/components/PostList";
 const products = [
   {
     id: 1,

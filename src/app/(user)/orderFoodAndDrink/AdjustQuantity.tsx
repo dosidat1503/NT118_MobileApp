@@ -1,6 +1,7 @@
 import { TextInput, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import { useCartContext } from "@/providers.tsx/CartProvider";
+import React from "react";
 
 interface AdjustQuantityProps {
     quantity: number;

@@ -1,10 +1,12 @@
-import { View, TextInput, StyleSheet } from "react-native";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { View, TextInput, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { useCartContext } from "@/providers.tsx/CartProvider";
+import { Link, Stack, useNavigation } from "expo-router";
+import React from "react";
 
 
 export default function SearchFAD() {
-    const { heightScreen, widthScreen } = useCartContext();
+    const { heightScreen, widthScreen, mainColor, textToSearchFAD, setTextToSearchFAD, setTagIDToGetFADInfo } = useCartContext();
     
     const heightSearchFAD = heightScreen * 0.06;
     const widthSearchFAD = widthScreen * 0.7;
@@ -34,7 +36,8 @@ export default function SearchFAD() {
             height: "100%",
             width: "100%",
             backgroundColor: "#FBFFC8",
-            color: "red",
+            color: mainColor,
+            fontWeight: "bold",
             fontSize: heightScreen * 0.02,
             paddingHorizontal: widthScreen * 0.02
         },
@@ -43,17 +46,34 @@ export default function SearchFAD() {
             justifyContent: 'center'
         },
     })
+
+    const navigation = useNavigation();
+
+    const handleSearch = () => {
+        setTagIDToGetFADInfo(0)
+        navigation.navigate('ShowFADSearchInfo' as never)
+    }
     return(
     // {/* input search bạn muốn ăn gì */}
-        <View style={styles.searchFADDivContainer}>
+        <View style={styles.searchFADDivContainer}> 
             <View style={styles.searchFADContainer}>
-                <FontAwesome5 
-                name="search" 
-                style={styles.searchFADIcon}
-                ></FontAwesome5>
+                <TouchableOpacity
+                    onPress={handleSearch}
+                    style={{
+                        flexDirection: 'row', 
+                        alignItems: "center"
+                    }}
+                >
+                    <FontAwesome5 
+                        name="search" 
+                        style={styles.searchFADIcon}
+                    ></FontAwesome5>
+                </TouchableOpacity>
                 <TextInput 
-                placeholder='Bạn đang thèm gì nào?'
-                style={styles.searchFADInput}
+                    placeholder='Bạn muốn ăn gì?'
+                    style={styles.searchFADInput}
+                    value={ textToSearchFAD }
+                    onChangeText={ (value) => setTextToSearchFAD(value) }
                 ></TextInput>
             </View>
         </View>

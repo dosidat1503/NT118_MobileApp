@@ -6,6 +6,7 @@ import Button from "./(user)/orderFoodAndDrink/Button";
 import { useNavigation } from "expo-router";
 import { StyleSheet } from "react-native";
 import { useCartContext } from "@/providers.tsx/CartProvider";
+import React from "react";
 
 export default function SignUpSuccess() {
 
@@ -76,7 +77,7 @@ export default function SignUpSuccess() {
                             <Button
                                 iconName="sign-in-alt"
                                 buttonName="Đăng nhập"
-                                handlePress={() => { navigation.navigate('index', null)}}
+                                handlePress={() => { navigation.navigate('index' as never)}}
                             ></Button> 
                         </Link>
                     </View>

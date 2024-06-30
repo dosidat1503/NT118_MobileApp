@@ -1,9 +1,10 @@
 import { FlatList, StyleSheet} from "react-native";
 import InfoListItemFADofShop from "./InfoListItemFADofShop";
 import { View } from "@/components/Themed";
+import React from "react";
 
-export default function InfoListFADofShop({products}) {
-    const renderListItemFADofShop = ({item}) => <InfoListItemFADofShop item={item}></InfoListItemFADofShop>
+export default function InfoListFADofShop({products}: {products: any}) {
+    const renderListItemFADofShop = ({item}: {item: any}) => <InfoListItemFADofShop item={item}></InfoListItemFADofShop>
 
     const styles = StyleSheet.create({
         listContainer: {

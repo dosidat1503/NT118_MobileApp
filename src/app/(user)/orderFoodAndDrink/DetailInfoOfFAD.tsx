@@ -2,7 +2,7 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, TextInput, ScrollView, Pressable } from "react-native";
 import { CheckBox } from 'react-native-elements'; 
 import { useCartContext } from "@/providers.tsx/CartProvider";
-import { defaultPrizzaImage } from "@/components/ProductListItem";
+import { defaultPrizzaImage } from "@/components/PostList";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import SlideHeaderOrderFAD from "@/components/orderFAD/SlideHeaderOrderFAD";
 import { useState } from "react";
@@ -14,7 +14,9 @@ import { useNavigation } from '@react-navigation/native';
 import { Link, Stack } from "expo-router";
 import Colors from "@/constants/Colors"
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect } from "react";
+import { useEffect } from "react"; 
+import React from "react";
+import axios from "axios";
 
 
 type RootStackParamList = {
@@ -29,6 +31,15 @@ interface Topping {
     label: string;
     quantity: number;
     price: number;
+    id: number;
+}
+
+interface toppingItem {
+    FAD_PRICE: any; 
+    FAD_NAME: any; 
+    label: string; 
+    price: number;  
+    FAD_ID: number;
 }
 
 interface OrderInfo {
@@ -45,14 +56,15 @@ interface OrderInfo {
 
 
 export default function DetailInfoOfFAD() {
-    const { heightScreen, widthScreen, mainColor } = useCartContext();
+    const { heightScreen, widthScreen, mainColor, DetailInfoOfFAD, baseURL } = useCartContext();
     const heightNameFAD = heightScreen * 0.08;
     const widthNameFAD = widthScreen * 0.95;
     const widthPaddingNameFAD = widthScreen * 0.04 
-     
-
+      
     const route = useRoute<RouteProp<RootStackParamList, 'DetailInfoOfFAD'>>();
-    const product = route.params?.item; 
+    const product = route.params?.item;  
+
+    const [isAdding, setIsAdding] = useState(false);
 
     const styles = StyleSheet.create({ 
         nameFADIcon: {
@@ -75,8 +87,8 @@ export default function DetailInfoOfFAD() {
             borderRadius: widthScreen * 0.03
         },
         nameFADText: {
-            height: "100%",
-            width: "100%", 
+            // height: "100%",
+            // width: "100%", 
             fontWeight: "bold",
             fontSize: widthScreen * 0.05, 
             alignSelf: "center",
@@ -100,8 +112,8 @@ export default function DetailInfoOfFAD() {
             marginTop: heightScreen * 0.01
         }, 
         require: {
-            height: "100%",
-            width: "100%",  
+            // height: "100%",
+            // width: "100%",  
             fontSize: widthScreen * 0.03, 
             alignSelf: "center",
             alignItems: "center",
@@ -198,27 +210,44 @@ export default function DetailInfoOfFAD() {
             fontWeight: 'bold',
             textAlign: 'center',
         },
-    })
-
-    
+    }) 
 
     const [orderInfoOfItem, setOrderInfoOfItem] = useState<OrderInfo>({
-        id: product.id,
-        name: product.name,
-        price: product.price,
+        id: DetailInfoOfFAD.FAD_ID,
+        name: DetailInfoOfFAD.FAD_NAME,
+        price: DetailInfoOfFAD.FAD_PRICE,
         sizes: [
             { label: 'M', checked: false },
             { label: 'L', checked: false }, 
         ],
         toppings: [
-            { label: 'Thạch', price: 5000, quantity: 0 },
-            { label: 'Trân châu trắng', price: 5000, quantity: 0}, 
+            { id: 1, label: 'Thạch', price: 5000, quantity: 0 },
+            { id: 2, label: 'Trân châu trắng', price: 5000, quantity: 0}, 
         ],
         note: "",
         quantity: 1,
         isCheckedForPayment: true,
         totalOfItem: 0
     })
+
+    useEffect(() => { 
+        console.log(DetailInfoOfFAD, "DetailInfoOfFAD1", product)
+        axios.get(baseURL + '/getFADDetailInfo', {params: {FAD_ID: DetailInfoOfFAD.FAD_ID}})
+        .then( (res) => {
+            console.log(res.data, "DetailInfoOfFAD2") 
+            setOrderInfoOfItem({
+                ...orderInfoOfItem, 
+                toppings: res.data.topping.map(( item: toppingItem  ) => { 
+                    return { 
+                        id: item.FAD_ID,
+                        label: item.FAD_NAME, 
+                        price: item.FAD_PRICE,
+                        quantity: 0 
+                    }
+                })
+            })
+        })
+    }, [])
 
     useEffect(() => {
         const totalOfTopping = orderInfoOfItem.toppings.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -227,7 +256,7 @@ export default function DetailInfoOfFAD() {
             ...orderInfoOfItem,
             totalOfItem: totalOfTopping + totalOfItem, 
         })
-    }, [orderInfoOfItem])
+    }, [orderInfoOfItem.toppings])
  
     const handleCheckBoxChange = (index: number) => { 
         setOrderInfoOfItem( 
@@ -283,6 +312,7 @@ export default function DetailInfoOfFAD() {
         return ( 
             <View 
                 style={styles.sizeItem}
+                key={index}
             > 
                 <View>
                     <Text style={styles.subTextSelect}>{item.label}</Text>
@@ -302,24 +332,28 @@ export default function DetailInfoOfFAD() {
     })
  
     const renderListTopping = orderInfoOfItem.toppings.map((item, index) => {
-    return ( 
-        <View 
-        key={index} 
-        style={styles.sizeItem}
-        > 
-            <View>
-                <Text style={styles.subTextSelect}>{item.label}</Text>
+        return ( 
+            <View 
+                key={index} 
+                style={styles.sizeItem}
+            > 
+                <View>
+                    <Text style={styles.subTextSelect}>{item.label}</Text>
+                </View>
+                <AdjustQuantity
+                    index={index}
+                    quantity={item.quantity}
+                    handleAdjustQuantity={handleAdjustQuantityTopping}
+                ></AdjustQuantity>
             </View>
-            <AdjustQuantity
-                index={index}
-                quantity={item.quantity}
-                handleAdjustQuantity={handleAdjustQuantityTopping}
-            ></AdjustQuantity>
-        </View>
-    );
+        );
     });
 
-    const addToCart = async () => {
+    const addToCart = async () => { 
+        setIsAdding(true);
+        setTimeout(() => {
+          setIsAdding(false);
+        }, 2000);
         try { 
             let array_a = [];
             let array_itemListInCart = await AsyncStorage.getItem('array_itemListInCart')
@@ -331,13 +365,39 @@ export default function DetailInfoOfFAD() {
             console.log("done asyncStorage", array_itemListInCart);
     
             const getItem = await AsyncStorage.getItem('item');
+            const getItemParsed = await JSON.parse(getItem);
     
-            if (getItem !== null) { 
-                array_itemListInCart.push(JSON.parse(getItem));
+            if (array_itemListInCart !== null && Array.isArray(array_itemListInCart)) {
+                const existingItemIndex = array_itemListInCart.findIndex(item => {
+                    return  (
+                        item.id === getItemParsed.id   
+                        && item.sizes.findIndex((item: { checked: any; label: any; }, index: string | number) => {
+                                return (
+                                    getItemParsed.sizes[index].checked === item.checked 
+                                    && getItemParsed.sizes[index].label === item.label
+                                )
+                            }) !== -1 // có nghĩa là size giống nhau
+                        && item.toppings.every((item: { label: any; quantity: any; price: any; }, index: string | number) => {
+                                return getItemParsed.toppings.some((item2: { label: any; quantity: any; price: any; }) => {
+                                    return (item2.label === item.label && item2.quantity === item.quantity && item2.price === item.price)
+                                })
+                            }) === true // có nghĩa là topping đều giống nhau
+                    )
+                });
+                console.log("existingItemIndex existingItemIndex", existingItemIndex, array_itemListInCart[0]);
+                if (existingItemIndex !== -1) {
+                    // Nếu item đã tồn tại trong mảng
+                    console.log("tăng quantity")
+                    array_itemListInCart[existingItemIndex].quantity++; // Tăng quantity
+                } else {
+                    // Nếu item chưa tồn tại trong mảng
+                    console.log("thêm item")
+                    array_itemListInCart.push(getItemParsed); // Thêm item mới vào mảng
+                }
             } else {
                 console.log("failt");
             }
-    
+
             await AsyncStorage.setItem('array_itemListInCart', JSON.stringify(array_itemListInCart));
     
             console.log(await AsyncStorage.getItem('array_itemListInCart'), "test");
@@ -378,7 +438,7 @@ export default function DetailInfoOfFAD() {
                 ></Stack.Screen>  
                 <SlideHeaderOrderFAD
                     products={[{
-                        image: product.image
+                        url: DetailInfoOfFAD.FOOD_IMAGE_URL,
                     }]}
                 ></SlideHeaderOrderFAD>
                 <View style={styles.nameFADDivContainer}>
@@ -386,16 +446,19 @@ export default function DetailInfoOfFAD() {
                         <View>
                             <Text  
                                 style={styles.nameFADText}
-                            >{product.name}</Text>
+                            >{DetailInfoOfFAD.FAD_NAME}</Text>
                         </View>
                         <View>
                             <Text  
                                 style={[styles.nameFADText, {color: "red"}]}
-                            >{product.price}</Text>
+                            >{DetailInfoOfFAD.FAD_PRICE}</Text>
                         </View>
                     </View>
                 </View>
-                <View style={styles.nameFADDivContainer}>
+                <View style={{
+                    flexDirection: 'column',
+                    justifyContent: 'center', 
+                }}>
                     <View style={styles.titleFADContainer}> 
                         <View>
                             <Text  
@@ -410,8 +473,7 @@ export default function DetailInfoOfFAD() {
                     </View>
                     <View style={styles.selectItemContainer}>
                         {renderListSizes}
-                    </View>
-
+                    </View> 
                     <View style={styles.titleFADContainer}> 
                         <View>
                             <Text  
@@ -426,8 +488,7 @@ export default function DetailInfoOfFAD() {
                     </View>
                     <View style={styles.selectItemContainer}>
                         {renderListTopping}
-                    </View>
-
+                    </View> 
                     <View style={styles.titleFADContainer}> 
                         <View>
                             <Text  
@@ -464,11 +525,19 @@ export default function DetailInfoOfFAD() {
                     ></AdjustQuantity>
                 </View> 
                 <View style={styles.buttonContainer}> 
-                    <Button
+                {
+                    isAdding 
+                    ? <Button
+                        iconName="check-circle"
+                        buttonName="Đã thêm vào giỏ" 
+                        color="green" 
+                    ></Button>
+                    : <Button
                         iconName="shopping-cart"
                         buttonName="THÊM VÀO GIỎ"
                         handlePress={addToCart}
                     ></Button>
+                }
                     <Button
                         iconName="money-bill-alt"
                         buttonName="THANH TOÁN"
