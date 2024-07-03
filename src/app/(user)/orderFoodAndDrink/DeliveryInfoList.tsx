@@ -4,6 +4,8 @@ import { useCartContext } from "@/providers.tsx/CartProvider";
 import React, { useState, useEffect } from 'react'; 
 import ItemType1 from "@/components/orderFAD/Payment/ItemType1";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5"; 
 
 interface DeliveryInfo { 
     address_id?: number,
@@ -15,9 +17,23 @@ interface DeliveryInfo {
 }
 
 export default function DeliveryInfoList() {
-    const { heightScreen, widthScreen, mainColor, baseURL, userID, isUpdatedInfoDelivery, orderInfo, setOrderInfo } = useCartContext();
+    const { heightScreen, widthScreen, mainColor, baseURL, userID,  setOrderInfo, isUpdatedInfoDelivery, RD } = useCartContext();
     const [deliveryInfoList, setDeliveryInfoList] = useState<DeliveryInfo[]>([]);
-
+    // let isUpdatedInfoDelivery = "";
+    // useEffect(() => {
+    //     const loadisUpdatedInfoDelivery = async () => {
+    //       isUpdatedInfoDelivery = await AsyncStorage.getItem('isUpdatedInfoDelivery') || ""; 
+    //     }
+    //     loadisUpdatedInfoDelivery()
+    // })
+    let orderInfo = {};
+    useEffect(() => {
+        const loadorderInfo = async () => {
+            orderInfo = parseInt(await AsyncStorage.getItem('orderInfo') || "1"); 
+        }   
+        loadorderInfo()
+    })
+  
     useEffect(() => {
         console.log(userID, "userIDâcsc")
         getDeliveryInfoList()
@@ -25,11 +41,12 @@ export default function DeliveryInfoList() {
 
     useEffect( () => {
         getDeliveryInfoList()
+        console.log(isUpdatedInfoDelivery, "isU2222pdatedInfoDelivery")
     }, [isUpdatedInfoDelivery])
 
     const getDeliveryInfoList = async () => {
         console.log(userID, "userIDâcsc")
-        axios.get(baseURL + '/getDeliveryInfo', { params: { userID: userID } })
+        axios.get(baseURL + '/getDeliveryInfo', { params: { userID: userID == 0 ? 1 : userID } })
         .then( (res) => {
             console.log(res.data, "DeliveryInfo11")
             setDeliveryInfoList(res.data.deliveryInfo.map((item: any) => {
@@ -61,6 +78,7 @@ export default function DeliveryInfoList() {
 
     const handleChangeChoseDeliveryInfo = (itemParameter: any) => {
         // console.log(address_id, "handleChangeChoseDeliveryInfo")
+
         setDeliveryInfoList(
             deliveryInfoList.map((item) => {
                 if (item.address_id === itemParameter.address_id) { 
@@ -99,11 +117,34 @@ export default function DeliveryInfoList() {
             )
         }) 
     }
+    let isUpdatedInfoDeliverys = "true"
     return (
         <View>
             <Stack.Screen
                 options={{
                     title: "Thông tin giao hàng",
+                    headerLeft(props) {
+                        return (
+                            <Pressable
+                                onPress={() => { 
+                                    navigation.navigate( "Payment", { deliveryInfoList }) ;
+                                    // navigation.setParams({deliveryInfoList})
+                                    // navigation.goBack(); 
+                                }}
+                            >
+                                <FontAwesome5
+                                    name="arrow-left"
+                                    // size={RD * 0.00005} 
+                                    style={{
+                                        marginLeft: widthScreen * 0.02,
+                                        marginRight: widthScreen * 0.06,
+                                        fontweight: "bold",
+                                        fontSize: RD * 0.00005
+                                    }}
+                                ></FontAwesome5>
+                            </Pressable> 
+                        );
+                    },
                 }}
             ></Stack.Screen>
             <ScrollView>

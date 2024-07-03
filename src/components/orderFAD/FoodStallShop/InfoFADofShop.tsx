@@ -9,12 +9,20 @@ import React from "react";
 import axios from "axios";
 import ShowFADSearchInfo from "@/app/(user)/orderFoodAndDrink/ShowFADSearchInfo";
 import ShowProduct from "../ShowProduct";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export function InfoFADofShop() {
     const [isCollapsed, setIsCollapsed] = useState(true);
-    const {widthScreen, heightScreen, mainColor, RD, baseURL, FADShop_ID} = useCartContext()
-
+    const {widthScreen, heightScreen, mainColor, RD, baseURL} = useCartContext()
+    let FADShop_ID = 0;
+    useEffect(() => {
+        const loadFADShop_ID = async () => {
+            FADShop_ID = parseInt(await AsyncStorage.getItem('FADShop_ID') || "0"); 
+            getFADInfo()
+        }   
+        loadFADShop_ID()
+    }, [])
     const [FADInfo, setFADInfo] = useState<any>({
         food: [],
         drink: [],
@@ -37,22 +45,20 @@ export function InfoFADofShop() {
                         //     products: products
                         // },
                     ])
-    useEffect(() => {
-        const getFADInfo = async () => {
-            axios.get(
-                baseURL + '/getFADInfo', 
-                { params: { FADShop_ID: FADShop_ID } }
-            )
-            .then((res) => {
-                console.log(res.data.FADInfo_eloquent.filter((item: any) => item.CATEGORY === 2), "getFADInfoAtHomeofShop") 
-                setFADInfo({
-                    food: res.data.FADInfo_eloquent.filter((item: any) => item.CATEGORY === 1),
-                    drink: res.data.FADInfo_eloquent.filter((item: any) => item.CATEGORY === 2), 
-                })
+    
+    const getFADInfo = () => {
+        axios.get(
+            baseURL + '/getFADInfo', 
+            { params: { FADShop_ID: FADShop_ID } }
+        )
+        .then((res) => {
+            console.log(res.data.FADInfo_eloquent.filter((item: any) => item.CATEGORY === 2), "getFADInfoAtHomeofShop file InfoFADofShop") 
+            setFADInfo({
+                food: res.data.FADInfo_eloquent.filter((item: any) => item.CATEGORY === 1),
+                drink: res.data.FADInfo_eloquent.filter((item: any) => item.CATEGORY === 2), 
             })
-        }
-        getFADInfo()
-    }, [])
+        })
+    } 
 
     const toogleCollapse = (itemToToggle: { name: string; }) => {
         setListFAD(
@@ -85,7 +91,7 @@ export function InfoFADofShop() {
                 <Collapsible
                     collapsed={item.isCollapsed}
                 > 
-                    {/* <InfoListFADofShop products={FADInfo.FADInfo_eloquent}></InfoListFADofShop>  */}
+                    <InfoListFADofShop products={FADInfo.FADInfo_eloquent}></InfoListFADofShop> 
                     {
                         item.name === listFAD[0].name 
                         ? <ShowProduct products={FADInfo.food} />

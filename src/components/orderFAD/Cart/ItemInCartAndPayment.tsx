@@ -6,6 +6,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { color } from "react-native-elements/dist/helpers";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from "react";
+import { useNavigation } from '@react-navigation/native';
 
 interface Topping {
     label: string;
@@ -15,11 +16,12 @@ interface Topping {
 interface ItemInCartAndPaymentProps {
     isCart: boolean,
     isTopping: boolean,
+    isRating?: boolean,
     isHaveAdjusting: boolean,
     isOrderDetail?: boolean,
     quantity: number,
     item: {
-        sizes: string;
+        sizes: any;
         label: string,
         name: string,
         price: number,
@@ -28,11 +30,11 @@ interface ItemInCartAndPaymentProps {
     },
     index: number,// index này thì có thể là indexItem hoặc indexTopping tuỳ thuộc vào câu lệnh gọi ItemInCartAndPayment là ở Item hay Topping
     indexItem: number,// cái này luôn là indexItem nó sẽ được gọi ở câu lệnh gọi ItemInCartAndPayment ở Topping, dùng để xác định index của Item
-    setArray_itemListInCart: (value: any) => void // Add the missing property
+    setArray_itemListInCart?: (value: any) => void // Add the missing property
 }
 
-export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjusting, quantity, item, index, setArray_itemListInCart, indexItem, isOrderDetail}: ItemInCartAndPaymentProps){
-    const { heightScreen, widthScreen, mainColor } = useCartContext();
+export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjusting, quantity, item, index, setArray_itemListInCart, indexItem, isOrderDetail, isRating = false}: ItemInCartAndPaymentProps){
+    const { heightScreen, widthScreen, mainColor, setDetailInfoOfFAD } = useCartContext();
 
     const avatarSize = widthScreen * 0.13;
 
@@ -71,6 +73,7 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
             display: "none"
         }
     })
+    const navigation = useNavigation();
     
     const saveToAssyncStorage = async (value: any) => { 
         console.log(value, "value", AsyncStorage.getAllKeys())
@@ -78,7 +81,7 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
     }
 
     const handleAdjustQuantity = (indexIgnore: number, type: string, quantityFromInput: ItemInCartAndPaymentProps["quantity"]) => {  
-        console.log(isTopping, "topping")
+        console.log(isTopping, "topping", index, indexItem, "ôkok", item)
         isTopping
         ? setArray_itemListInCart( (prevArray_itemListInCart: any) => {
             const newArray_itemListInCart = [...prevArray_itemListInCart];
@@ -93,15 +96,27 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                     ) 
                     : newArray_itemListInCart[indexItem].toppings[index].quantity = quantityFromInput || 0 
             
-            const totalOfTopping = newArray_itemListInCart[indexItem].toppings.reduce((total: number, item : Topping) => total + item.price * item.quantity, 0);
-            const totalOfItem = newArray_itemListInCart[indexItem].price * newArray_itemListInCart[indexItem].quantity;
+            const totalOfTopping = newArray_itemListInCart[indexItem].toppings.length !== 0 
+                                    ? newArray_itemListInCart[indexItem].toppings.reduce((total: number, item : Topping) => total + item.price * item.quantity, 0) * newArray_itemListInCart[indexItem].quantity 
+                                    : 0;
+             
+            const checkedSize = newArray_itemListInCart[indexItem].sizes.length !== 0 
+                                ? newArray_itemListInCart[indexItem].sizes.find((size: any) => size.checked === true) 
+                                : 0;
+
+            // console.log(checkedSize, "checkedS22ize",  newArray_itemListInCart[indexItem])
+            // console.log(newArray_itemListInCart[indexItem].price, "pri22ce", newArray_itemListInCart[indexItem].price + checkedSize.price)
+
+            const checkedSizePrice =  checkedSize !== 0 ? checkedSize.price : 0
+            const totalOfItem = (newArray_itemListInCart[indexItem].price + checkedSizePrice) * newArray_itemListInCart[indexItem].quantity;
+
             newArray_itemListInCart[indexItem].totalOfItem = totalOfTopping + totalOfItem;
             saveToAssyncStorage(newArray_itemListInCart)// phải để đúng vị trí này thì nó mới đúng được
             return newArray_itemListInCart;
         }) 
         : (setArray_itemListInCart( (prevArray_itemListInCart: any) => {
             const newArray_itemListInCart = [...prevArray_itemListInCart];
-            console.log(isTopping, "topping")
+            console.log(isTopping, "toppwing", item.price )
 
             type === "increase" 
                 ? ++newArray_itemListInCart[index].quantity 
@@ -113,8 +128,17 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                     ) 
                     : newArray_itemListInCart[index].quantity = quantityFromInput || 0 
 
-            const totalOfTopping = newArray_itemListInCart[index].toppings.reduce((total: number, item : Topping) => total + item.price * item.quantity, 0);
-            const totalOfItem = newArray_itemListInCart[index].price * newArray_itemListInCart[index].quantity;
+            const totalOfTopping =  newArray_itemListInCart[index].toppings.length !== 0
+                                    ? newArray_itemListInCart[index].toppings.reduce((total: number, item : Topping) => total + (item.price * item.quantity), 0) * newArray_itemListInCart[index].quantity
+                                    : 0;
+
+            const checkedSize = newArray_itemListInCart[index].sizes.length !== 0 
+                                ? newArray_itemListInCart[index].sizes.find((size: any) => size.checked === true)
+                                : 0;
+            console.log(totalOfTopping, checkedSize, "totalofTopping and checkedsize")
+            const checkedSizePrice =  checkedSize !== 0 ? checkedSize.price : 0
+            const totalOfItem = (newArray_itemListInCart[index].price + checkedSizePrice) * newArray_itemListInCart[index].quantity;
+            console.log(totalOfItem, "totalOfI22tem", checkedSizePrice )
             newArray_itemListInCart[index].totalOfItem = totalOfTopping + totalOfItem;
             saveToAssyncStorage(newArray_itemListInCart)
             return newArray_itemListInCart;
@@ -144,6 +168,19 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
             return newArray_itemListInCart;
         })
     }
+
+    const handlePressMainItem = (item: any) => {
+        setDetailInfoOfFAD({
+            FAD_ID: item.id,
+            FAD_NAME: item.name,
+            FAD_PRICE: item.price,
+            FOOD_IMAGE_URL: item.uri,
+            SHOP_NAME: item.shopName,
+        }) 
+        navigation.navigate('DetailInfoOfFAD' as never, {item})
+        console.log(item, "itemsdvd")
+    }
+
     const renderAdjustQuantity = () => {
         return isOrderDetail
         ? null
@@ -155,19 +192,22 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
     }
 
     const renderSize = () => {
-        let size = !isTopping 
+        if(item.sizes)
+        {
+            let size = !isTopping 
                     ? item.sizes.length === 0 
                         ? ""
                         : item.sizes.find((itemSize: { checked: any; }) => itemSize.checked)?.label 
                     : ""
                     
-        return (
-            size !== ""
-            ? <Text>
-                Size: {size}
-            </Text>
-            : ""
-        )
+            return (
+                size !== ""
+                ? <Text>
+                    Size: {size}
+                </Text>
+                : ""
+            )
+        }
     }
  
     return (
@@ -177,46 +217,49 @@ export default function ItemInCartAndPayment({ isCart, isTopping, isHaveAdjustin
                 isTopping && item.quantity === 0 ? styles.hidden : {}
             ]}
         >
-            <View 
-                style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginLeft: isTopping ? widthScreen * 0.03 : 0
-                }}
-            >
-                <Image
-                    source={{uri: item.uri || ""}}
-                    style={styles.avatar}
-                /> 
-                <View style={{
-                    marginLeft: widthScreen * 0.03 
-                }}>
-                    <Text
-                        style={styles.nameShopText}
-                    >
-                        {isTopping ? item.label : item.name}
-                    </Text>
+            
+            <TouchableOpacity onPress={() => isTopping === false ? handlePressMainItem(item) : {}}>
+                <View 
+                    style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginLeft: isTopping ? widthScreen * 0.03 : 0
+                    }}
+                >
+                    <Image
+                        source={{uri: item.uri || ""}}
+                        style={styles.avatar}
+                    /> 
                     <View style={{
-                        flexDirection: "row" 
+                        marginLeft: widthScreen * 0.03 
                     }}>
                         <Text
-                            style={{ marginRight: widthScreen * 0.02}}
+                            style={styles.nameShopText}
                         >
-                            Giá: {item.price}
+                            {item.name || item.label}
                         </Text>
-                        {
-                            renderSize()
-                        }
-                    </View>
-                </View> 
-            </View>
+                        <View style={{
+                            flexDirection: "row" 
+                        }}>
+                            <Text
+                                style={{ marginRight: widthScreen * 0.02}}
+                            >
+                                Giá: {item.price}
+                            </Text>
+                            {
+                                renderSize()
+                            }
+                        </View>
+                    </View> 
+                </View>
+            </TouchableOpacity>
             <View
                 style={{ 
                     alignSelf: "flex-end",
                     alignItems: "flex-end",
                     // alignContent: "flex-end",
-                    display: isCart ? "flex" : "none"
+                    display: isCart && isRating === false ? "flex" : "none"
                 }}
             >
                 <TouchableOpacity

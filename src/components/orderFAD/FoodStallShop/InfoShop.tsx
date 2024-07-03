@@ -5,7 +5,8 @@ import { defaultPrizzaImage } from "@/components/PostList";
 import { Link } from "expo-router";
 import { useNavigation } from '@react-navigation/native'; 
 import { useEffect } from "react";
-import React from "react";
+import React from "react"; 
+import call from "react-native-phone-call";
 
 export default function InfoShop({infoShop}: {infoShop: any}) {
     const { heightScreen, widthScreen } = useCartContext();
@@ -13,10 +14,7 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
     const heightInfoShop = heightScreen * 0.08; 
     const avatarSize = heightScreen * 0.05;
     const navigation = useNavigation(); 
-
-    useEffect(() => {
-        console.log(infoShop, "infoShop")
-    }, [])
+ 
 
     const styles = StyleSheet.create({  
         infoShopDivContainer: {
@@ -80,6 +78,15 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
             width: widthScreen * 0.45,
         }
     })
+
+    const callShop = () => {
+        const args = {
+            number: infoShop?.PHONE,
+            prompt: false
+        }
+        call(args).catch(console.error);
+    }
+
     return(
     // {/* input search bạn muốn ăn gì */}
         <View style={styles.infoShopDivContainer}>
@@ -98,7 +105,7 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                 </View> 
 
                 {/* rate / review */}
-                <Link href="/(user)/orderFoodAndDrink/ReviewShop"> 
+                {/* <Link href="/(user)/orderFoodAndDrink/ReviewShop"> 
                     <View style={styles.infoShopItem}>
                         <FontAwesome
                             name="star"
@@ -112,7 +119,7 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                             style={styles.angleRight}
                         />
                     </View> 
-                </Link>
+                </Link> */}
 
                 {/* address shop */}
                 <View style={styles.infoShopItem}>
@@ -140,9 +147,13 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                         name="phone-square-alt"
                         style={styles.star}
                     />
-                    <Text
-                        style={styles.address}
-                    >{infoShop?.PHONE}</Text>
+                    <TouchableOpacity onPress={() => callShop()}>
+                        <Text
+                            style={styles.address}
+                        >
+                            {infoShop?.PHONE}
+                        </Text>
+                    </TouchableOpacity>
                 </View> 
             </View>
         </View>

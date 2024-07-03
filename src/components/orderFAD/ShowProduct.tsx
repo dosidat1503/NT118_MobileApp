@@ -10,14 +10,14 @@ import axios from "axios";
 export default function ShowProduct({products}: {products: any[]}) { 
     const { heightScreen, widthScreen, setDetailInfoOfFAD, baseURL, RD } = useCartContext();
     const navigation = useNavigation();   
-
+    console.log( "products")
     const renderFADCategory = ({item, index}: {item: any, index: number}) => {
-        return( 
-            // <Link href="/(user)/orderFoodAndDrink/FoodStallShop" asChild> 
+        return(  
             <TouchableOpacity 
                 onPress={() => { 
-                    navigation.navigate('DetailInfoOfFAD' as never)
                     setDetailInfoOfFAD(item)
+                    // setIsLoading(true)
+                    navigation.navigate('DetailInfoOfFAD' as never  , {item} )
                 }}
                 key={index}
             >   
@@ -54,8 +54,7 @@ export default function ShowProduct({products}: {products: any[]}) {
                         </View>
                     </View>
                 </View> 
-            </TouchableOpacity>
-            // </Link>
+            </TouchableOpacity> 
         )
     }
     const styles = StyleSheet.create({ 
@@ -85,7 +84,7 @@ export default function ShowProduct({products}: {products: any[]}) {
             paddingVertical: 5,
             paddingHorizontal: 10,
             // borderWidth: 1
-            marginTop: heightScreen * 0.03
+            // marginTop: heightScreen * 0.03
         }
     })
     return(

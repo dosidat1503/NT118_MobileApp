@@ -9,17 +9,21 @@ import { useNavigation } from "expo-router";
  
 interface ItemType1Props {
     deliveryInfo: {
-        id: number,
+        address_id?: number,
         name: string,
         phone: string,
         address: string,
         isDefault?: boolean,
-        isChoose?: boolean
+        isChoose?: boolean,
+
     },
-    isChangeAddress?: boolean
+    isChangeAddress?: boolean, 
+    deliveryInfoItem?: any,
+    handleChangeChoseDeliveryInfo?: (addressId: any) => void,// hàm này được gọi từ DeliveryInfoList.tsx
+    isWatchOrderDetail?: boolean, 
 }
 
-export default function ItemType1({deliveryInfo, isChangeAddress = false}: ItemType1Props) {
+export default function ItemType1({deliveryInfo, isChangeAddress = false, handleChangeChoseDeliveryInfo,   isWatchOrderDetail = false}: ItemType1Props) {
     const { heightScreen, widthScreen, mainColor } = useCartContext();
 
     const styles = StyleSheet.create({
@@ -148,8 +152,10 @@ export default function ItemType1({deliveryInfo, isChangeAddress = false}: ItemT
             </View>
             <View style={styles.deliveryItemContainer}>
                 <CheckBox
-                    // checked={}
-                    onPress={() =>  {}}
+                    checked={ deliveryInfo.isChoose ? true : false}
+                    onPress={() => { 
+                        handleChangeChoseDeliveryInfo && handleChangeChoseDeliveryInfo(deliveryInfo.address_id)
+                    }}
                     containerStyle={{
                         padding: 0,
                         margin: 0,
@@ -188,8 +194,16 @@ export default function ItemType1({deliveryInfo, isChangeAddress = false}: ItemT
                     > */}
                     {
                         isChangeAddress 
-                        ? 
-                        <Link href={"/(user)/orderFoodAndDrink/EditDeliveryAddress"}>
+                        ? <Link href={{
+                            pathname: "/(user)/orderFoodAndDrink/EditDeliveryAddress",
+                            params: { 
+                                address_id: deliveryInfo.address_id || 1,
+                                name: deliveryInfo.name,
+                                phone: deliveryInfo.phone,
+                                address: deliveryInfo.address,
+                                isDefault: deliveryInfo.isDefault ? 1 : 0,
+                            }
+                        }}>
                             <FontAwesome5 
                                 name="edit" 
                                 size={widthScreen * 0.05}
@@ -199,19 +213,20 @@ export default function ItemType1({deliveryInfo, isChangeAddress = false}: ItemT
                                 }} 
                             />
                         </Link>
-                        : 
-                        // <Link href={"/(user)/orderFoodAndDrink/DeliveryInfoList"}>
-                        <TouchableOpacity onPress={() => navigation.navigate("DeliveryInfoList" as never)}>
-                            <FontAwesome5 
-                                name="chevron-right" 
-                                size={widthScreen * 0.05}
-                                style={{
-                                    opacity: 1,
-                                    color: mainColor,  
-                                }} 
-                            />
-                        </TouchableOpacity>
-                        // </Link>
+                        : isWatchOrderDetail 
+                            ? ""
+                            : // <Link href={"/(user)/orderFoodAndDrink/DeliveryInfoList"}>
+                            <TouchableOpacity onPress={() => navigation.navigate("DeliveryInfoList" as never, { deliveryInfo })}>
+                                <FontAwesome5 
+                                    name="chevron-right" 
+                                    size={widthScreen * 0.05}
+                                    style={{
+                                        opacity: 1,
+                                        color: mainColor,  
+                                    }} 
+                                />
+                            </TouchableOpacity>
+                            // </Link>
                     }
                     {/* </TouchableOpacity> */}
                 </View>

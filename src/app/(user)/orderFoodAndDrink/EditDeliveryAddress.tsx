@@ -7,10 +7,12 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Stack, useSearchParams } from "expo-router";
 import axios from "axios";
 import Loading from "@/components/Loading";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function EditDeliveryAddress() {
-    const { heightScreen, widthScreen, mainColor, baseURL, setIsUpdatedInfoDelivery, isUpdatedInfoDelivery, userID, isLoading, setIsLoading } = useCartContext();
-
+    const { heightScreen, widthScreen, mainColor, baseURL, setIsUpdatedInfoDelivery,  userID, isUpdatedInfoDelivery } = useCartContext();
+    
+    const [isLoading, setIsLoading] = useState(false);
     const { name, phone, address, isDefault, address_id } = useSearchParams()
     const [deliveryInfo, setDeliveryInfo] = useState([
         {key: "name", title: "Họ và tên", value: name},
@@ -18,6 +20,15 @@ export default function EditDeliveryAddress() {
         {key: "address", title: "Địa chỉ", value: address},
         {key: "isDefault", title: "Chọn làm địa chỉ mặc định", value: isDefault}
     ])
+    const [isUpdatedInfoDeliveryInFile, setIsUpdatedInfoDeliveryInFile] = useState(false) // [1
+    // let isUpdatedInfoDelivery = "";
+    // useEffect(() => {
+    //     const loadisUpdatedInfoDelivery = async () => {
+    //         isUpdatedInfoDelivery = await AsyncStorage.getItem('isUpdatedInfoDelivery') || ""; 
+    //     }   
+    //     loadisUpdatedInfoDelivery()
+    // })
+
 
     const styles = StyleSheet.create({ 
         titleTextForDeliveryContainer: {
@@ -68,7 +79,7 @@ export default function EditDeliveryAddress() {
             deliveryInfo.map((item) => { 
                 if (item.key === deliveryInfo[3].key) return{
                     ...item,
-                    value: parseInt(item.value) === 1 ? "0" : "1"
+                    value: parseInt(item.value.toString()) === 1 ? "0" : "1"
                 } 
                 return item
             })
@@ -78,12 +89,12 @@ export default function EditDeliveryAddress() {
     const handleSaveInfo =  () => {
         setIsLoading(true)
         const dataSave = {
-            userID: userID,
-            address_id: parseInt(address_id),
+            userID: userID === 0 ? 1 : userID,
+            address_id: parseInt(address_id.toString()),
             name: deliveryInfo[0].value,
             phone: deliveryInfo[1].value,
             address: deliveryInfo[2].value,
-            isDefault: parseInt(deliveryInfo[3].value),
+            isDefault: parseInt(deliveryInfo[3].value.toString()),
             isDefaultHasChanged: deliveryInfo[3].value !== isDefault
         }
         console.log("done save", dataSave)
@@ -91,6 +102,7 @@ export default function EditDeliveryAddress() {
         axios.post(baseURL + '/updateDeliveryInfo', dataSave)
         .then((res) => {
             setIsUpdatedInfoDelivery(true)
+            setIsUpdatedInfoDeliveryInFile(true) // [1
             console.log("done", res.data.afterSave)
             setIsLoading(false)
         })
@@ -136,7 +148,7 @@ export default function EditDeliveryAddress() {
                                 ? <View style={{flexDirection: "row", alignItems: "center"}}>
                                     <Text style={styles.titleTextForDelivery}>{item.title}</Text>
                                     <CheckBox
-                                        checked={ parseInt(item.value) === 1 ? true : false}
+                                        checked={ parseInt(item.value.toString()) === 1 ? true : false}
                                         onPress={() => handleCheckDefault()}
                                         containerStyle={{
                                             padding: 0,
@@ -148,7 +160,7 @@ export default function EditDeliveryAddress() {
                                     <Text style={styles.titleTextForDelivery}>{item.title}</Text>
                                     <TextInput 
                                         style={styles.inputText}
-                                        value={item.value}
+                                        value={item.value.toString()}
                                         onChangeText={(text) => handleEditDeliveryInfo(item.key, text)}
                                     ></TextInput>
                                 </View>
