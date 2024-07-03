@@ -13,7 +13,7 @@ export default function FADShop({products}: {products: any}){
 
     const [FADShopList, setFADShopList] = useState(products)
     const navigation = useNavigation();
-
+    console.log( "FADShopList")
     useEffect(() => {
         axios.get(baseURL + '/getFADShop')
         .then((res) => {
@@ -28,6 +28,7 @@ export default function FADShop({products}: {products: any}){
     const handleClickFADShop = (id: number) => {
         navigation.navigate('FoodStallShop' as never)
         setFADShop_ID(id)
+        console.log(id, "handleClickFADShop")
     }
     
     const renderFADShop = ({item}: {item: any}) => {

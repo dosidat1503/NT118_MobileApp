@@ -1,32 +1,41 @@
-import { View, TextInput, StyleSheet, Text, Animated, FlatList  } from "react-native";
-import {Picker} from '@react-native-picker/picker';
+import { View, TextInput, StyleSheet, Text, Animated, FlatList  } from "react-native"; 
 import { FontAwesome5 } from "@expo/vector-icons";
-import { useCartContext } from "@/providers.tsx/CartProvider";
-import { DEFAULT_EXTENSIONS } from "@babel/core";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { fonts } from "react-native-elements/dist/config";
-import { color } from "react-native-elements/dist/helpers";
+import { useCartContext } from "@/providers.tsx/CartProvider"; 
+import { TouchableOpacity } from "react-native-gesture-handler"; 
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
-import React, { SetStateAction, useEffect, useRef, useState } from "react";
-import { SelectList } from "react-native-dropdown-select-list"; 
+import React, { SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react"; 
 import Collapsible from 'react-native-collapsible';
 import axios from "axios";
 import ShowProduct from "@/components/orderFAD/ShowProduct";
 import FilterButton from "../home/FilterButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ShowFADSearchInfo() {
     const { 
         heightScreen, 
-        widthScreen, mainColor, 
-        textToSearchFAD, setTextToSearchFAD, 
-        baseURL, RD, 
-        dataHadChosenToFilter, setDataHadChosenToFilter,
-        tagIDToGetFADInfo, setTagIDToGetFADInfo, 
+        widthScreen, mainColor,  
+        baseURL, RD,   
     } = useCartContext();
-    
-    const widthPaddingSearchFAD = widthScreen * 0.04
 
-    const styles = StyleSheet.create({ 
+    let tagIDToGetFADInfo = "";
+    useEffect(() => {
+        const loadtagIDToGetFADInfo= async () => {
+            tagIDToGetFADInfo = await AsyncStorage.getItem('tagIDToGetFADInfo') || ""; 
+        }   
+        loadtagIDToGetFADInfo()
+    })
+
+    
+    let [textToSearchFAD, settextToSearchFAD] = useState('')
+    const widthPaddingSearchFAD = widthScreen * 0.04
+    const loadtextToSearchFAD = async () => {
+        textToSearchFAD = await AsyncStorage.getItem('textQueryPost') || "";
+        if (textToSearchFAD !== null) {
+            settextToSearchFAD(textToSearchFAD);
+            getFADInfo(); 
+        }
+    };
+    const styles = useMemo(() => StyleSheet.create({ 
         searchFADIcon: {
             // paddingVertical: "auto",
             alignSelf: 'center',
@@ -166,16 +175,15 @@ export default function ShowFADSearchInfo() {
             borderColor: 'green',
             borderWidth: RD * 0.000007,
         },
-    })
+    }), [])
     
-    const [showFilterElement, setShowFilterElement] = useState(false); // Hiển thị bộ lọc
-    // const [dataHadChosenToFilter, setDataHadChosenToFilter] = useState({
-    //     range: [5, 400],
-    //     FADtype: 0,
-    //     deliveryType: 0,
-    //     sortType: 0,
-    // });
-
+    const [showFilterElement, setShowFilterElement] = useState(false); // Hiển thị bộ lọc 
+    const [dataHadChosenToFilter, setDataHadChosenToFilter] = useState({
+        range: [5, 400],
+        FADtype: 0,
+        deliveryType: 0,
+        sortType: 0,
+    }); 
     const [FADInfo, setFADInfo] = useState<any>({}) 
     const filterList =  [
         {
@@ -221,7 +229,7 @@ export default function ShowFADSearchInfo() {
 
     
     useEffect(() => { 
-        getFADInfo()
+        loadtextToSearchFAD()
     }, [])
 
     const getFADInfo = async () => {
@@ -242,11 +250,11 @@ export default function ShowFADSearchInfo() {
         })
     }
 
-    const handleRangeChange = (values: number[]) => {
+    const handleRangeChange = useCallback((values: number[]) => {
         setDataHadChosenToFilter({...dataHadChosenToFilter, range: values}); 
-    };
+    }, [dataHadChosenToFilter])
 
-    const handleChooseValue = (value: string, itemFilter: any) => {
+    const handleChooseValue = useCallback((value: string, itemFilter: any) => {
         if(itemFilter.propertyName === filterList[0].propertyName) {
             setDataHadChosenToFilter({...dataHadChosenToFilter, FADtype: parseInt(value)})
         }
@@ -257,10 +265,9 @@ export default function ShowFADSearchInfo() {
         //     setDataHadChosenToFilter({...dataHadChosenToFilter, deliveryType: parseInt(value)})
         // }
         console.log(dataHadChosenToFilter, "dataHadChosenToFilter", itemFilter.propertyName)
-    }
- 
+    }, [dataHadChosenToFilter])
 
-    const renderFiltersList = ( 
+    const renderFiltersList = useCallback(( 
         item: { 
             propertyName: string,
             valueList: {
@@ -268,7 +275,7 @@ export default function ShowFADSearchInfo() {
                 value: string
             }[] 
         } 
-    )  => {
+    ) => {
         let isSlected = false;
         let isSlectedSortBy = false;
         let mainStyle = {};
@@ -322,9 +329,9 @@ export default function ShowFADSearchInfo() {
                 </View>
             )
         })
-    }
+    },[handleChooseValue, handleRangeChange])
 
-    const renderFilterElement = () => {
+    const renderFilterElement = useCallback(() => {
         const slideAnimaed = useRef(new Animated.Value(0)).current;
 
         Animated.timing(slideAnimaed, {
@@ -333,15 +340,7 @@ export default function ShowFADSearchInfo() {
             useNativeDriver: true,
         }).start(); 
 
-        return (
-            // <Animated.View style={{
-            //     transform: [{ 
-            //         translateY: slideAnimaed.interpolate({
-            //             inputRange: [0, 1],
-            //             outputRange: [200, 0],
-            //         }) 
-            //     }],
-            // }}> 
+        return ( 
                 <View style={styles.filterElementDivContainer}>
                     <View style={styles.everyFilterElementContainer}>
                         <View>
@@ -378,55 +377,8 @@ export default function ShowFADSearchInfo() {
                             />
                             <Text style={[styles.filterText, {marginRight: widthScreen * 0.0001}]}>{dataHadChosenToFilter.range[1]}</Text>
                         </View> 
-                    </View>
+                    </View> 
                     {
-                        // filterList.map((itemFilter, index) => {
-                        //     return (
-                        //         <View style={styles.everyFilterElementContainer} key={index}>
-                        //             <Text style={styles.filterText}>{itemFilter.propertyName}</Text>
-                        //             <SelectList
-                        //                 setSelected={(value: string) => handleChooseValue(value, itemFilter)}
-                        //                 // onSelect={() => {}}
-                        //                 data={itemFilter.valueList}
-                        //                 // placeholder='Chọn chủ đề'
-                        //                 defaultOption={itemFilter.valueList[0]}
-                        //                 boxStyles={{ 
-                        //                     paddingVertical: heightScreen * 0.006,
-                        //                     paddingHorizontal: widthScreen * 0.04,
-                        //                     borderColor: "#89CFF0",
-                        //                     marginBottom: 5,
-                        //                 }}
-                        //                 dropdownItemStyles={{
-                        //                     paddingVertical: 1
-                        //                 }}
-                        //                 dropdownStyles={{
-                        //                     paddingTop: 0,
-                        //                     marginTop: 2, 
-                        //                     marginBottom: heightScreen * 0.01, 
-                        //                     width: widthScreen * 0.4,
-                        //                 }} 
-                        //                 inputStyles={{
-                        //                     width: widthScreen * 0.2, 
-                        //                     fontSize: widthScreen * 0.035,
-                        //                     fontWeight: "bold",
-                        //                     color: "#787877",
-                        //                 }} 
-                        //                 dropdownTextStyles={{ 
-                        //                     // paddingRight: widthScreen * 0.02,
-                        //                     // paddingVertical: heightScreen * 0.01,
-                        //                     fontSize: widthScreen * 0.035,
-                        //                     fontWeight: "bold",
-                        //                     color: "#787877",
-                        //                     // borderWidth: 1,
-                        //                     borderColor: '#b3b3a8',
-                        //                     backgroundColor: "white",
-                        //                     borderRadius: widthScreen * 0.02,
-                        //                 }}
-                        //                 search={false}  
-                        //             ></SelectList>
-                        //         </View>
-                        //     ) 
-                        // })
                         filterList.map((item, index) => (
                             <View style={ styles.chooseTopic } key={ index }> 
                                 <View> 
@@ -443,16 +395,10 @@ export default function ShowFADSearchInfo() {
                 </View>
             // </Animated.View> 
         ) 
-    }
+    }, [handleChooseValue, handleRangeChange])
   
 
-    return(
-    // {/* input search bạn muốn ăn gì */}
-        // <View >
-             
-             
-              
-        // </View>
+    return( 
         <FlatList
             data={[]}  // Không có dữ liệu cụ thể cho danh sách này
             renderItem={(item) => null}
