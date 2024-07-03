@@ -29,7 +29,7 @@ export default function Response({
         href2, buttonIcon2, buttonName2, buttonFunction2, buttonColor2 = "#89CFF0",
         confirmPopup,
     }: ResponseProps) {
-
+    console.log("Response")
     const {heightScreen, widthScreen, mainColor, baseURL, emailPattern, phoneNumberPattern, fullNamePattern} = useCartContext();
     console.log(" color: ", mainColor);
 
@@ -95,6 +95,16 @@ export default function Response({
                     }}
                 >
                     {
+                        // buttonName1 && buttonIcon1 && href1
+                        // ? <Link href={href1} asChild> 
+                        //     <Button
+                        //         iconName={buttonIcon1}
+                        //         buttonName={buttonName1}
+                        //         handlePress={buttonFunction1}
+                        //         color={buttonColor1}
+                        //     ></Button> 
+                        // </Link>
+                        // : 
                         buttonName1 && buttonIcon1 &&
                         // <Link href={href1} asChild> 
                             <Button
@@ -106,15 +116,23 @@ export default function Response({
                         //{/* </Link> */}
                     }
                     {
+                        // buttonName2 && buttonIcon2 && href2
+                        // ? <Link href={href2} asChild> 
+                        //     <Button
+                        //         iconName={buttonIcon2}
+                        //         buttonName={buttonName2}
+                        //         handlePress={buttonFunction2}
+                        //         color={buttonColor2}
+                        //     ></Button> 
+                        // </Link> 
+                        // : 
                         buttonName2 && buttonIcon2 &&
-                        // <Link href={href2} asChild> 
                             <Button
-                                iconName={buttonIcon2}
-                                buttonName={buttonName2}
-                                handlePress={buttonFunction2}
-                                color={buttonColor2}
-                            ></Button> 
-                        //</Link>{/* </Link> */}
+                            iconName={buttonIcon2}
+                            buttonName={buttonName2}
+                            handlePress={buttonFunction2}
+                            color={buttonColor2}
+                        ></Button> 
                     }
                     {/* <Link href={'/index'} asChild> 
                         <Button

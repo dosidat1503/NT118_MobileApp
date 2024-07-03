@@ -11,9 +11,10 @@ import Button from "./Button";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default function Cart() {
-    const { heightScreen, widthScreen, mainColor, setIsLoading } = useCartContext(); 
+    const { heightScreen, widthScreen, mainColor, RD, setDetailInfoOfFAD, setShopID } = useCartContext(); 
     const avatarSize = widthScreen * 0.13; 
 
     const styles = StyleSheet.create({   
@@ -85,8 +86,10 @@ export default function Cart() {
             }
         }
         getitemListInCart();
-        const totalChecked = array_itemListInCart.reduce(((total, item) => item.isCheckedForPayment === true ? ++total : total), 0);
-        totalChecked === array_itemListInCart.length ? setIsCheckedForPaymentAll(true) : setIsCheckedForPaymentAll(false); 
+        
+        // console.log( "totalCh2ecked" , array_itemListInCart.every((item) => item.isCheckedForPayment === true))
+        // array_itemListInCart.map((item) => { console.log(item.isCheckedForPayment, "scjdjcdc") })
+        // totalChecked === array_itemListInCart.length ? setIsCheckedForPaymentAll(true) : setIsCheckedForPaymentAll(false); 
     }, []) 
  
     useEffect(() => {
@@ -98,6 +101,7 @@ export default function Cart() {
             } 
         }
         updateArray_itemListInCart();
+        array_itemListInCart.every((item) => item.isCheckedForPayment === true) ? setIsCheckedForPaymentAll(true) : setIsCheckedForPaymentAll(false);
     }, [array_itemListInCart])
 
     const handleCheckedForPayment = useCallback((item: any) => {
@@ -152,8 +156,30 @@ export default function Cart() {
         }
         setIsCheckedForPaymentAll(false)
     } , [array_itemListInCart])
+
+    const handlePayment = () => { 
+        if(array_itemListInCart.every((item) => item.isCheckedForPayment === false) )
+        {
+            alert("Vui lòng chọn ít nhất một món ăn")
+        }
+        else {
+            const firstCheckedItemShopID = array_itemListInCart.find(item => item.isCheckedForPayment)?.shopID;
+            const allItemsHaveSameShopID = array_itemListInCart.every(item =>  !item.isCheckedForPayment || item.shopID === firstCheckedItemShopID);
+            if(allItemsHaveSameShopID){ 
+                setShopID(firstCheckedItemShopID);
+                // setIsLoading(true);
+                navigation.navigate('Payment' as never, {array_itemListInCart: array_itemListInCart, shopID: firstCheckedItemShopID}); 
+            }
+            else{
+                alert("Vui lòng chọn món ăn trong cùng một cửa hàng")
+            }
+        } 
+        
+    }
+    
     const renderTopping = (toppings: any[], indexItem: number) => {
         return toppings.map((item, index) => { 
+            console.log(item, "caksncksa2")
             return (
                 <ItemInCartAndPayment
                     isCart={true}
@@ -193,16 +219,46 @@ export default function Cart() {
                         {/* itemInfo */}
                         <View style={styles.itemContainer}>
                             {/* view đầu này là của item chính */} 
-                            <ItemInCartAndPayment
-                                isCart={true}
-                                isTopping={false}
-                                isHaveAdjusting={true} 
-                                quantity={0}        
-                                item={item}
-                                index={index}             
-                                setArray_itemListInCart={setArray_itemListInCart}
-                                indexItem={index}       
-                            ></ItemInCartAndPayment>
+                            <View 
+                                style={{ 
+                                    flexDirection: "row", 
+                                    borderWidth: 1,
+                                    borderColor: mainColor,
+                                    borderRadius: RD * 0.00003,
+                                    paddingHorizontal: widthScreen * 0.02,
+                                    paddingVertical: heightScreen  * 0.005,
+                                    alignItems: "center",
+                                    justifyContent: "flex-start",
+                                    alignSelf: 'flex-start',
+                                    backgroundColor: "#FFFCE8",
+                                    flexShrink: 1, 
+                                    opacity: 0.7
+                                }}
+                            >
+                                <Image
+                                    source={{uri: item.shopAvatarURL}}
+                                    style={{
+                                        height: RD * 0.00005,
+                                        width: RD * 0.00005,
+                                        borderRadius: avatarSize * 0.5,
+                                        // marginLeft: widthScreen * 0.01,
+                                        marginRight: widthScreen * 0.02, 
+                                    }}
+                                ></Image>
+                                <Text style={[styles.nameShopText, { opacity: 0.8 }]}>
+                                    {item.shopName || ""}
+                                </Text>
+                            </View>
+                                <ItemInCartAndPayment
+                                    isCart={true}
+                                    isTopping={false}
+                                    isHaveAdjusting={true} 
+                                    quantity={0}        
+                                    item={item}
+                                    index={index}             
+                                    setArray_itemListInCart={setArray_itemListInCart}
+                                    indexItem={index}       
+                                ></ItemInCartAndPayment> 
                             <Text style={[
                                 styles.textInCart,
                                 item.toppings.length === 0 ? {display: "none"} : {display: "flex"}
@@ -273,10 +329,7 @@ export default function Cart() {
                         <Button
                             iconName="money-bill-alt"
                             buttonName="THANH TOÁN"
-                            handlePress={() => {
-                                setIsLoading(true);
-                                navigation.navigate('Payment' as never)
-                            }}
+                            handlePress={() => handlePayment()}
                         ></Button>
                     {/* </Link> */}
                 </View>

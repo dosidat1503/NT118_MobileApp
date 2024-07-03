@@ -1,49 +1,84 @@
-import { useEffect, useState } from "react";
-import { StyleSheet, FlatList } from "react-native" 
-import { useCartContext } from "@/providers.tsx/CartProvider";
-import axios from "axios";
-import React from "react"; 
-import PostAtHome from "../home/PostAtHome";
-import { ScrollView } from "react-native-gesture-handler";
-import CollapsibleFilter from "../home/CollapsibleFilter";
-import { Stack } from "expo-router";
+import { useCartContext } from '@/providers.tsx/CartProvider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
+const mainColor = '#DFEBF4';
 
-export default function LikeAndSave() {
+export default function Security() { 
+  const {  mainColor, baseURL, userID,   } = useCartContext();
+  const [errorMessage, setErrorMessage] = useState('');
+ 
+  const [itemList, setItemList] = useState([
+    { placeholder: 'Mật khẩu cũ', value: "" },
+    { placeholder: 'Mật khẩu mới', value: "" },
+    { placeholder: 'Xác nhận mật khẩu mới', value: "" },
+  ])
 
-    const {setSelectedItem } = useCartContext()
-
-    const [reloadPost, setReloadPost] = useState(false) 
-    const handleReloadPost = () => {
-        setReloadPost(!reloadPost)
-        console.log("handleReloadPost")
+  const handleChangePassword = () => {
+    // Kiểm tra độ dài của mật khẩu mới
+    if (itemList[1].value.length < 6) {
+      setErrorMessage('Mật khẩu mới cần ít nhất 6 ký tự.');
+      return;
     }
 
-    useEffect(() => {
-        setSelectedItem({
-            topicItem: [],
-            sortByItem: '',
-            startDate: "",
-            endDate: "", 
-        })
-    }, [])
+    // Xử lý logic để thay đổi mật khẩu ở đây
+    if (itemList[1].value !== itemList[2].value) {
+      setErrorMessage('Xác nhận mật khẩu mới không khớp.');
+      return;
+    }
+    const dataSave = {
+      userID: userID === 0 ? 1 : userID,
+      oldPassword: itemList[0].value,
+      newPassword: itemList[1].value
+    }
+    axios.post(baseURL + '/changePassword', dataSave)
+    .then((res) => {
+      console.log(res.data)
+      if(res.data.statusCode === 1)
+        setErrorMessage(res.data.message);
+      if(res.data.statusCode === 200)
+        setErrorMessage(res.data.message);
+    })
+    .catch((err) => {
+      console.log(err)
+      setErrorMessage("Lỗi trong quá trình đổi mật khẩu");
+    })
 
-    return ( 
-        <FlatList
-            data={[]}  // Nếu không có dữ liệu cụ thể, bạn có thể để trống hoặc truyền dữ liệu phù hợp
-            renderItem={({ item }) => null}
-            keyExtractor={(item, index) => index.toString()}
-            // sử dụng listHeaderComponent và ListFooterComponent để thêm các thành phần vào đầu và cuối danh sách
-            ListHeaderComponent={
-                <CollapsibleFilter handleReloadPost={handleReloadPost} />
-            }
-            ListFooterComponent={
-                <PostAtHome reloadPost={reloadPost} isLikeAndSave={true} />
-            }
-            // contentContainerStyle={styles.contentContainer}
-        />
- 
-    )
+    // Đoạn mã xử lý thay đổi mật khẩu sẽ được thêm vào ở đây
+    console.log('Đổi mật khẩu thành công!');
+  };
+
+  return (
+    <View style={[styles.container, { backgroundColor: mainColor }]}>
+      <Text style={styles.title}>Đổi mật khẩu</Text>
+      {
+        itemList.map((item, index) => {
+          return (
+            <TextInput
+              key={index}
+              style={styles.input}
+              placeholder={item.placeholder}
+              secureTextEntry
+              value={item.value}
+              onChangeText={(text) => {
+                const newItemList = [...itemList];
+                newItemList[index].value = text;
+                setItemList(newItemList);
+              }}
+            />
+          )
+        })
+      } 
+
+      {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+
+      <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
+        <Text style={styles.buttonText}>Lưu thay đổi</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

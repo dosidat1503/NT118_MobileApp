@@ -27,7 +27,7 @@ type PersonalInfo = {
 
 export default function AccountInfo() {
 
-  const { heightScreen, widthScreen, mainColor, emailPattern, phoneNumberPattern, baseURL, userID, isLoading, setIsLoading } = useCartContext();
+  const { heightScreen, widthScreen, mainColor, emailPattern, phoneNumberPattern, baseURL, userID } = useCartContext();
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -99,7 +99,8 @@ export default function AccountInfo() {
       marginBottom: heightScreen * 0.01,
     },
   });
-  const [image, setImage] = useState('');
+  const [image, setImage] = useState(''); 
+  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState("");
   const [isShowBirthdayCalendar, setIsShowBirthdayCalendar] = useState(false);
@@ -389,8 +390,8 @@ export default function AccountInfo() {
 
   const handleSendCodeVerifyChangeMail = () => {
     setIsLoading(true)
-    console.log(handleSendCodeVerifyChangeMail, 'handleSendCodeVerifyChangeMail')
-    axios.post(baseURL + '/verifyChangeMail', { userID: userID, email: emailBeforeChange })
+    console.log(handleSendCodeVerifyChangeMail, 'handleSendCodeVerifyChangeMail', userID, emailBeforeChange)
+    axios.post(baseURL + '/verifyChangeMail', { userID: userID === 0 ? 1 : userID, email: emailBeforeChange })
     .then(res => {
       console.log(res.data, "res.datahandleSendCodeVerifyChangeMail") 
       setIsLoading(false)
@@ -507,19 +508,25 @@ export default function AccountInfo() {
                 {
                   //Hiển thị ô nhập mã xác nhận bằng email trước khi đổi email
                   item.field === 'email' && isEditing && isShowVerifyEmail && (
-                    <View style={{ flexDirection: 'row', marginBottom: heightScreen * 0.02 }}>
-                      <Button
-                        iconName='paper-plane'
-                        buttonName='Gửi mã'
-                        handlePress={handleSendCodeVerifyChangeMail}
-                        color={mainColor}
-                      /> 
-                      <TextInput
-                        style={[styles.input, { marginHorizontal: widthScreen * 0.03}]}
-                        placeholder="Nhập mã xác nhận để thay đổi mail"
-                        value={personalInfo.codeVerifyEmail}
-                        onChangeText={(value) => handleInputChange('codeVerifyEmail', value)}
-                      />
+                    <View>
+                      <View style={{ flexDirection: 'row', marginBottom: heightScreen * 0.02 }}>
+                        <Button
+                          iconName='paper-plane'
+                          buttonName='Gửi mã'
+                          handlePress={handleSendCodeVerifyChangeMail}
+                          color={mainColor}
+                        /> 
+                        <TextInput
+                          style={[styles.input, { marginHorizontal: widthScreen * 0.03}]}
+                          placeholder="Nhập mã xác nhận để thay đổi mail"
+                          value={personalInfo.codeVerifyEmail}
+                          onChangeText={(value) => handleInputChange('codeVerifyEmail', value)}
+                        />
+                      </View>
+                      <View>
+                        <Text style={{ color: "red", fontSize: heightScreen * 0.02, fontWeight: "bold" }}>Mã được gửi về email cũ để xác nhận trước khi đổi email </Text>
+                      </View>
+
                     </View>
                   )
                 }

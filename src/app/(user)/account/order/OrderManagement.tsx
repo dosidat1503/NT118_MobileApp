@@ -8,13 +8,16 @@ import axios from "axios";
 import Button from "@/app/(user)/orderFoodAndDrink/Button";
 import { useNavigation } from "expo-router";
 import RenderFooter from "@/components/RenderFooter";
-import Response from "../../Response";
+import Response from "../../Response"; 
+import * as WebBrowser from 'expo-web-browser';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface orderItem {
     ORDER_ID: number;
     TOTAL_PAYMENT: string;
     FAD_QUANTITY: number;
     PAYMENT_METHOD: string;
+    PAYMENT_STATUS: string;
     DATE: string;
     FAD_INFO: {
         IMAGE_URL: string,
@@ -23,7 +26,7 @@ interface orderItem {
         FAD_PRICE: number
     };
     FADFirst: { imgURL: string; name: string; quantity: number; price: number; }; 
-    necessaryInfo: { FADQuantityHaveOrder: number; time: string; paymentMethod: string; voucherID: string; };
+    necessaryInfo: { FADQuantityHaveOrder: number; time: string; paymentMethod: string; voucherCODE: string; };
     paymentToTal: number; 
 }
 
@@ -38,7 +41,7 @@ interface infoManagementEveryOrderStatus {
 
 export default function OrderManagement() {
 
-    const {heightScreen, widthScreen, mainColor, orderStatusList, baseURL, userID, setOrderID, RD} = useCartContext();
+    const {heightScreen, widthScreen, mainColor, orderStatusList, baseURL, userID, setOrderID, RD,  setVnpURL} = useCartContext();
 
     const avatarSize = widthScreen * 0.13;
 
@@ -158,12 +161,23 @@ export default function OrderManagement() {
         }
     });
 
+    
+    let vnpURL = "";
+    useEffect(() => {
+        const loadvnpURL = async () => {
+            vnpURL = await AsyncStorage.getItem('vnpURL') || ""; 
+        }   
+        loadvnpURL()
+    })
+
     const itemButtonList = [
         { orderStatusCode: 1, icon: "window-close", name: "Huỷ đơn"},
         { orderStatusCode: 2, icon: "phone-square-alt", name: "Liên hệ" },
+        { orderStatusCode: 2, icon: "credit-card", name: "Thanh toán" },
         { orderStatusCode: 3, icon: "phone-square-alt", name: "Liên hệ" },
+        { orderStatusCode: 3, icon: "credit-card", name: "Thanh toán" },
         { orderStatusCode: 4, icon: "star", name: "Đánh giá" },
-        { orderStatusCode: 5, icon: "undo-alt", name: "Đặt lại" },
+        // { orderStatusCode: 5, icon: "undo-alt", name: "Đặt lại" },
     ]   
     const [parameterForChangeOrderStatus, setParameterForChangeOrderStatus] = useState({ orderStatusCode: 0, item: {}, itemStatus: {}});
 
@@ -277,6 +291,19 @@ export default function OrderManagement() {
         } 
     }, [parameterForChangeOrderStatus])
 
+    const openInBrowser = async () => {
+        // Linking.openURL(vnpURL)
+        // .catch(err => {
+        //     console.error("An error occurred", err); 
+        // })
+        await WebBrowser.openBrowserAsync(vnpURL);
+    };
+
+    useEffect(() => {
+        if(vnpURL != "")
+            openInBrowser();
+    }, [vnpURL])
+
     const buttonPressCaseInEveryOrderStatus = (item: orderItem, itemButton: any, itemStatus: infoManagementEveryOrderStatus ) => {
         if(itemStatus.orderStatusCode === itemButtonList[0].orderStatusCode){ 
             setIsShowConfirmPopup(true)
@@ -285,6 +312,29 @@ export default function OrderManagement() {
                 item: item, 
                 itemStatus: itemStatus 
             }) 
+        }
+        if(itemButton.orderStatusCode === itemStatus.orderStatusCode && parseInt(item.PAYMENT_STATUS) === 0 && itemButton.name === itemButtonList[2].name){
+            
+            setIsLoading(true);
+            axios.get(baseURL + "/paymentOnline", {params: { ORDER_ID: item.ORDER_ID }})
+            .then((response) => {
+                // xoan navigation đến trang thanh toán thành công
+                // orderInfo.paymentMethod === paymentType.paymentOnline ? 
+                setVnpURL(response.data.vnp_Url)
+                
+                setIsLoading(false);
+                // navigation.navigate("OrderSuccess" as never);
+                console.log(response.data, 'kksks')
+                // openInBrowser();
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+        }
+        if(itemStatus.orderStatusCode === itemButtonList[5].orderStatusCode){
+            console.log("kjdjcd2") 
+            const orderID = item.ORDER_ID
+            navigation.navigate("order/RateFAD" as never, {orderID})
         }
     }
 
@@ -345,6 +395,12 @@ export default function OrderManagement() {
                     </View>
                     <View style={styles.NeceesaryInfoInBodyOfItemOrder_row}>
                         <View style={styles.NeceesaryInfoInBodyOfItemOrder_row_item}>
+                            <Text style={styles.headerNormalTextOfItemOder}>Trạng thái thanh toán:</Text>
+                            <Text style={styles.NeceesaryInfoInBodyOfItemOrder_row_item_mainText}>{parseInt(item.PAYMENT_STATUS) === 1 ? "Đã thanh toán" : "Chưa thanh toán"}</Text>
+                        </View> 
+                    </View>
+                    <View style={styles.NeceesaryInfoInBodyOfItemOrder_row}>
+                        <View style={styles.NeceesaryInfoInBodyOfItemOrder_row_item}>
                             <Text style={styles.headerNormalTextOfItemOder}>Số lượng món:</Text>
                             <Text style={styles.NeceesaryInfoInBodyOfItemOrder_row_item_mainText}>{item.FAD_QUANTITY}</Text>
                         </View> 
@@ -355,7 +411,9 @@ export default function OrderManagement() {
                     style={styles.detailInfoOfOderTextContainer} 
                     onPress={() => {
                         setOrderID(item.ORDER_ID)
-                        navigation.navigate("order/OrderDetail" as never)
+                        setIsLoading(true)
+                        const orderID = item.ORDER_ID
+                        navigation.navigate("order/OrderDetail" as never, {orderID})
                     }}
                 >
                     <Text style={styles.detailInfoOfOderText}>Thông tin chi tiết đơn hàng &gt;</Text>
@@ -365,7 +423,17 @@ export default function OrderManagement() {
             <View style={styles.footerOfItemOder}> 
                 {
                     itemButtonList.map((itemButton, index) => {
-                        if(itemButton.orderStatusCode === itemStatus.orderStatusCode)
+                        if(itemButton.orderStatusCode === itemStatus.orderStatusCode && parseInt(item.PAYMENT_STATUS) === 0)
+                            return (
+                                <View key={index}>
+                                    <Button
+                                        iconName={itemButton.icon}
+                                        buttonName={itemButton.name}
+                                        handlePress={() =>  buttonPressCaseInEveryOrderStatus(item, itemButton, itemStatus) }
+                                    ></Button> 
+                                </View>
+                            ) 
+                        if(itemButton.orderStatusCode === itemStatus.orderStatusCode && itemButton.name !== itemButtonList[2].name)
                             return (
                                 <View key={index}>
                                     <Button
