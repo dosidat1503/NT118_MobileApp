@@ -6,7 +6,8 @@ import DetailProduct from "./[id]"
 import React from 'react';
 
 export default function MenuStack(){
-
+    
+  console.log("MenuStack")
     return (
       <Stack>
         <Stack.Screen
@@ -28,6 +29,12 @@ export default function MenuStack(){
           name="order/OrderDetail" 
           options={{
             title: 'Chi tiết đơn hàng',    
+          }}
+        />
+        <Stack.Screen
+          name="order/RateFAD" 
+          options={{
+            title: 'Đánh giá sản phẩm',    
           }}
         />
         <Stack.Screen

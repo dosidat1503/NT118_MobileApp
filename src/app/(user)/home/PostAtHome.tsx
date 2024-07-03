@@ -1,30 +1,70 @@
 import axios from "axios";
 import React, { useState, useEffect, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { FlatList, ScrollView, StyleSheet } from "react-native";
+import { Dimensions, FlatList, ScrollView, StyleSheet } from "react-native";
 import PostList from "@/components/PostList";
 import { renderItemPostProp } from "@/types";
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import { itemInfoPost } from "@/types";
 import { View, Text } from "react-native";
 import RenderFooter from "@/components/RenderFooter";
+import { useSearchPostContext } from "./SearchPostContext";
 
 type PostAtHomeProp = {
-    reloadPost: boolean 
+    reloadPost: boolean,
+    isLikeAndSave?: boolean, 
+    isManagePost?: boolean,
 }
 
-export default function PostAtHome({reloadPost}: PostAtHomeProp) {
+export default function PostAtHome({reloadPost, isLikeAndSave, isManagePost}: PostAtHomeProp) {
     const [queryNotHaveResult, setQueryNotHaveResult] = useState("")
     const itemQuantityEveryLoad = 15;
-    let pageNumber = 0;
+    const [pageNumber, setPageNumber] = useState(0)
+ 
+    
 
-    const {     
-        heightScreen, widthScreen, mainColor, 
-        baseURL, setUserID, RD, textQueryPost, 
-        setTextQueryPost, selectedItem, 
-        setIsLoading, isLoading,
-    } = useCartContext();
+    const {selectedItem} = useSearchPostContext()
+    const [isLoading, setIsLoading] = useState(false) 
+    const [prepareForReloadPost, setPrepareForReloadPost] = useState(false)
+    const widthScreen = Dimensions.get("window").width
+    const heightScreen = Dimensions.get("window").height
+    const RD = widthScreen * heightScreen 
+    const mainColor = "#89CFF0" 
+    const baseURL = "http://26.85.40.176:8000/api"
+    const userID = 1 
+    let [textQueryPost, setTextQueryPost] = useState('')
+ 
 
+    const loadTextQueryPost = async () => {
+        textQueryPost = await AsyncStorage.getItem('textQueryPost') || "";
+        if (textQueryPost !== null) {
+            setTextQueryPost(textQueryPost);
+            getInforPost(); 
+        }
+    };
+
+    useEffect(() => {
+        setInfoPost([]) 
+        console.log("setPageNumber", pageNumber)
+        console.log( "đã chạy infoPost") 
+        if(pageNumber === 0){ 
+            loadTextQueryPost();
+        }
+        else{ 
+            setPageNumber(0) 
+            setPrepareForReloadPost(true)
+        }
+    }, [reloadPost]);
+
+    useEffect(() => {
+        if(prepareForReloadPost){
+            loadTextQueryPost()
+            setPrepareForReloadPost(false)
+        }
+    }, [prepareForReloadPost])
+ 
+
+    const [endPost, setEndPost] = useState(false)
     const [infoPost, setInfoPost] = useState([{
         user: {
             ID:  0,
@@ -58,7 +98,7 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
         setQueryNotHaveResult("")
         let pathAPI;
         textQueryPost === '' ? pathAPI = '/getInfoPost' : pathAPI = '/getInfoPost'
-
+ 
         const dataSendRequest = {
             textQueryPost: textQueryPost,
             topic: selectedItem.topicItem,
@@ -67,13 +107,16 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
             endDate: selectedItem.endDate,
             startIndex: pageNumber * itemQuantityEveryLoad,
             itemQuantityEveryLoad: itemQuantityEveryLoad, 
+            isLikeAndSave: isLikeAndSave,
+            isManagePost: isManagePost,
+            userID: userID,
         }
 
-        // console.log(dataSendRequest, "dataSendRequest")
+        console.log(dataSendRequest, "dataSendRequest", pageNumber, endPost, isLoading)
         
         axios.get(baseURL + pathAPI, {params: dataSendRequest})
         .then((response) => {
-            // console.log(response.data, "getInforPost2", pathAPI, textQueryPost)
+            console.log(response.data, "getInforPost2", pathAPI, textQueryPost, "d", response.data.postIDLikeAndSave, 'postIDLikeAndSave')
             let updateInfoPost = [...infoPost]
             if(
                 selectedItem.topicItem.length !== 0 
@@ -83,22 +126,40 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
             ) {
                 updateInfoPost = []
             }
-            if(response.data.infoPost.length === 0 && textQueryPost === ''){
+            if(response.data.infoPost.length === 0 && textQueryPost === '' && pageNumber === 0){
                 setQueryNotHaveResult("Không có kết quả tìm kiếm phù hợp")
                 setInfoPost([])
                 setIsLoading(false)
-                pageNumber = 0;
+                setEndPost(true)
+                setPageNumber(pageNumber + 1);
+                // setPageNumber(0);
                 return
             }
-            if(response.data.infoPost.length === 0){
-                setQueryNotHaveResult("Không có kết quả tìm kiếm phù hợp")
+            else if(response.data.infoPost.length === 0){
+                setQueryNotHaveResult("End")
                 setIsLoading(false)
-                pageNumber = 0;
+                setEndPost(true)
+                setPageNumber(pageNumber + 1);
+                // setPageNumber(0);
                 return
             } 
+            if(response.data.infoPost.length === 0 && response.data.infoPostImage.length === 0 && response.data.usersInfo.length === 0){
+                setEndPost(true)
+                setIsLoading(false)
+                console.log("endPost")
+            }
+            if(response.data.infoPost.length + infoPost.length < itemQuantityEveryLoad * (pageNumber + 1)){
+                setEndPost(true)
+                setQueryNotHaveResult("End")
+                setIsLoading(false)
+                console.log("endPost")
+            }
+            
             
             response.data.infoPost.map((item: itemInfoPost, index: any) => {
                 const imageUrls: any = []; // Khởi tạo một mảng để chứa các URL
+                let name = ""
+                let avatarURL = ""
 
                 response.data.infoPostImage.forEach((itemImage: any) => {
                     if (itemImage.POST_ID === item.POST_ID) {
@@ -106,11 +167,18 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
                     }
                 });
 
+                response.data.usersInfo.forEach((itemUser: any) => {
+                    if(itemUser.USER_ID === item.USER_ID){
+                        name = itemUser.NAME
+                        avatarURL = itemUser.AVT_URL
+                    }
+                })
+
                 updateInfoPost.push({
                     user: {
                         ID:  item.USER_ID,
-                        avatarImage: response.data.infoAvatarImage[0].URL,
-                        Name: response.data.infoUser[0].NAME,
+                        avatarImage: avatarURL,
+                        Name: name,
                     },
                     post: {
                         ID: item.POST_ID,
@@ -120,54 +188,65 @@ export default function PostAtHome({reloadPost}: PostAtHomeProp) {
                         likeQuantity: response.data.infoPost[index].LIKE_QUANTITY,
                     },
                     interact: {
-                        isLiked: false,
-                        isSaved: false,
+                        isLiked: item.IS_LIKE === 1 ? true : false,
+                        isSaved: item.IS_SAVE === 1 ? true : false,
                     }
                 }) 
             })  
 
             setInfoPost(updateInfoPost) 
             setIsLoading(false)
-            ++pageNumber;
+            setPageNumber(pageNumber + 1);
             // console.log(updateInfoPost[2].post.image, "setInfoPo1st")
         })
     } 
     
-    useEffect(() => { 
-        const getUserID = async () => {
-            const userID = await AsyncStorage.getItem("userID");
-            return userID;
-        }
-    
-        setUserID(1)
-    
-    
-        getInforPost() 
-        // console.log(infoPost, "đã chạy infoPost")
-    }, [textQueryPost, reloadPost])
+    // useEffect(() => {  
+        
+    //     setInfoPost([])
 
-    const renderItemPost = ({item}: renderItemPostProp) => (
-        <PostList 
-            infoPostItem = {item} 
-            infoPostList = {infoPost} 
-            setInfoPost = {setInfoPost} 
-            segments={[]}
-        ></PostList>
-    )
+    //     getInforPost() 
+    //     console.log( "đã chạy infoPost")
+    // }, [reloadPost])
+ 
 
-    return (
-        <View style={{ 
-            marginBottom: heightScreen * 0.14,  
-        }}>
+    const renderItemPost = ({item}: renderItemPostProp) => {
+        console.log("renderItemPost")
+        return (
+            <PostList 
+                infoPostItem = {item} 
+                infoPostList = {infoPost} 
+                setInfoPost = {setInfoPost} 
+                segments={[]}
+                isManagePost={isManagePost}
+            ></PostList>
+        )
+    }
+
+    const renderPostList =  () => {
+        return (
             <FlatList
                 data={infoPost}
                 renderItem={renderItemPost}
                 numColumns={1}
                 contentContainerStyle={{gap: 10}} 
                 ListFooterComponent={ <RenderFooter isLoading={isLoading}></RenderFooter> } 
-                onEndReached={() => getInforPost()}
+                onEndReached={() => {
+                    if(infoPost.length > 0 && endPost === false) {
+                        console.log("continue")
+                        getInforPost()
+                    }
+                }}
                 onEndReachedThreshold={0.005}
             />
+        )
+    }
+
+    return (
+        <View style={{ 
+            marginBottom: heightScreen * 0.14,  
+        }}>
+            {renderPostList()}
             {
                 queryNotHaveResult && <Text style={ styles.queryNotHaveResultText }>{queryNotHaveResult}</Text>
             } 

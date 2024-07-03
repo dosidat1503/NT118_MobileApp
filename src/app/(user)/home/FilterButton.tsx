@@ -1,11 +1,16 @@
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import React from "react"
-import { TouchableOpacity, View, StyleSheet, Text } from "react-native"
+import { TouchableOpacity, View, StyleSheet, Text, Dimensions } from "react-native"
+import { useSearchPostContext } from "./SearchPostContext";
+import { selectedType } from "./SearchPostContext";
 
-
-export default function FilterButton({ handleReloadPost } : { handleReloadPost: () => void }){
-    const { mainColor, heightScreen, widthScreen, RD, selectedItem, setSelectedItem } = useCartContext();
+export default function FilterButton({ handleReloadPost, selectedInFile } : { handleReloadPost: () => void, selectedInFile?: selectedType }){
+    const { setSelectedItem } = useSearchPostContext();
+    const widthScreen = Dimensions.get("window").width
+    const heightScreen = Dimensions.get("window").height
+    const RD = widthScreen * heightScreen 
+    const mainColor = "#89CFF0" 
 
     const styles = StyleSheet.create({
         applyFilterButtonContainer: { 
@@ -35,13 +40,14 @@ export default function FilterButton({ handleReloadPost } : { handleReloadPost: 
             fontSize: RD * 0.00004,
         },
     })
-
+    console.log("FilterButton")
     return(
         <View style={ styles.applyFilterButtonContainer } >
             <TouchableOpacity 
                 style={ styles.applyFilterButtonTouchable }
                 onPress={() => {
                     handleReloadPost()
+                    setSelectedItem(selectedInFile)
                 }}
             > 
                 <Text style={ styles.applyFilterButtonText } >Áp Dụng Bộ Lọc</Text>

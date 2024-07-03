@@ -1,33 +1,17 @@
 import { FlatList, StyleSheet, View, Text, Image, TextInput, Button,  Pressable, SectionList, Linking } from 'react-native';
-import { Stack, Link } from 'expo-router';
-import ProductListItem from '@/components/PostList'; 
-import products from '@assets/data/products';
-import { Product } from '@/types';
-// import Button from '@/components/Button';
-import { useCartContext } from '@/providers.tsx/CartProvider'; 
-import PostList, { defaultPrizzaImage } from '@/components/PostList';
+ 
+import { useCartContext } from '@/providers.tsx/CartProvider';  
 import FontAwesome from '@expo/vector-icons/FontAwesome'; 
 import { FontAwesome5 } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';  
-// import { AddPostNew } from '@/components/AddPostImage';
-// import Carousel from 'react-native-snap-carousel';
-// import { SafeAreaView } from 'react-native-safe-area-context';
+import { useEffect, useState } from 'react';   
 import { SelectList } from 'react-native-dropdown-select-list';
 import Filter, { filters } from './filter';  
-import { useNavigation } from 'expo-router';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { LogBox } from 'react-native'; 
-import * as ImagePicker from 'expo-image-picker';
-import React from 'react';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-
-import { renderItemPostProp } from '@/types';
-import PostAtHome from './PostAtHome';
-import Collapsible from 'react-native-collapsible';
-import { ScrollView } from 'react-native-gesture-handler';
-import CollapsibleFilter from './CollapsibleFilter';
+import { useNavigation } from 'expo-router'; 
+import { LogBox } from 'react-native';  
+import React from 'react'; 
 import SearchPost from './SearchPost';
+import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 LogBox.ignoreLogs(['Warning: ...']);
 
@@ -37,11 +21,8 @@ LogBox.ignoreLogs(['Warning: ...']);
 // }
 
 
-export default function TabOneScreen() {  
-
-  
-
-  const { heightScreen, widthScreen, mainColor, baseURL, setUserID, RD } = useCartContext();
+const  Home = React.memo( () => {   
+  const { heightScreen, widthScreen, mainColor, baseURL, RD } = useCartContext();
 
   const styles = StyleSheet.create({ 
     image: {
@@ -151,24 +132,38 @@ export default function TabOneScreen() {
 
   const navigation = useNavigation();
   const [image, setImage] = useState('');
-  const [imageList, setImageList] = useState<string[]>([]);
-  const [hasGalleryPermission, setHasGalleryPermission] = useState(false);
- 
+  const [imageList, setImageList] = useState<string[]>([]); 
+  
   const [expandInputPostInfo, setExpandInputPostInfo] = useState(false)
   const [topicSelectedToPost, setTopicSelectedToPost] = useState("")
-
-  const [isShowFilter, setIsShowFilter] = useState(false);
+  const [backFromAddPost, setBackFromAddPost] = useState(false)
+  // const handleBackFromAddPost = () => {
+  //   setBackFromAddPost(!backFromAddPost)
+  // } 
+  // const route = useRoute();
+  // console.log(route.params, 'route.params');
+  // const { screen } = route.params as any;
+  // useEffect(() => { setBackFromAddPost(true) }, [screen])
   
   const dataToSelectTopic = [
-    {key:'1', value:'Chọn chủ đề', disabled:true},
-    // {key:'2', value: filters[1].list[0].name},
-    // {key:'3', value:'Cameras'},
-    // {key:'4', value:'Computers', disabled:true},
-    // {key:'5', value:'Vegetables'},
-    // {key:'6', value:'Diary Products'},
-    // {key:'7', value:'Drinks'},
+    {key:'1', value:'Chọn chủ đề', disabled:true}, 
   ]
 
+  const [nameAndAVTURL, setNameAndAVTURL] = useState({name: '', url: ''})
+  const getNameAndAVTURL = async () => {
+    const NameAndAVTURL = await AsyncStorage.getItem('NameAndAVTURL'); 
+    if (NameAndAVTURL) {
+      const JSONNameAndAVTURL = JSON.parse(NameAndAVTURL )
+      setNameAndAVTURL({
+        name: JSONNameAndAVTURL.NAME,
+        url: JSONNameAndAVTURL.AVT_URL
+      })
+      console.log(JSONNameAndAVTURL, 'JSONNameAndAVTURL');
+    }
+  }
+  useEffect(() => {
+    getNameAndAVTURL() 
+  }, [])
    
   const importDataFromFilters = () => { 
     filters[1].list.forEach((item, index) => {
@@ -185,13 +180,9 @@ export default function TabOneScreen() {
   }
 
   const toogleExpand = () => {
-    navigation.navigate('AddPost' as never)
-    // setExpandInputPostInfo(!expandInputPostInfo)
+    navigation.navigate('AddPost' as never) 
   }
-  
-  const toogleCollapseFilter = () => {
-    setIsShowFilter(!isShowFilter)
-  }
+   
   
   importDataFromFilters(); // Call the function here
 
@@ -207,7 +198,7 @@ export default function TabOneScreen() {
         <View style={ [styles.createPost, expandInputPostInfo && styles.expandInputPostInfoContainer]}> 
           <Image
             style={ styles.image }
-            source={require('@assets/images/avatar.jpg')}
+            source={{ uri: nameAndAVTURL.url }}
           ></Image> 
           <View style={styles.createPostCenterContainer}>   
             <View style={styles.selectTopicToPost} >
@@ -255,9 +246,12 @@ export default function TabOneScreen() {
             ></FontAwesome>  
           </View>
         </View>   
-        <SearchPost></SearchPost>
+        <SearchPost 
+          // backFromAddPost={backFromAddPost} 
+          // setBackFromAddPost={setBackFromAddPost}
+        ></SearchPost>
       </View>  
   );
-}
+} )
 
-
+export default Home;

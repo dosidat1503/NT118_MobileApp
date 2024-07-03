@@ -1,17 +1,23 @@
 import React, { useState } from "react";
-import { TouchableOpacity, View, Text, Image, StyleSheet } from "react-native"; 
+import { TouchableOpacity, View, Text, Image, StyleSheet, Dimensions } from "react-native"; 
 import Filter from "./filter";
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import Collapsible from 'react-native-collapsible';
 
 type CollapsibleFilterProps = {
-    handleReloadPost: () => void 
+    handleReloadPost: () => void,
+    isShowFilter: boolean,
+    setIsShowFilter: (value: boolean) => void,
 }
 
-export default function CollapsibleFilter({handleReloadPost}: CollapsibleFilterProps) {
+export default function CollapsibleFilter({handleReloadPost, isShowFilter, setIsShowFilter}: CollapsibleFilterProps) {
 
-    const { heightScreen, widthScreen, mainColor, baseURL, setUserID, RD } = useCartContext();
-    
+    // const { heightScreen, widthScreen, mainColor, baseURL, setUserID, RD } = useCartContext();
+    const widthScreen = Dimensions.get("window").width
+    const heightScreen = Dimensions.get("window").height
+    const RD = widthScreen * heightScreen 
+    const mainColor = "#89CFF0" 
+
     const styles = StyleSheet.create({ 
     
         filterIcon: {
@@ -40,7 +46,6 @@ export default function CollapsibleFilter({handleReloadPost}: CollapsibleFilterP
         },
     })
 
-    const [isShowFilter, setIsShowFilter] = useState(true);
     const toogleCollapseFilter = () => {
         setIsShowFilter(!isShowFilter)
     }

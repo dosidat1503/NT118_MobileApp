@@ -1,45 +1,30 @@
-import index from "@/app";
+ 
 import { Stack, useNavigation } from "expo-router"
 import { useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View, Image, Text, Platform, Modal, TextInput, ScrollView, FlatList, PermissionsAndroid, SafeAreaView } from "react-native"
-// import { View } from "@/components/Themed"
-// import DatePicker from 'react-native-modern-datepicker' 
-import DateTimePicker from '@react-native-community/datetimepicker'
-import { FindFilterAtHome } from "@/types";
-import { defaultPrizzaImage } from "@/components/PostList";
+import { StyleSheet, TouchableOpacity, View, Image, Text, TextInput, FlatList, SafeAreaView } from "react-native"
+  
 import { SelectList } from 'react-native-dropdown-select-list';
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
-import { filters } from './filter'; 
-import CartProvider, { useCartContext } from "@/providers.tsx/CartProvider";
-// import ImagePicker from "react-native-customized-image-picker";
-import { launchImageLibrary } from "react-native-image-picker";
-// import { CameraRoll } from "react-native";
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
-// import { ImagePickerIOS } from "react-native";
+import { filters } from "./filter";
+import { useCartContext } from "@/providers.tsx/CartProvider"; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";  
 import LoadingDots from "react-native-loading-dots";
-import * as ImagePicker from 'expo-image-picker';
-import { color } from "react-native-elements/dist/helpers";
-import { uploadToFirebase } from '../../../firebase/index';
-import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker'; 
+import { uploadToFirebase } from '../../../firebase/index'; 
 import React, { useRef }  from "react";
 import Response from "@/app/(user)/Response";
+import { useRoute } from "@react-navigation/native";
 
-type changeIntervalTimeProps = {
-    item: Date,
-}
-type chooseFilterItemProps = {
-    item: never,
-    filterType: string,
-} 
-type renderFiltersListProps = {
-    item: FindFilterAtHome
+type dataToSelectTopic = {
+    key: string,
+    value: string,
+    disabled: boolean 
 }
  
 export default function AddPost() {   
 
-    const {widthScreen, heightScreen, userID, baseURL} = useCartContext();
+    const {widthScreen, heightScreen, baseURL } = useCartContext();
     const widthAvatar = widthScreen * 0.12;
     const endContainer = widthScreen * 0.15;
     const widthCenterContainer = widthScreen - widthAvatar - endContainer;
@@ -47,8 +32,7 @@ export default function AddPost() {
     const [image, setImage] = useState('');
     const [response, setResponse] = useState('');
     const [imageList, setImageList] = useState<string[]>([]);
-    const inputRef = useRef<TextInput>(null);
-    const [haveImage, setHaveImage] = useState(true)//chú ý là giá trị khởi đầu bằng true, đồng nghĩa với việc đăng bài sẽ có ảnh
+    const inputRef = useRef<TextInput>(null); 
     const [showWarning, setShowWarning] = useState(false)
 
     const styles = StyleSheet.create({
@@ -158,52 +142,60 @@ export default function AddPost() {
           }
         }
         getUserID();
+        
         if (inputRef.current) {
             inputRef.current.focus();
         }
+        let arr_dataToSelectTopic = filters[1].list.map((item, index) => {
+            return(
+                {
+                    key: `${index + 2}`,
+                    value: item.name,
+                    disabled: false
+                }
+            )
+        })
+        setDataToSelectTopic(arr_dataToSelectTopic)
     }, [])
-
-    useEffect( () => {
-        console.log('response', response)
-    }, [response])
+ 
+    const [userID, setUserID] = useState(1)
+    const [nameAndAVTURL, setNameAndAVTURL] = useState({name: '', url: ''})
+    const getNameAndAVTURL = async () => {
+        const NameAndAVTURL = await AsyncStorage.getItem('NameAndAVTURL'); 
+        const userID = await AsyncStorage.getItem('userID'); 
+        if (NameAndAVTURL) {
+            const JSONNameAndAVTURL = JSON.parse(NameAndAVTURL )
+            const JSONuserID = JSON.parse(userID || "1")
+            setNameAndAVTURL({
+                name: JSONNameAndAVTURL.NAME,
+                url: JSONNameAndAVTURL.AVT_URL
+            })
+            setUserID(JSONuserID)
+            console.log(JSONNameAndAVTURL, 'JSONNameAndAV22TURL', JSONuserID, 'JSONuserID');
+        }
+    }
+    useEffect(() => {
+        getNameAndAVTURL() 
+    }, [])
+    console.log( 'addposst')
     
     const [expandInputPostInfo, setExpandInputPostInfo] = useState(false)
     const [topicSelectedToPost, setTopicSelectedToPost] = useState("")   
-    const dataToSelectTopic: {}[] = [
-        // {key:'1', value:'Chọn chủ đề', disabled:true},
-        // {key:'2', value: filters[1].list[0].name},
-        // {key:'3', value:'Cameras'},
-        // {key:'4', value:'Computers', disabled:true},
-        // {key:'5', value:'Vegetables'},
-        // {key:'6', value:'Diary Products'},
-        // {key:'7', value:'Drinks'},
-    ]
+    const [dataToSelectTopic, setDataToSelectTopic] = useState<dataToSelectTopic[]>([])
     const [infoAddPost, setInfoAddPost] = useState({
         topic: topicSelectedToPost,
         content: '',
         imageList: [],
         userID: userID, 
     })
- 
-    const importDataFromFilters = () => { 
-        filters[1].list.forEach((item, index) => { 
-            return(
-              dataToSelectTopic.push({
-                key: `${index + 2}`,
-                value: item.name,
-                disabled: false
-              })
-            )
-          }
-        )
-    }
+    // const route = useRoute();
+    // console.log(route.params, 'route.params');
+    // const { setBackFromAddPost } = route.params as any;
     
     const toogleExpand = () => {
         navigation.navigate('AddPost' as never)
         // setExpandInputPostInfo(!expandInputPostInfo)
-    }
-    
-    
+    } 
     const pickImage = async () => {
 
         // let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -300,15 +292,16 @@ export default function AddPost() {
     }, [infoAddPost.imageList.length > 0])
     
     const renderCarouselProduct = ({item, index}: {item: any, index: number}) => {
+        console.log("renderCarouselProduct")
         return (
-          <View 
-            style={{
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                width: widthCenterContainer * 0.94,
-                marginHorizontal: widthScreen * 0.02,   
-            }}
+            <View 
+                style={{
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: widthCenterContainer * 0.94,
+                    marginHorizontal: widthScreen * 0.02,   
+                }}
             >
             <TouchableOpacity
                 style={{
@@ -345,7 +338,7 @@ export default function AddPost() {
     }
 
     return (
-        <SafeAreaView style = {{ backgroundColor: "white"}}>
+        <SafeAreaView style = {{ backgroundColor: "white"}}> 
             <View>
                 {
                     response === "" && <View style={ styles.container }  >
@@ -356,7 +349,7 @@ export default function AddPost() {
                     ]}> 
                         <Image
                             style={ styles.image }
-                            source={require('@assets/images/avatar.jpg')}
+                            source={{ uri: nameAndAVTURL.url }}
                         ></Image> 
                         <View style={styles.createPostCenterContainer}> 
                             <View style={{ 
@@ -374,17 +367,16 @@ export default function AddPost() {
                                         fontSize: 16,
                                         // position: "fixed"
                                     }}>
-                                        Đỗ Sĩ Đạt
+                                        { nameAndAVTURL.name }
                                     </Text>
                                 </View> 
-                                <View>
-                                    {importDataFromFilters()}
+                                <View> 
                                     <View style={styles.selectTopicToPost}>
                                         <SelectList
                                             setSelected={(selectedItem: any) => {setInfoAddPost({...infoAddPost, topic: selectedItem})}}
                                             data={dataToSelectTopic}
                                             placeholder='Chọn chủ đề'
-                                            defaultOption={{key:'1', value:'Chọn chủ đề', disabled:true}}
+                                            defaultOption={{key:'1', value:'Chọn chủ đề' }}
                                             boxStyles={{ 
                                                 paddingVertical: heightScreen * 0.006,
                                                 paddingHorizontal: widthScreen * 0.04,
@@ -459,7 +451,7 @@ export default function AddPost() {
                         href2="/(user)"
                         buttonIcon2="eye"
                         buttonName2="Bài Viết"
-                        buttonFunction2={() => { navigation.navigate('index' as never)}}
+                        buttonFunction2={() => {  navigation.navigate('index' as never, { screen: 'Home' }) }}
                     ></Response>
                     : <Response
                         content="Đã có lỗi xảy ra khi đăng bài. Hãy đăng lại bài viết."

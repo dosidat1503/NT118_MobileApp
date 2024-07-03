@@ -1,7 +1,7 @@
 import index from "@/app";
 import { Stack } from "expo-router"
-import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View, Image, Text, Platform, Modal, Button, Pressable, TextInput, SafeAreaView, ScrollView } from "react-native"
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { StyleSheet, TouchableOpacity, View, Image, Text, Platform, Modal, Button, Pressable, TextInput, SafeAreaView, ScrollView, Dimensions } from "react-native"
 // import { View } from "@/components/Themed"
 // import DatePicker from 'react-native-modern-datepicker' 
 // import DateTimePicker from '@react-native-community/datetimepicker'
@@ -15,6 +15,8 @@ import DateTimePicker from 'react-native-ui-datepicker';
 import dayjs from 'dayjs'; 
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import FilterButton from "./FilterButton";
+import { useSearchPostContext } from "./SearchPostContext";
+import { selectedType } from "./SearchPostContext";
  
 
 type FilterProps  = { 
@@ -101,7 +103,7 @@ export const filters = [
             },
             { 
                 id: 8,
-                name: "Dramma",
+                name: "Khác",
                 imagePath: require('@assets/images/passItem.png'),
                 isComboBoxSelected: false,
             },
@@ -121,13 +123,24 @@ export const filters = [
     } 
 ]
 
-export default function Filter({handleReloadPost}: FilterProps ) {
+const Filter = React.memo( ({handleReloadPost}: FilterProps ) => {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState(""); 
   
-    const { mainColor, heightScreen, widthScreen, RD, selectedItem, setSelectedItem } = useCartContext();
+    // const { selectedItem, setSelectedItem } = useSearchPostContext();
+    const [selectedInFile, setSelectedInFile] = useState<selectedType>({ 
+        startDate: "", 
+        endDate: "", 
+        topicItem: [], 
+        sortByItem: undefined 
+    })
     
-    const styles = StyleSheet.create({
+    const widthScreen = Dimensions.get("window").width
+    const heightScreen = Dimensions.get("window").height
+    const RD = widthScreen * heightScreen 
+    const mainColor = "#89CFF0" 
+    
+    const styles = useMemo(() => StyleSheet.create({
         container: {
             flexDirection: 'row',
             flexWrap: 'wrap',
@@ -246,53 +259,66 @@ export default function Filter({handleReloadPost}: FilterProps ) {
             justifyContent: "center",
             alignContent: "center",
             // paddingLeft: widthScreen * 0.22
+        },
+        filterItemContainer: {
+            width: "50%", 
+            justifyContent: "center", 
+            flexDirection: "row"
+        },
+        containerForDateFilter: { 
+            width: widthScreen * 0.7,
+            paddingHorizontal: widthScreen * 0.03,
+            paddingBottom: heightScreen * 0.05,
         }
-    }) 
+    }), [mainColor, heightScreen, widthScreen, RD])
     
     const handleDateChange = useCallback(({ startDate, endDate } : {startDate: any, endDate: any}) => { 
+        console.log('handleDateChange')
         const formattedStartDate = startDate ? dayjs(startDate).format('YYYY-MM-DD HH:mm:ss') : null;
         const formattedEndDate = endDate ? dayjs(endDate).format('YYYY-MM-DD HH:mm:ss') : null;
 
         setStartDate(startDate);
         setEndDate(endDate);
-        console.log(formattedStartDate, formattedEndDate, 'ok', selectedItem)
-        setSelectedItem({
-            ...selectedItem,
+        console.log(formattedStartDate, formattedEndDate, 'ok', selectedInFile)
+        setSelectedInFile({
+            ...selectedInFile,
             startDate: formattedStartDate || "",
             endDate: formattedEndDate || ""
         })
-    }, [ selectedItem ])
-    
+    }, [ selectedInFile ])
+
     // ===== CÁC BỘ LỌC THU NHỎ PHẠM VI HIỂN THỊ BÀI ĐĂNG =====
     // Bộ lọc thay đổi khoảng thời gian 
     // Bộ lọc chọn chủ đề (topic)
     const handleChooseFilterItem = useCallback((item: any, filterType: string | undefined) => {  
         //filterType là sortByItem hoặc topicItem
+        console.log('handleChooseFilterItem')
         if(filterType === filters[1].propertyNameOfSlectedItem) 
         {
             // Khi select comboBox Topic thì vào logic này
-            if(selectedItem.topicItem.includes(item))
-                setSelectedItem({
-                    ...selectedItem,
-                    topicItem: selectedItem.topicItem.filter(itemInListSelected => itemInListSelected !== item)
+            if(selectedInFile.topicItem.includes(item))
+                setSelectedInFile({
+                    ...selectedInFile,
+                    topicItem: selectedInFile.topicItem.filter(itemInListSelected => itemInListSelected !== item)
                 })
             else
-                setSelectedItem({
-                    ...selectedItem, 
-                    topicItem: [...selectedItem.topicItem, item]
+                setSelectedInFile({
+                    ...selectedInFile, 
+                    topicItem: [...selectedInFile.topicItem, item]
                 }) 
         }
         else if(filterType === filters[0].propertyNameOfSlectedItem) 
         { 
-            setSelectedItem({
-                ...selectedItem,
+            setSelectedInFile({
+                ...selectedInFile,
                 sortByItem:  item,
             }) 
         }   
-        console.log(selectedItem, 'selectedItemFilter')
-    }, [selectedItem]) 
+        console.log(selectedInFile, 'selectedItemFilter')
+    }, [ selectedInFile ])  
     
     const renderFiltersList = useCallback(( item: itemInFilterProps ) => {
+        console.log('renderFiltersList')
         let isSlected = false;
         let mainStyle = {};
         let styleIcon = {};
@@ -300,12 +326,11 @@ export default function Filter({handleReloadPost}: FilterProps ) {
         return item.list.map((itemInList, index) => {
             isSlected = false
             selectedStyle = {}
-            // console.log(selectedItem, 'selectedItem22')
+            // console.log(selectedInFile, 'selectedItem22')
             //Điều chỉnh các thuộc tính trong style cho từng loại bộ lọc là sortBy hay topic
-            
-            
+             
             if(filters[0].name === item.name){//sắp xếp theo
-                itemInList.id === selectedItem.sortByItem ? isSlected = true : isSlected = false  
+                itemInList.id === selectedInFile.sortByItem ? isSlected = true : isSlected = false  
                 mainStyle = styles.chooseTopicItem;
                 styleIcon = styles.sortByIcon;
                 selectedStyle = isSlected && styles.topicIsSelected; 
@@ -313,14 +338,14 @@ export default function Filter({handleReloadPost}: FilterProps ) {
             else if(filters[1].name === item.name){// chọn chủ đề
                 mainStyle = styles.chooseTopicItem;
 
-                isSlected = selectedItem.topicItem.includes(itemInList.id);
+                isSlected = selectedInFile.topicItem.includes(itemInList.id);
                 selectedStyle = isSlected && styles.topicIsSelected;
 
                 styleIcon = styles.topicIcon;
             }
             
             return (
-                <View style={{width: "50%", justifyContent: "center", flexDirection: "row"}} key={index}>
+                <View style={ styles.filterItemContainer } key={index}>
                     { 
                         // Nếu là bộ lọc "Sắp xếp theo" và "Chọn chủ đề" thì render ra các item trong list còn "Khoảng thời gian" thì render ra DateTimePicker
                         item.name !== "Khoảng thời gian" 
@@ -337,13 +362,7 @@ export default function Filter({handleReloadPost}: FilterProps ) {
                                 {itemInList.name}
                             </Text>   
                         </TouchableOpacity>
-                        : <View 
-                            style={{ 
-                                width: widthScreen * 0.7,
-                                paddingHorizontal: widthScreen * 0.03,
-                                paddingBottom: heightScreen * 0.05,
-                            }}
-                        >
+                        : <View  style={ styles.containerForDateFilter} >
                             <DateTimePicker
                                 height={heightScreen * 0.2}
                                 mode="range"
@@ -357,36 +376,34 @@ export default function Filter({handleReloadPost}: FilterProps ) {
                 </View>
             )
         })
-    }, [ handleChooseFilterItem,  handleDateChange])
+    }, [ handleChooseFilterItem,  handleDateChange])  
+
+    const renderFilterGroup = useCallback(() => filters.map((item, index) => (
+            <View style={ styles.chooseTopic } key={ index }> 
+                <View> 
+                    <Text style={ styles.titleChooseTopic }>
+                        {item.name}
+                    </Text>
+                </View>
+                <View style={ styles.filterListContainer }>
+                    { renderFiltersList(item) } 
+                </View>    
+            </View> 
+        ))
+    , [ selectedInFile ])
 
     return (
         <SafeAreaView
             style={ styles.container } 
-        >
-            {/* <Stack.Screen
-                options={{
-                    title: "Bộ lọc"
-                }}
-            ></Stack.Screen> */}
+        > 
             <View>
-                {
-                    filters.map((item, index) => (
-                        <View style={ styles.chooseTopic } key={ index }> 
-                            <View> 
-                                <Text style={ styles.titleChooseTopic }>
-                                    {item.name}
-                                </Text>
-                            </View>
-                            <View style={ styles.filterListContainer }>
-                                {renderFiltersList(item)}
-                            </View>    
-                        </View> 
-                    ))
-                }  
-                <FilterButton handleReloadPost={ handleReloadPost }></FilterButton>
+                { renderFilterGroup() }   
+                <FilterButton handleReloadPost={ handleReloadPost } selectedInFile={ selectedInFile } ></FilterButton>
             </View>
         </SafeAreaView>
     )
-}
+}) 
+
+export default Filter;
 
  

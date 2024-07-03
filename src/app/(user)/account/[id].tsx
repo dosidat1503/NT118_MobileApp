@@ -1,5 +1,4 @@
-import { FlatList, StyleSheet, View, Text, Image, Pressable } from 'react-native';
-import ProductListItem from '@/components/PostList'; 
+import { FlatList, StyleSheet, View, Text, Image, Pressable } from 'react-native'; 
 import products from '@assets/data/products';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { defaultPrizzaImage } from '@/components/PostList';

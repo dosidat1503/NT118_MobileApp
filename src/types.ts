@@ -60,6 +60,8 @@ export type renderItemPostProp = {
 }
 
 export interface itemInfoPost {
+  IS_SAVE: number;
+  IS_LIKE: number;
   LIKE_QUANTITY: number;
   CONTENT: string;
   POST_ID: number;

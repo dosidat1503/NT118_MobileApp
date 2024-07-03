@@ -16,7 +16,7 @@ LogBox.ignoreLogs(['Warning: ...']);
 
 const index = () => {
   const [users, setUsers] = useState<any[]>([]);
-  const {heightScreen, widthScreen, mainColor, baseURL, isLoading, setIsLoading} = useCartContext();
+  const {heightScreen, widthScreen, mainColor, baseURL } = useCartContext();
   const styles = StyleSheet.create({
       divContainer: {
           width: widthScreen,
@@ -45,6 +45,7 @@ const index = () => {
   const [rememberPassword, setRememberPassword] = useState(false);
 
   const [errorText, setErrorText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {

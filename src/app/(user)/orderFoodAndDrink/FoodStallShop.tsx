@@ -1,48 +1,50 @@
 import { Stack } from "expo-router";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Pressable, FlatList } from "react-native";
-import SlideHeaderOrderFAD from "@/components/orderFAD/SlideHeaderOrderFAD";
-import { defaultPrizzaImage } from "@/components/PostList"; 
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Pressable, FlatList } from "react-native"; 
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";  
 import InfoShop from "@/components/orderFAD/FoodStallShop/InfoShop";
 import { InfoFADofShop } from "@/components/orderFAD/FoodStallShop/InfoFADofShop";
 import { BackHandler } from "react-native";
-import { useEffect, useState } from "react";
-import { useNavigation } from '@react-navigation/native';
+import { useEffect, useState } from "react"; 
 import { useCartContext } from "@/providers.tsx/CartProvider"; 
 import { Link } from "expo-router"; 
 import axios from "axios";
-import LoadingDots from "react-native-loading-dots";
 import Loading from "@/components/Loading";
 import React from "react";
-import Voucherdetail from "./VoucherDetail";
+import VoucherScreen from "./VoucherScreen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type InfoShopProp = {
     COVER_IMAGE_URL: string
 }
 
 export default function FoodStallShop() { 
-    const {heightScreen, widthScreen, mainColor, FADShop_ID, baseURL, isLoading, setIsLoading} = useCartContext();
- 
+    const {heightScreen, widthScreen, mainColor, baseURL } = useCartContext();
+    let FADShop_ID = 0;
+    useEffect(() => {
+        const loadFADShop_ID = async () => {
+            FADShop_ID = parseInt(await AsyncStorage.getItem('FADShop_ID') || "0");   
+            getShopInfo();
+        }   
+        loadFADShop_ID()
+    }, [])
+    const [isLoadingFADShop, setIsLoadingFADShop] = useState(true)
     const [infoShop, setInfoShop] = useState<InfoShopProp | undefined>(undefined) 
     const getShopInfo = () => { 
         axios.get(baseURL + '/getFADShopDetailInfo', { params: { shop_id: FADShop_ID } })
         .then( (res) => {
-            console.log(res.data, "FADShopDetailInfo")
+            // console.log(res.data, "FADShopDetailInfo")
+            console.log("FoodStallShop ham getShopInfo")
             setInfoShop(res.data.shop[0])
-            setIsLoading(false)
+            setIsLoadingFADShop(false)
         })
     }
+
     useEffect(() => {
         const backHandle = BackHandler.addEventListener("hardwareBackPress", handleBackPress) 
-        setIsLoading(true)
-        getShopInfo();
+        setIsLoadingFADShop(true)
         return backHandle.remove()
-    }, [])
-
-
-    useEffect(() => {
-        console.log(infoShop, "infoShop")
-    }, [infoShop])
+    }, []) 
+ 
 
     const handleBackPress = () => { 
         return true; // Trả về true để ngăn chặn việc thoát ứng dụng
@@ -85,6 +87,7 @@ export default function FoodStallShop() {
             width: widthScreen
         }
     })
+
     return ( 
         <FlatList
             data={[]}  // Không có dữ liệu cụ thể cho danh sách này
@@ -119,55 +122,25 @@ export default function FoodStallShop() {
                         }}
                     ></Stack.Screen>  
                     {
-                        isLoading 
+                        isLoadingFADShop 
                         ? ""
-                        : <View> 
+                        :  <View> 
                             {/* Hiển thị ảnh cover */}
                             <Image
                                 source={{ uri: infoShop?.COVER_IMAGE_URL }}
                                 style={styles.cover}
-                            ></Image>  
-
-                            {/* Nút back */}
-                            {/* <TouchableOpacity 
-                                onPress={handleBackPress}
-                                style={styles.touchableBack}
-                            >
-                                <FontAwesome5 
-                                name="arrow-circle-left"
-                                color="#89CFF0"
-                                size={30}
-                                style={styles.backIcon}
-                                />
-                            </TouchableOpacity> */}
-
-                            {/* Nút giỏ hàng */}
-                                {/* <TouchableOpacity 
-                                    onPress={handleBackPress}
-                                    style={styles.touchableCart}
-                                >
-                                    
-                                    <Link href="/(user)/orderFoodAndDrink/Cart"> 
-                                        <FontAwesome5 
-                                        name="shopping-cart"
-                                        color="#89CFF0"
-                                        size={30}
-                                        // style={styles.cartIcon}
-                                        />
-                                    </Link>
-                                </TouchableOpacity> */}
-                            {/* Thông tin shop */}
-                            
+                            ></Image>   
                             <InfoShop infoShop={infoShop}></InfoShop>
 
                             {/* Thông tin sản phẩm của shop */}
                             <InfoFADofShop></InfoFADofShop>
 
                             {/* Xoan code hiển thị thông tin voucher ở đây */}
-                            <Voucherdetail></Voucherdetail>
+                            
+
+                            <VoucherScreen></VoucherScreen>
                         </View> 
-                    }
-                    <Loading></Loading>
+                    } 
                 </View>
             }
             // ListFooterComponent={} 

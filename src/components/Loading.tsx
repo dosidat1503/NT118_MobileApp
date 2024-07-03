@@ -4,7 +4,7 @@ import { useCartContext } from "@/providers.tsx/CartProvider";
 import React from "react";
 
 export default function Loading() {
-    const {heightScreen, widthScreen, isLoading} = useCartContext();
+    const {heightScreen, widthScreen} = useCartContext();
     const styles = StyleSheet.create({
         displayNone: {
             display: "none"
@@ -23,7 +23,7 @@ export default function Loading() {
         },
     })
     return(
-        <View style={[styles.loadingScreen, isLoading ? {} : styles.displayNone]}>
+        <View style={[styles.loadingScreen ]}>
             <View style={styles.dotsWrapper}>
                 <LoadingDots />
             </View>

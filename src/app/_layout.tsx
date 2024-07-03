@@ -53,18 +53,17 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   // const Stack = createStackNavigator();
-
+  console.log("colorScheme")
   return (
     <Fragment>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <CartProvider>
+        <CartProvider> 
           <Stack>
             <Stack.Screen name="(user)" options={{ headerShown: false }} />
             <Stack.Screen name="(admin)" options={{ headerShown: false }} /> 
             <Stack.Screen name="signUp" options={{ headerShown: false }} />
             <Stack.Screen name="signUpSuccess" options={{ headerShown: false }} /> 
-            {/* <Stack.Screen name="(user)/home/filter" options={{ headerShown: false }} />  */}
-             
+            {/* <Stack.Screen name="(user)/home/filter" options={{ headerShown: false }} />  */} 
           </Stack> 
         </CartProvider>
       </ThemeProvider >

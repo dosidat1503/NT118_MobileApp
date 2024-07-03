@@ -13,7 +13,7 @@ interface ButtonProps {
 export default function Button({iconName, buttonName, handlePress, color}: ButtonProps) { 
 
     const {widthScreen, heightScreen} = useCartContext();
-
+    console.log("  color: ", color);
     const styles = StyleSheet.create({
         button: {
             backgroundColor: color ? color : '#3498db',

@@ -1,8 +1,9 @@
-import { PropsWithChildren, createContext, useContext, useState } from "react";
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 import { Dimensions } from "react-native";
 import { CartItem, Product } from "@/types";
 import {randomUUID} from 'expo-crypto' 
 import React from 'react';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type productsProp = {
     id: number,
@@ -13,120 +14,163 @@ type productsProp = {
 
 type selectedItemProp = {
     topicItem: any[],
-    sortByItem: number,
+    sortByItem: number, 
     startDate: string,
     endDate: string 
 }
 
+type toppingType = {
+    id: number,
+    name: string,
+    price: number,
+    quantity: number
+}
+
+type productListType = {
+    id: number,
+    name: string,
+    price: number,
+    size: string,
+    toppings: toppingType[], 
+    quantity: number,
+    totalOfItem: number 
+}
+
+type orderInforType = {
+    deliveryInfo: { 
+        id: number,
+        name: string,
+        phone: string,
+        address: string,
+        isDefault: boolean,
+        isChoose: boolean
+    },
+    productList: productListType[],
+    paymentMethod: string,
+    note: string,
+    discountValue: number,
+    paymentStatus: number,
+    voucherCODE: string,
+    paymentTotal: number,
+    userID: number 
+}
+
 type CartType = {
-    items: CartItem[],
-    addItem: (product: Product, size: CartItem['size']) => void,
-    updateQuantity: (itemId: string, amount: -1 | 1) => void,
-    total: number,
+    // items: CartItem[],
+    // addItem: (product: Product, size: CartItem['size']) => void,
+    // updateQuantity: (itemId: string, amount: -1 | 1) => void,
+    // total: number,
     widthScreen: number,
     heightScreen: number,
     mainColor: string,
-    products: productsProp[],
-    itemListInCart: any,
-    setItemListInCart: any,
+    products: productsProp[], 
     baseURL: string,
     emailPattern: RegExp,
     phoneNumberPattern: RegExp,
     fullNamePattern: RegExp, 
     defaultImageID: number,
-    textQueryPost: string,
-    setTextQueryPost: any,
+    // textQueryPost: string,
+    // setTextQueryPost: any,
     orderStatusList: any,
     userID: number,
-    setUserID: any,
-    FADShop_ID: number,
-    setFADShop_ID: any,
-    DetailInfoOfFAD: any,
-    setDetailInfoOfFAD: any,
-    isLoading: boolean,
-    setIsLoading: any,
-    RD: number, //rectangular diagonal 
-    orderID: number,
-    setOrderID: any, 
-    selectedItem: selectedItemProp,
-    setSelectedItem: any,
-    textToSearchFAD: string,
-    setTextToSearchFAD: any,
-    dataHadChosenToFilter: any,
-    setDataHadChosenToFilter: any,
-    tagIDToGetFADInfo: number, 
-    setTagIDToGetFADInfo: any,
+    setUserID: any, 
+    setFADShop_ID: any,  
+    setDetailInfoOfFAD: any, 
+    RD: number, //rectangular diagonal  
+    setOrderID: any,   
+    setTextToSearchFAD: any,  
+    setTagIDToGetFADInfo: any, 
+    setVnpURL: any,
+    // deliveryInfoItem: any,
+    // setDeliveryInfoItem: any, 
+    isUpdatedInfoDelivery: boolean,
+    setIsUpdatedInfoDelivery: any, 
+    setOrderInfo: any, 
+    setShopID: any, 
+    setContentForOrderSuccess: any,
+    returnHome: boolean,
+    setReturnHome: any
 }
 
 const CartContext = createContext<CartType>({
-    items: [],
-    addItem: () => {},
-    updateQuantity: () => {},
-    total: 0,
+    // items: [],
+    // addItem: () => {},
+    // updateQuantity: () => {},
+    // total: 0,
     widthScreen: 0,
     heightScreen: 0,
     mainColor: "#89CFF0",
-    products: [],
-    itemListInCart: [],
-    setItemListInCart: () => {},
+    products: [],  
     baseURL: "http://26.85.40.176:8000/api",
     emailPattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
     phoneNumberPattern: /^0\d{9}$/,
     fullNamePattern: /^[\p{L}\s]+$/u, 
     defaultImageID: 1,
-    textQueryPost: "",
-    setTextQueryPost: () => {},
+    // textQueryPost: "",
+    // setTextQueryPost: () => {},
     orderStatusList: [],
     userID: 0,
-    setUserID: () => {},
-    FADShop_ID: 0, 
-    setFADShop_ID: () => {},
-    DetailInfoOfFAD: {},
-    setDetailInfoOfFAD: () => {},
-    isLoading: true,
-    setIsLoading: () => {},
-    RD: 0,
-    orderID: 1,
-    setOrderID: () => {},  
-    selectedItem: {
-        topicItem: [],
-        sortByItem: 0,
-        startDate: "",
-        endDate: "" 
-    },
-    setSelectedItem: () => {},
-    textToSearchFAD: "",
-    setTextToSearchFAD: ()=> {},
-    dataHadChosenToFilter: {},
-    setDataHadChosenToFilter: () => {},
-    tagIDToGetFADInfo: 0, 
-    setTagIDToGetFADInfo: () => {},
+    setUserID: () => {}, 
+    setFADShop_ID: () => {},  
+    setDetailInfoOfFAD: () => {}, 
+    RD: 0, 
+    setOrderID: () => {},    
+    setTextToSearchFAD: ()=> {},  
+    setTagIDToGetFADInfo: () => {}, 
+    setVnpURL: () => {},
+    // deliveryInfoItem: {},
+    // setDeliveryInfoItem: () => {}, 
+    isUpdatedInfoDelivery: false,
+    setIsUpdatedInfoDelivery: () => {},
+    // orderInfo: {
+    //     deliveryInfo: {
+    //         id: 0,
+    //         name: "",
+    //         phone: "",
+    //         address: "",
+    //         isDefault: false,
+    //         isChoose: false
+    //     },
+    //     productList: [],
+    //     paymentMethod: "",
+    //     note: "",
+    //     discountValue: 0,
+    //     paymentStatus: 1,
+    //     voucherCODE: "",
+    //     paymentTotal: 0,
+    //     userID: 0,
+    // },
+    setOrderInfo: () => {},  
+    setShopID: () => {}, 
+    setContentForOrderSuccess: () => {},
+    returnHome: false,
+    setReturnHome: () => {}
 });
 
 const CartProvider = ({children} : PropsWithChildren) => {
-    const [items, setItems] = useState<CartItem[]>([])
-    const addItem = (product: Product, size: CartItem['size']) => {
-        const existingItem = items.find(item => item.product === product && size === item.size)
+    // const [items, setItems] = useState<CartItem[]>([])
+    // const addItem = (product: Product, size: CartItem['size']) => {
+    //     const existingItem = items.find(item => item.product === product && size === item.size)
 
-        if(existingItem){
-            updateQuantity(existingItem.id, 1);
-            return;
-        }
+    //     if(existingItem){
+    //         updateQuantity(existingItem.id, 1);
+    //         return;
+    //     }
 
-        const newCartItem: CartItem = {
-            id: randomUUID(),
-            product,
-            product_id: product.id,
-            size,
-            quantity: 1
-        }
-        setItems([newCartItem, ...items]);
-    }
-    const updateQuantity = (itemId: string, amount: -1 | 1) => {
-        const updateItems = items.map((item) => item.id === itemId ? {...item, quantity: item.quantity + amount} : item)
-        setItems(updateItems);
-    }
-    const total = items.reduce((sum, item) => (sum += item.product.price * item.quantity), 0);
+    //     const newCartItem: CartItem = {
+    //         id: randomUUID(),
+    //         product,
+    //         product_id: product.id,
+    //         size,
+    //         quantity: 1
+    //     }
+    //     setItems([newCartItem, ...items]);
+    // }
+    // const updateQuantity = (itemId: string, amount: -1 | 1) => {
+    //     const updateItems = items.map((item) => item.id === itemId ? {...item, quantity: item.quantity + amount} : item)
+    //     setItems(updateItems);
+    // }
+    // const total = items.reduce((sum, item) => (sum += item.product.price * item.quantity), 0);
     const widthScreen = Dimensions.get("window").width
     const heightScreen = Dimensions.get("window").height
     const mainColor = "#89CFF0"
@@ -135,14 +179,41 @@ const CartProvider = ({children} : PropsWithChildren) => {
     const phoneNumberPattern = /^0\d{9}$/
     const fullNamePattern = /^[\p{L}\s]+$/u
     const defaultImageID = 1
-    const [textQueryPost, setTextQueryPost] = useState("") 
-    const [userID, setUserID] = useState(0)
-    const [FADShop_ID, setFADShop_ID] = useState(0)
-    const [DetailInfoOfFAD, setDetailInfoOfFAD] = useState({} as any) // Fix: Update the type of DetailInfoOfFAD to any
-    const [isLoading, setIsLoading] = useState(false)
-    const RD = widthScreen * heightScreen;//rectangular diagonal
-    const [orderID, setOrderID] = useState(1) // Fix: Update the type of orderDetailID to number 
-    const [textToSearchFAD, setTextToSearchFAD] = useState("")
+    // const [textQueryPost, setTextQueryPost] = useState("") 
+    const [userID, setUserID] = useState(1)
+    // const [FADShop_ID, setFADShop_ID] = useState(0) 
+    const setFADShop_ID = (id: number) => {
+        AsyncStorage.setItem('FADShop_ID', id.toString());
+    } 
+    // const [DetailInfoOfFAD, setDetailInfoOfFAD] = useState({} as any) // Fix: Update the type of DetailInfoOfFAD to any
+    const setDetailInfoOfFAD = (data: any) => {
+        AsyncStorage.setItem('DetailInfoOfFAD', JSON.stringify(data));
+    }  
+    const setOrderID = (id: number) => {
+        AsyncStorage.setItem('orderID', id.toString());
+    } 
+    const setTextToSearchFAD = (text: string) => {
+        AsyncStorage.setItem('textToSearchFAD', text);
+    }
+
+    const setVnpURL = (url: string) => {
+        AsyncStorage.setItem('vnpURL', url);
+    }
+    // const setIsUpdatedInfoDelivery = (value: boolean) => {
+    //     AsyncStorage.setItem('isUpdatedInfoDelivery', value.toString());
+    // }
+    const [isUpdatedInfoDelivery, setIsUpdatedInfoDelivery] = useState(false) // Fix: Update the type of isUpdatedInfoDelivery to boolean
+    const setShopID = (id: number) => {
+        AsyncStorage.setItem('shopID', id.toString());
+    }
+    const setContentForOrderSuccess = (content: string) => {
+        AsyncStorage.setItem('contentForOrderSuccess', content);
+    }
+    const setTagIDToGetFADInfo = (id: number) => {
+        AsyncStorage.setItem('tagIDToGetFADInfo', id.toString());
+    }
+    const RD = widthScreen * heightScreen;//rectangular diagonal      
+    const [returnHome, setReturnHome] = useState(false) // Fix: Update the type of returnHome to boolean
     
     const products = [
         {
@@ -216,23 +287,6 @@ const CartProvider = ({children} : PropsWithChildren) => {
         },
     ];
 
-    const [itemListInCart, setItemListInCart] =  useState([
-        {
-            name: "Cơm sườn",
-            price: 45000,
-            sizes: [
-                { label: 'M', checked: false },
-                { label: 'L', checked: false }, 
-            ],
-            toppings: [
-                { label: 'Thạch', quantity: 0 },
-                { label: 'Trân châu trắng', quantity: 0}, 
-            ],
-            note: "",
-            quantity: 1
-        }
-    ])
-
     const orderStatusList = [
         { id: 1, name: "Chờ xác nhận", icon: "clock"},
         { id: 2, name: "Đang chuẩn bị", icon: "clock" },
@@ -240,42 +294,70 @@ const CartProvider = ({children} : PropsWithChildren) => {
         { id: 4, name: "Đã giao", icon: "clipboard-check" },
         { id: 5, name: "Đã hủy", icon: "window-close" }
     ]
-    
-    const [selectedItem, setSelectedItem] = useState({
-        topicItem: [],
-        sortByItem: 0,
-        startDate: "",
-        endDate: "", 
-    }) 
+     
+    // const [deliveryInfoItem, setDeliveryInfoItem] = useState({ 
+    //     name: "",
+    //     phone: 0,
+    //     address: "",
+    // })
 
-    const [dataHadChosenToFilter, setDataHadChosenToFilter] = useState({
-        range: [5, 400],
-        FADtype: 0,
-        deliveryType: 0,
-        sortType: 0,
-    });
-    const [tagIDToGetFADInfo, setTagIDToGetFADInfo] = useState(0)
+    const setOrderInfo = (orderInfo: orderInforType) => {
+        AsyncStorage.setItem('orderInfo', JSON.stringify(orderInfo));
+    }
+
+    // const [orderInfo, setOrderInfo] = useState<orderInforType>({
+    //     deliveryInfo: {
+    //         id: 1,
+    //         name: "Đỗ Phạm Hoàng Ân",
+    //         phone: "0968795750",
+    //         address: "Toà B4, KTX Khu B",
+    //         isDefault: true,
+    //         isChoose: true
+    //     },
+    //     productList: [
+    //         {
+    //             id: 1,
+    //             name: "trà sữa ô long",
+    //             price: 30000,
+    //             size: "M",
+    //             toppings: [
+    //                 { id: 1, name: 'Thạch', price: 5000, quantity: 0 },
+    //                 { id: 2, name: 'Trân châu trắng', price: 5000, quantity: 0}, 
+    //             ], 
+    //             quantity: 1, 
+    //             totalOfItem: 30000
+    //         } 
+    //     ], 
+    //     paymentMethod: "Tiền mặt",
+    //     note: "",
+    //     paymentStatus: 0,
+    //     voucherCODE: "",
+    //     discountValue: 0,
+    //     paymentTotal: 0,
+    //     userID: userID
+    // }) 
  
     return (
         <CartContext.Provider value={{
-            items, addItem, updateQuantity, total, 
-            heightScreen, widthScreen, mainColor, products, 
-            itemListInCart, setItemListInCart,
+            // items, addItem, updateQuantity, total, 
+            heightScreen, widthScreen, mainColor, products,  
             baseURL, emailPattern, phoneNumberPattern, fullNamePattern, // Fix: Update the type of emailPattern to string
-            defaultImageID, textQueryPost, setTextQueryPost,
+            defaultImageID, 
+            // textQueryPost, setTextQueryPost,
             orderStatusList, userID, setUserID,
-            setFADShop_ID, FADShop_ID,
-            DetailInfoOfFAD, setDetailInfoOfFAD,
-            isLoading, setIsLoading, RD, 
-            selectedItem, setSelectedItem, orderID, setOrderID,
-            textToSearchFAD, setTextToSearchFAD, 
-            dataHadChosenToFilter, setDataHadChosenToFilter,
-            tagIDToGetFADInfo, setTagIDToGetFADInfo,
+            setFADShop_ID, 
+            setDetailInfoOfFAD, RD,  setOrderID,
+            setTextToSearchFAD,  setTagIDToGetFADInfo,
+            setVnpURL,
+            // deliveryInfoItem, setDeliveryInfoItem,
+            setIsUpdatedInfoDelivery,  setOrderInfo, setShopID,
+            setContentForOrderSuccess,  
+            returnHome, setReturnHome,
+            isUpdatedInfoDelivery,
         }}> 
             {children}
         </CartContext.Provider>
-    )  
-
+    )   
 }
 
 export default CartProvider;
