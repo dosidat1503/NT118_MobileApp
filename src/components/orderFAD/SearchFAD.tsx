@@ -2,17 +2,18 @@ import { View, TextInput, StyleSheet, TouchableOpacity, Pressable } from "react-
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import { Link, Stack, useNavigation } from "expo-router";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 export default function SearchFAD() {
-    const { heightScreen, widthScreen, mainColor, textToSearchFAD, setTextToSearchFAD, setTagIDToGetFADInfo } = useCartContext();
+    const { heightScreen, widthScreen, mainColor,  setTagIDToGetFADInfo } = useCartContext();
     
     const heightSearchFAD = heightScreen * 0.06;
     const widthSearchFAD = widthScreen * 0.7;
     const widthPaddingSearchFAD = widthScreen * 0.04
 
-    const styles = StyleSheet.create({ 
+    const styles = useMemo(() => StyleSheet.create({ 
         searchFADIcon: {
             // paddingVertical: "auto",
             alignSelf: 'center',
@@ -45,8 +46,12 @@ export default function SearchFAD() {
             flexDirection: 'row',
             justifyContent: 'center'
         },
-    })
+    }), [])
 
+    const [textToSearchFAD, setTextToSearchFAD] = useState("")
+    useEffect(() => {
+        AsyncStorage.setItem('textQueryPost', textToSearchFAD);
+      }, [textToSearchFAD]);
     const navigation = useNavigation();
 
     const handleSearch = () => {
