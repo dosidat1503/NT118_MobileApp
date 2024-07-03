@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "648313110076",
+    "project_id": "nt118-firebase-a9bb2",
+    "storage_bucket": "nt118-firebase-a9bb2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648313110076:android:5d63f5f8ec9405fccf4d39",
+        "android_client_info": {
+          "package_name": "com.nt118.pushNotification"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEDDJm_wuWy6livL1bGROQvjocyFP2aBc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

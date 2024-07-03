@@ -3,8 +3,10 @@ import { View, Text, Image, StyleSheet } from "react-native";
 import { useCartContext } from "@/providers.tsx/CartProvider";
 import { defaultPrizzaImage } from "@/components/PostList";
 import { FontAwesome, FontAwesome5 } from "@expo/vector-icons";
+import React from "react";
+import { rateProps } from "./DetailInfoOfFAD";
 
-export default function ReviewShop() {
+export default function ReviewShop( rateInfo: rateProps ) {
     const { heightScreen, widthScreen } = useCartContext();
     
     const heightReviewShop = heightScreen * 0.08; 
@@ -29,8 +31,9 @@ export default function ReviewShop() {
         reviewShopItem: {
             flexDirection: 'row',
             alignItems: "center",
+            justifyContent: "space-between",
             paddingVertical: heightScreen * 0.01,
-            paddingHorizontal: widthScreen * 0.07,
+            paddingHorizontal: widthScreen * 0.04,
             width: widthScreen * 0.95,
             borderBottomWidth: 1,
             borderBottomColor: "#89CFF0"
@@ -72,7 +75,7 @@ export default function ReviewShop() {
             marginLeft: widthScreen * 0.03
         }
     })
-    for(let i = 0; i < 5; i++){
+    for(let i = 0; i < rateInfo.STAR_QUANTITY_RATE; i++){
         stars.push(
             <FontAwesome
                 name="star"
@@ -85,19 +88,24 @@ export default function ReviewShop() {
             <View style={styles.reviewShopContainer}>
                 {/* avatar & name shop */}
                 <View style={styles.reviewShopItem}>
-                    <Image
-                        source={{uri: defaultPrizzaImage}}
-                        style={styles.avatar}
-                    />
-                    <View style={styles.nameAndStarContainer}>
-                        <Text
-                            style={styles.nameShopText}
-                        >
-                            Trần thị mỹ xoan
-                        </Text>
-                        <View style={styles.starContainer}>
-                            {stars}
+                    <View style={{ flexDirection: "row" }}>
+                        <Image
+                            source={{uri: rateInfo.USER_AVT_URL}}
+                            style={styles.avatar}
+                        />
+                        <View style={styles.nameAndStarContainer}>
+                            <Text
+                                style={styles.nameShopText}
+                            >
+                                {rateInfo.NAME}
+                            </Text>
+                            <View style={styles.starContainer}>
+                                {stars}
+                            </View>
                         </View>
+                    </View>
+                    <View>
+                        <Text>{rateInfo.DATE_RATE}</Text>
                     </View>
                 </View> 
 
@@ -105,7 +113,7 @@ export default function ReviewShop() {
                 <View style={styles.reviewShopItem}>
                     <Text
                         style={styles.reviewText}
-                    >Đánh giá và nhận xét</Text> 
+                    >{rateInfo.CONTENT_RATE}</Text> 
                 </View>   
             </View>
         </View>

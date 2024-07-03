@@ -12,7 +12,7 @@ import Loading from '@/components/Loading';
 // import index from '.';
 
 export default function SignUp () { 
-  const {heightScreen, widthScreen, mainColor, baseURL, emailPattern, phoneNumberPattern, fullNamePattern, isLoading, setIsLoading} = useCartContext();
+  const {heightScreen, widthScreen, mainColor, baseURL, emailPattern, phoneNumberPattern, fullNamePattern } = useCartContext();
     const styles = StyleSheet.create({
         divContainer: {
             width: widthScreen,
@@ -51,6 +51,7 @@ export default function SignUp () {
       repeatPassword: true, 
     });
 
+    const [isLoading, setIsLoading] = useState(false);
     const navigation = useNavigation();
 
     const handleInputInfo = (key: string, value: any) => {
@@ -162,8 +163,7 @@ export default function SignUp () {
           <TextInput
               style={styles.input}
               placeholder="Họ và tên"
-              placeholderTextColor={'gray'} 
-              style={styles.input}
+              placeholderTextColor={'gray'}  
               onChangeText={text => handleInputInfo('fullname', text)}
               value={signUpInfo.fullname}
           />

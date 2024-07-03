@@ -10,6 +10,8 @@ import React, { useState, useEffect } from 'react';
 import ItemType1 from "@/components/orderFAD/Payment/ItemType1";
 import axios from "axios";
 import Loading from "@/components/Loading";
+import { useRoute } from "@react-navigation/native";
+import { orderInforType } from "../../orderFoodAndDrink/Payment";
 
 interface ItemProductProps {
     PRICE: any;
@@ -28,9 +30,10 @@ interface ItemToppingProps {
 }
 
 export default function Payment() {
-    const { heightScreen, widthScreen, mainColor, baseURL, userID, setIsLoading, isLoading, orderID } = useCartContext(); 
+    const { heightScreen, widthScreen, mainColor, baseURL, userID } = useCartContext(); 
     const avatarSize = widthScreen * 0.13;
 
+    const [isLoading, setIsLoading] = useState(true);
     const styles = StyleSheet.create({
         titleContainer: {  
             width: widthScreen,
@@ -193,48 +196,68 @@ export default function Payment() {
             alignItems: "center",
         }
     })
-    const [array_itemListInCart, setArray_itemListInCart] = useState<any[]>([]);
-    const [deliveryInfo, setDeliveryInfo] = useState<any>({}); 
-    const [isCash, setIsCash] = useState(true);
-    const [orderInfo, setOrderInfo] = useState({
+    // let orderInfo = {};
+    // useEffect(() => {
+    //     const loadorderInfo = async () => {
+    //         orderInfo = parseInt(await AsyncStorage.getItem('orderInfo') || "1"); 
+    //     }   
+    //     loadorderInfo()
+    // })
+
+    // let orderID = 0;
+    // useEffect(() => {
+    //     const loadorderID = async () => {
+    //         orderID = parseInt(await AsyncStorage.getItem('orderID') || "1"); 
+    //     }   
+    //     loadorderID()
+    // })
+
+    const [orderInfo, setOrderInfo] = useState<orderInforType>({
         deliveryInfo: {
             id: 1,
             name: "Đỗ Phạm Hoàng Ân",
             phone: "0968795750",
-            address: "Toà B4, KTX Khu B", 
+            address: "Toà B4, KTX Khu B",
+            isDefault: true,
+            isChoose: true
         },
         productList: [
             {
                 id: 1,
                 name: "trà sữa ô long",
                 price: 30000,
-                uri: "",
-                sizes: [
-                    { label: 'M', checked: true },
-                    { label: 'L', checked: false }, 
-                ],
+                size: "M",
                 toppings: [
-                    { name: 'Thạch', price: 5000, quantity: 0 },
-                    { name: 'Trân châu trắng', price: 5000, quantity: 0}, 
-                ],
-                note: "",
+                    { id: 1, name: 'Thạch', price: 5000, quantity: 0 },
+                    { id: 2, name: 'Trân châu trắng', price: 5000, quantity: 0}, 
+                ], 
                 quantity: 1, 
                 totalOfItem: 30000
             } 
         ], 
-        paymentMethod: "COD",
-        voucherID: 1,
-        paymentAmount: 0,
-        userID: userID
+        paymentMethod: "Tiền mặt",
+        note: "",
+        paymentStatus: 0,
+        voucherCODE: "",
+        discountValue: 0,
+        paymentTotal: 0,
+        userID: userID, 
+        shopID: 1
     }) 
-    
+
+    const route = useRoute();
+    const { orderID } = route.params as { orderID: number };
+
+    const [array_itemListInCart, setArray_itemListInCart] = useState<any[]>([]); 
+    const [isCash, setIsCash] = useState(true); 
     useEffect(() => {   
         const getAdress = async () => {
-            const totalChecked = array_itemListInCart.reduce(((total, item) => item.isCheckedForPayment === true ? total += item.totalOfItem : total), 0);
-            console.log(orderID, "orderID")
+            // const totalChecked = array_itemListInCart.reduce(((total, item) => item.isCheckedForPayment === true ? total += item.totalOfItem : total), 0);
+            console.log(orderID, "or22d3erID")
+            setIsLoading(true)
             axios.get(baseURL + "/getOrderDetailInfo", {params: { orderID: orderID}})
             .then((response) => {  
-                console.log(response.data.imagesURL, 'imagesURL')
+                // console.log(response.data.imagesURL, 'imagesURL')
                 let indexURL = 0;
                 setOrderInfo({  
                     ...orderInfo,
@@ -257,7 +280,7 @@ export default function Payment() {
                                 itemMainFAD.fad.IMAGE_ID
                             )
                             let imageObject = response.data.imagesURL.find((item: { IMAGE_ID: any; URL: any; }) => item.IMAGE_ID === itemMainFAD.fad.IMAGE_ID);
-                            console.log(imageObject, 'imageObject')
+                            // console.log(imageObject, 'imageObject')
                             return {
                                 id: itemMainFAD.ORDER_DETAIL_ID, 
                                 name: itemMainFAD.fad.FAD_NAME,
@@ -272,7 +295,7 @@ export default function Payment() {
                                 toppings: response.data.orderDetailInfo[0].order_details.filter((itemSubFAD: ItemProductProps) => {
                                         return itemMainFAD.ORDER_DETAIL_ID === itemSubFAD.ID_PARENT_OD_OF_THIS_OD && itemMainFAD.ORDER_DETAIL_ID !== null;
                                     }).map((itemSubFAD: ItemProductProps) => {
-                                        console.log(itemMainFAD.ORDER_DETAIL_ID, itemSubFAD.fad.FAD_NAME, 'itemSubFAD.ID_PARENT_OD_OF_THIS_OD', itemSubFAD, 'total', totalOfItem);
+                                        // console.log(itemMainFAD.ORDER_DETAIL_ID, itemSubFAD.fad.FAD_NAME, 'itemSubFAD.ID_PARENT_OD_OF_THIS_OD', itemSubFAD, 'total', totalOfItem);
                                         totalOfItem += itemSubFAD.PRICE * itemSubFAD.QUANTITY;
                                         return {
                                             name: itemSubFAD.fad.FAD_NAME,
@@ -284,23 +307,27 @@ export default function Payment() {
                             } 
                         }
                     }),
-                    paymentAmount:  response.data.orderDetailInfo[0].order_details.reduce(((total: number, item: { PRICE: number; QUANTITY: number; }) => 
-                        total += item.PRICE * item.QUANTITY
-                    ), 0)
+                    // paymentTotal:  response.data.orderDetailInfo[0].order_details.reduce(((total: number, item: { PRICE: number; QUANTITY: number; }) => 
+                    //     total += item.PRICE * item.QUANTITY
+                    // ), 0)
+                    paymentTotal: response.data.TOTAL_PAYMENT,
+                    discountValue: response.data.DISCOUNT_VALUE !== null ? response.data.DISCOUNT_VALUE : 0,
+                    voucherCODE: response.data.VOUCHER_CODE
                 })
-                // setIsLoading(false);
-                console.log(response.data.imagesURL, response.data.deliveryInfo[0].NAME, "orderDetailI22nfo")
+                setIsLoading(false);
+                // console.log(response.data.imagesURL, response.data.deliveryInfo[0].NAME, "orderDetailI22nfo")
+                console.log(response.data.VOUCHER_CODE, response.data.DISCOUNT_VALUE, response.data.TOTAL_PAYMENT, 'response.data.voucherCODE')
             })
         }
         getAdress(); 
     }, [])
 
-    useEffect(() => { console.log(orderInfo.productList, 'orderInfo') }, [orderInfo.productList])
+    useEffect(() => { console.log(orderInfo, 'or22derInfo') }, [orderInfo])
  
     const renderTopping = (itemProductList: any, indexItem: number) => {
-        console.log( '2222211dc1', itemProductList.toppings[0], 'cscsc222', itemProductList)
+        // console.log( '2222211dc1', itemProductList.toppings[0], 'cscsc222', itemProductList)
         return itemProductList.toppings.map((item: ItemToppingProps, index: number) => { 
-            
+            console.log(item, 'kscksocs')
             // bởi vì trong list, khi axios trả dữ liệu về và set dữ liệu thì sẽ có một vài phần tử bị undefined 
             // nên phải kiểm tra xem item có phải là undefined không
             return (
@@ -323,7 +350,7 @@ export default function Payment() {
     const renderItemListInCart = () => {
         if(orderInfo.productList != null){ 
             return orderInfo.productList.map((item, index) => {   
-                console.log(orderInfo.productList[0].toppings[0], 'orderInfo.productList111', item)
+                // console.log(orderInfo.productList[0].toppings[0], 'orderInfo.productList111', item)
                 return (
                     // bởi vì trong list, khi axios trả dữ liệu về và set dữ liệu thì sẽ có một vài phần tử bị undefined 
                     // nên phải kiểm tra xem item có phải là undefined không
@@ -389,18 +416,16 @@ export default function Payment() {
     }
 
     return( 
-        <SafeAreaView style={[{flex: 10}]}  >  
-        
-            {
-                isLoading
-                ? <View style={{marginVertical: heightScreen * 0.045}}>
-                    <Loading></Loading>
-                </View> 
-                : <ItemType1 
-                    deliveryInfo={orderInfo.deliveryInfo}
-                    isWatchOrderDetail={true}
-                ></ItemType1>  
-            } 
+        isLoading
+        ? 
+        // <View style={{marginVertical: heightScreen * 0.045}}>
+            <Loading></Loading>
+        // </View> 
+        :  <SafeAreaView style={[{flex: 10}]}  > 
+            <ItemType1 
+                deliveryInfo={orderInfo.deliveryInfo}
+                isWatchOrderDetail={true}
+            ></ItemType1> 
             <View style={styles.titleContainer}> 
                 <View>
                     <Text  
@@ -411,7 +436,7 @@ export default function Payment() {
             <ScrollView style={{flex: 7}} >  
                 { renderItemListInCart() }  
             </ScrollView>
-            <View style={{flex: 0.45}}>
+            <View style={{flex: 0.63}}>
                 <View style={styles.titleContainer}> 
                     <View style={{flexDirection: "row"}}>
                         <Text  
@@ -431,14 +456,19 @@ export default function Payment() {
                                 borderWidth: 1,
                                 borderRadius: widthScreen * 0.02,
                                 borderColor: "#89CFF0",
-                                marginLeft: widthScreen * 0.28
+                                marginLeft: widthScreen * 0.28,
+                                color: "gray",
+                                fontWeight: "bold"
                             }}
-                            placeholder="Nhập mã voucher"
+                            placeholder="Không Dùng Voucher"
+                            editable={false}
+                            value={orderInfo.voucherCODE}
                         ></TextInput>
+                        {/* <Text>{orderInfo.voucherCODE}</Text> */}
                         <FontAwesome
                             name="ticket"
                             style={{
-                                opacity: 0.5,
+                                opacity: 0,
                                 marginLeft: widthScreen * 0.02,
                                 backgroundColor: "#5288d9",
                                 color: "white",
@@ -454,6 +484,38 @@ export default function Payment() {
                         ></FontAwesome>
                     </View>  
                 </View> 
+                {
+                        <View style={styles.titleContainer}> 
+                            <Text  
+                                style={{
+                                    fontWeight: "bold",
+                                    fontSize: widthScreen * 0.04,
+                                    opacity: 0.7
+                                }}
+                            >Số tiền Voucher Giảm: </Text>
+                            {
+                                orderInfo.discountValue !== 0 && orderInfo.voucherCODE !== ""
+                                ? <Text
+                                    style={{
+                                        fontWeight: "bold",
+                                        fontSize: widthScreen * 0.04,
+                                        opacity: 0.7
+                                    }}
+                                >
+                                    -{ orderInfo.discountValue }
+                                </Text>
+                                : <Text
+                                    style={{
+                                        fontWeight: "bold",
+                                        fontSize: widthScreen * 0.04,
+                                        opacity: 0.7
+                                    }}
+                                >
+                                    0
+                                </Text>
+                            }
+                        </View>
+                    }
                 <View>
                     <View style={styles.titleContainer}>  
                         <Text  
@@ -477,6 +539,7 @@ export default function Payment() {
                                     padding: 0,
                                     margin: 0, 
                                 }}
+                                disabled={true}
                             />
                             <Text 
                                 style={{
@@ -495,6 +558,7 @@ export default function Payment() {
                                     padding: 0,
                                     margin: 0, 
                                 }}
+                                disabled={true}
                             />
                             <Text
                                 style={{
@@ -508,7 +572,7 @@ export default function Payment() {
                     </View>
                 </View>
             </View>
-            {/* <View style={{backgroundColor: "white", flex: 0.16 }}>
+            <View style={{backgroundColor: "white", flex: 0.16 }}>
                 <View 
                     style={styles.taskBarPayment}
                 >
@@ -526,9 +590,9 @@ export default function Payment() {
                             opacity: 0.5,
                             color: "#e87823"
                         }}
-                    >{orderInfo.paymentAmount} </Text> 
+                    >{orderInfo.paymentTotal} </Text> 
                 </View>
-            </View>   */}
+            </View>  
         </SafeAreaView>
     )
 }

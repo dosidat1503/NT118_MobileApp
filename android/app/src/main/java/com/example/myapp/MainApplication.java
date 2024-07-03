@@ -3,6 +3,9 @@ package com.example.myapp;
 import android.app.Application;
 import android.content.res.Configuration;
 import androidx.annotation.NonNull;
+import io.invertase.firebase.app.ReactNativeFirebaseAppPackage;
+import io.invertase.firebase.messaging.ReactNativeFirebaseMessagingPackage; // Import gói messaging nếu sử dụng
+
 
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
@@ -84,6 +87,16 @@ public class MainApplication extends Application implements ReactApplication {
     return Arrays.asList(
             ...,
             new CustomTabsPackage()
+    );
+  }
+
+  @Override
+  protected List<ReactPackage> getPackages() {
+    return Arrays.<ReactPackage>asList(
+        new MainReactPackage(),
+        new ReactNativeFirebaseAppPackage(), // Thêm dòng này
+        new ReactNativeFirebaseMessagingPackage() // Thêm dòng này nếu sử dụng messaging
+  
     );
   }
 }

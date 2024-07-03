@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, View, Text, Image, TextInput, ScrollView, Pressable, TouchableOpacity  } from 'react-native'; 
+import { FlatList, StyleSheet, View, Text, Image, TextInput, ScrollView, Pressable, TouchableOpacity, Dimensions  } from 'react-native'; 
 import products from '@assets/data/products';  
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import SlideHeaderOrderFAD from '@/components/orderFAD/SlideHeaderOrderFAD';
@@ -12,13 +12,15 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { LogBox } from 'react-native'; 
 import Loading from '@/components/Loading';
-import LoadingDots from 'react-native-loading-dots';
+// import Loading from '@/components/Loading';
+// import LoadingDots from 'react-native-loading-dots';
 LogBox.ignoreLogs(['Warning: ...']);
 LogBox.ignoreAllLogs();
 
  
-export default function TabOneScreen() { 
-  const { heightScreen, widthScreen, mainColor, baseURL, RD, isLoading, setIsLoading  } = useCartContext();
+// const FADHome = React.memo(() => { 
+export default function FADHome() {
+  const { heightScreen, widthScreen, mainColor, baseURL, RD , userID } = useCartContext();
   const styles = StyleSheet.create({
       collapseBar: {
           flexDirection: "row",
@@ -54,7 +56,11 @@ export default function TabOneScreen() {
           height: heightScreen
       }
   })
-  
+  // const widthScreen = Dimensions.get("window").width
+  // const heightScreen = Dimensions.get("window").height
+  // const RD = widthScreen * heightScreen 
+  // const mainColor = "#89CFF0" 
+  // const baseURL = "http://26.85.40.176:8000/api"
   const [homeInfo, setHomeInfo] = useState<any>({})
   const imageList = [ 
     {
@@ -78,33 +84,33 @@ export default function TabOneScreen() {
       tagID: 2,
     },
   ] 
+  const [isLoadingHome, setIsLoadingHome] = useState(true)
 
-  useEffect(() => { 
-    
+  useEffect(() => {  
     const getHomeInfo = async () => {
       axios.get(baseURL + '/getFADInfo', {params: {atHome: 1}})
       .then((res) => {
         // console.log(res.data, "getFADInfoAtHome") 
         setHomeInfo(res.data)
-        setIsLoading(false)
+        setIsLoadingHome(false)
       })
     }
     getHomeInfo()
   }, [])
-
-  if(isLoading) return <Loading></Loading>
+ 
+  console.log("orderFADH33ome", userID)
   
-  return (   
-    
-    isLoading 
+  return (    
+    isLoadingHome 
     ? <Loading></Loading>
-    : <FlatList
+    : 
+    <FlatList
       data={[]}  // Không có dữ liệu cụ thể cho danh sách này
       renderItem={(item) => null}
       keyExtractor={(item, index) => index.toString()}
       ListHeaderComponent={
         <View>
-          <SlideHeaderOrderFAD products={imageList} />
+          <SlideHeaderOrderFAD cateroty={imageList} />
           <SearchFAD/>
         </View>
       }
@@ -113,11 +119,13 @@ export default function TabOneScreen() {
           <FADShop products={homeInfo.shopInfo} />
           <View style={styles.collapseBar}>
             <Text style={styles.collapseBarText}> Bán chạy </Text>  
-          </View>   
+          </View>     
           <ShowProduct products={homeInfo.FADInfo_eloquent} />
         </View>
       } 
     /> 
   ); 
 }
+// )
 
+// export default FADHome;
