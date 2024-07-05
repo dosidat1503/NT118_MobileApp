@@ -101,7 +101,7 @@ const CartContext = createContext<CartType>({
     heightScreen: 0,
     mainColor: "#89CFF0",
     products: [],
-    baseURL: "http://10.1.7.234:8000/api",
+    baseURL: "http://26.85.40.176:8000/api",
     emailPattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
     phoneNumberPattern: /^0\d{9}$/,
     fullNamePattern: /^[\p{L}\s]+$/u,
@@ -174,7 +174,7 @@ const CartProvider = ({ children }: PropsWithChildren) => {
     const widthScreen = Dimensions.get("window").width
     const heightScreen = Dimensions.get("window").height
     const mainColor = "#89CFF0"
-    const baseURL = "http://10.1.7.234:8000/api"
+    const baseURL = "http://26.85.40.176:8000/api"
     const emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
     const phoneNumberPattern = /^0\d{9}$/
     const fullNamePattern = /^[\p{L}\s]+$/u

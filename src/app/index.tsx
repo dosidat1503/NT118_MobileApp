@@ -16,7 +16,7 @@ LogBox.ignoreLogs(['Warning: ...']);
 
 const index = () => {
   const [users, setUsers] = useState<any[]>([]);
-  const { heightScreen, widthScreen, mainColor, baseURL, isLoading, setIsLoading, setUserID } = useCartContext();
+  const { heightScreen, widthScreen, mainColor, baseURL, setUserID } = useCartContext();
   const styles = StyleSheet.create({
     divContainer: {
       width: widthScreen,
