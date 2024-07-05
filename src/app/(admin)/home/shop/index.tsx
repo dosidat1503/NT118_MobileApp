@@ -9,6 +9,7 @@ import {
 import { useFonts } from 'expo-font';
 import { useRouter } from 'expo-router';
 import { Dimensions } from 'react-native';
+import React from 'react';
 
 const screenWidth = Dimensions.get('window').width; // Get the screen width
 const screenHeight = Dimensions.get('window').height; // Get the screen height

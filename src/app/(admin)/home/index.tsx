@@ -6,6 +6,7 @@ import {
   Pressable,
   Image,
 } from "react-native";
+import React from "react";
 import AvatarExample from "@/components/Avartar";
 import { FontAwesome, FontAwesome5, Entypo } from "@expo/vector-icons";
 import {

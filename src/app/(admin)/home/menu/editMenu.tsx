@@ -1,11 +1,135 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native'
-import React from 'react'
-import { FontAwesome } from '@expo/vector-icons'
-import { router } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react'
+import { AntDesign, FontAwesome } from '@expo/vector-icons'
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import globalApi from '@/services/globalApi';
+import Categories from '@/components/Categories';
+import { StatusBar } from 'expo-status-bar';
+import HeaderbarSe from '@/components/HeaderBarSe';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import FADCard from '@/components/FADCart';
+import { Item } from 'react-native-paper/lib/typescript/components/Drawer/Drawer';
+import { formatCurrency, valueLabelFormat } from '@/app/utils/formatter';
+import { useRoute, StackActions, useNavigation } from '@react-navigation/native';
+interface Option {
+  label: string;
+  value: string;
+}
 
-export default function editMenu() {
+export default function editMenu({ navigation }) {
+  const [foodArray, setFoodArray] = useState<Option[]>([]);
+  const [isFoodLoad, setIsFoodLoad] = useState(false);
+  const [drinkArray, setDrinkArray] = useState<Option[]>([]);
+  const [isDrinkLoad, setIsDrinkLoad] = useState(false);
+  const [sizeArray, setSizeArray] = useState<Option[]>([]);
+  const [isSizeLoad, setIsSizeLoad] = useState(false);
+  const [toppingArray, setToppingArray] = useState<Option[]>([]);
+  const [isToppingLoad, setIsToppingLoad] = useState(false);
+  const [isAllLoad, setIsAllLoad] = useState(false);
+  const fetchFadArray = async (id: any) => {
+    try {
+      const response = await globalApi.getFADs(id);
+      console.log(response);
+      if (response.data !== null && response.statusCode === 200) {
+        const foodArray = [...response.data.foods];
+        const drinkArray = [...response.data.drinks];
+        const sizeArray = [...response.data.sizes];
+        const toppingArray = [...response.data.toppings];
+        console.log('food array', typeof foodArray[0].FAD_PRICE);
+        // Formatting data for dropdown menu
+        setFoodArray(foodArray);
+        setIsFoodLoad(true);
+
+        setDrinkArray(drinkArray);
+        setIsDrinkLoad(true);
+
+        setSizeArray(sizeArray);
+        setIsSizeLoad(true);
+
+        setToppingArray(toppingArray);
+        setIsToppingLoad(true);
+
+        setIsAllLoad(true);
+      } else {
+        setIsFoodLoad(false);
+        setIsDrinkLoad(false);
+        setIsSizeLoad(false);
+        setIsAllLoad(false);
+        setIsToppingLoad(false);
+      }
+    } catch (e) {
+      console.error("Lỗi lấy thông tin món ăn cửa hàng", e);
+      setIsFoodLoad(false);
+      setIsDrinkLoad(false);
+      setIsAllLoad(false);
+      setIsSizeLoad(false);
+      setIsToppingLoad(false);
+    }
+  }
+
+  const resetData = () => {
+    setIsFoodLoad(false);
+    setIsDrinkLoad(false);
+    setIsSizeLoad(false);
+    setIsAllLoad(false);
+    setIsToppingLoad(false);
+    setFoodArray([]);
+    setDrinkArray([]);
+    setSizeArray([]);
+    setToppingArray([]);
+  }
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (route.params?.refresh) {
+  //       resetData();
+  //       fetchFadArray(1);
+  //       // Clear the refresh parameter to avoid multiple fetches
+  //       navigation.setParams({ refresh: false });
+  //     }
+  //   }, [route.params])
+  // );
+  const refreshData = () => {
+    resetData();
+    fetchFadArray(1);
+  }
+
+  useEffect(() => {
+    resetData();
+    fetchFadArray(1);
+  }, []);
+
+  const onDelete = async (item) => {
+    try {
+      const response = await globalApi.deleteFAD(item.FAD_ID);
+      if (response.data !== null && response.statusCode === 200) {
+        console.log('Xóa thành công');
+        resetData();
+        fetchFadArray(1);
+      } else {
+        console.log('Xóa thất bại');
+      }
+    } catch (e) {
+      console.log('Lỗi khi xoá món ăn');
+    }
+  };
+
+
+  const handleEdit = (item: any) => {
+    navigation.dispatch(
+      StackActions.replace('editFAD', {
+        id: item.FAD_ID
+      })
+    );
+  };
+
+  const handleDelete = (item: any) => {
+    onDelete(item);
+  };
+
+
   return (
-    <View style={styles.homeContainer}>
+    <ScrollView style={styles.homeContainer}>
       {/* <View style={styles.headerBar}>
         <Pressable
           onPress={() => router.back()} // Navigate back to the previous screen
@@ -31,68 +155,142 @@ export default function editMenu() {
         </Pressable>
       </View> */}
 
-      <View style={styles.whiteContainer}>
+      {/* <View style={styles.whiteContainer}>
         <View style={styles.containerItem}>
           <Text style={styles.buttonText}>Các món chính</Text>
         </View ><View style={styles.containerItem}>
           <Text style={styles.buttonText}>Tuỳ chọn nhóm</Text>
         </View>
-      </View>
+      </View> */}
+      {/* <StatusBar backgroundColor={'#FF3F00'} /> */}
+      <TouchableOpacity style={styles.searchbox}>
+        <AntDesign name="search1" size={24} color="black" style={{ color: '#FF3F00' }} />
+        <Text style={styles.input}>Search</Text>
+      </TouchableOpacity>
 
-
+      <Categories />
       <View>
         <View style={(styles.paddingTotal, styles.pickMenuHeader)}>
           <Text style={{ color: "black", fontWeight: "700" }}>
-            Menu{" "}
+            Kết quả{" "}
             <Text style={{ marginLeft: 10, color: "gray", fontSize: 12 }}>
-              (3 danh mục)
+              (4 danh mục)
             </Text>
           </Text>
-
           <Pressable>
             <Text style={{ color: "#709dee" }}>Chọn</Text>
           </Pressable>
         </View>
-
         <View style={styles.menuContainer}>
           <View style={styles.menuRow}>
             <View style={{ display: "flex", flexDirection: "column" }}>
-              <Text style={{ fontWeight: "700" }}>Lẩu</Text>
+              <Text style={{ fontWeight: "700" }}>Thức ăn</Text>
               <Text style={{ color: "#6495ED" }}>Chỉnh sửa danh mục</Text>
             </View>
             <View style={styles.mealCount}>
 
-              <Text>3 Món</Text>
+              <Text>{isFoodLoad && foodArray.length} Món</Text>
               <FontAwesome name="angle-down" size={24} color="black" />
             </View>
           </View>
+          {isAllLoad === true ? foodArray.map((food: object) => {
+            food.FAD_PRICE = formatCurrency((food.FAD_PRICE as unknown) as number);
+            return (
+              <FADCard key={food.FAD_ID} url={food.IMAGE_URL} item={food} onEdit={() => handleEdit(food)}
+                onDelete={() => handleDelete(food)} />
+            );
+          }) : ""}
+        </View>
+        <View style={styles.menuContainer}>
           <View style={styles.menuRow}>
             <View style={{ display: "flex", flexDirection: "column" }}>
-              <Text style={{ fontWeight: "700" }}>Ăn vặt</Text>
+              <Text style={{ fontWeight: "700" }}>Nước uống</Text>
               <Text style={{ color: "#6495ED" }}>Chỉnh sửa danh mục</Text>
             </View>
             <View style={styles.mealCount}>
-              <Text>3 Món</Text>
+
+              <Text>{isDrinkLoad && drinkArray.length} Món</Text>
               <FontAwesome name="angle-down" size={24} color="black" />
             </View>
           </View>
+          {isAllLoad === true ? drinkArray.map((drink: object) => {
+            drink.FAD_PRICE = formatCurrency((drink.FAD_PRICE as unknown) as number);
+            return (
+              <FADCard key={drink.FAD_ID} url={drink.IMAGE_URL} item={drink} onEdit={() => handleEdit(drink)}
+                onDelete={() => handleDelete(drink)} />
+            );
+          }) : ""}
+        </View>
+        <View style={styles.menuContainer}>
           <View style={styles.menuRow}>
             <View style={{ display: "flex", flexDirection: "column" }}>
-              <Text style={{ fontWeight: "700" }}>Thức uống</Text>
+              <Text style={{ fontWeight: "700" }}>Topping</Text>
               <Text style={{ color: "#6495ED" }}>Chỉnh sửa danh mục</Text>
             </View>
             <View style={styles.mealCount}>
-              <Text>3 Món</Text>
+
+              <Text>{isToppingLoad && toppingArray.length} Món</Text>
               <FontAwesome name="angle-down" size={24} color="black" />
             </View>
           </View>
+          {isAllLoad === true ? toppingArray.map((topping: object) => {
+            topping.FAD_PRICE = formatCurrency((topping.FAD_PRICE as unknown) as number);
+            return (
+              <FADCard key={topping.FAD_ID} url={topping.IMAGE_URL} item={topping} onEdit={() => handleEdit(topping)}
+                onDelete={() => handleDelete(topping)} />
+            );
+          }) : ""}
+        </View>
+        <View style={styles.menuContainer}>
+          <View style={styles.menuRow}>
+            <View style={{ display: "flex", flexDirection: "column" }}>
+              <Text style={{ fontWeight: "700" }}>Size</Text>
+              <Text style={{ color: "#6495ED" }}>Chỉnh sửa danh mục</Text>
+            </View>
+            <View style={styles.mealCount}>
+
+              <Text>{isSizeLoad && sizeArray.length} Món</Text>
+              <FontAwesome name="angle-down" size={24} color="black" />
+            </View>
+          </View>
+          {isAllLoad === true ? sizeArray.map((size: object) => {
+            size.FAD_PRICE = formatCurrency((size.FAD_PRICE as unknown) as number);
+            return (
+              <FADCard key={size.FAD_ID} url={size.IMAGE_URL} item={size} onEdit={() => handleEdit(size)}
+                onDelete={() => handleDelete(size)} />
+            );
+          }) : ""}
         </View>
       </View>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    height: '100%'
+
+  },
+  searchbox: {
+    flexDirection: 'row',
+    width: '95%',
+    backgroundColor: 'white',
+    alignItems: 'center',
+    padding: 10,
+    marginVertical: 10,
+    borderRadius: 20, //30
+    alignSelf: 'center',
+    elevation: 2
+  },
+  input: {
+    marginLeft: 10,
+    width: '90%',
+    fontSize: 16,
+    color: '#c4c4c4',
+  }
+  ,
+
   homeContainer: {
     backgroundColor: "#e0effa",
     gap: 10,

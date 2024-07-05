@@ -6,7 +6,7 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import ProductListItem from "@components/ProductListItem";
+import React from "react";
 import { FontAwesome, FontAwesome5, Entypo } from "@expo/vector-icons";
 import {
   Roboto_400Regular,
@@ -17,13 +17,12 @@ import { useFonts } from "expo-font";
 import { router } from "expo-router";
 import { useNavigation } from "@react-navigation/native";
 
-export default function ShopScreen() {
+export default function ShopScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
     Roboto_500Medium,
     Roboto_700Bold,
   });
-  const navigation = useNavigation();
   return (
     <View style={styles.homeContainer}>
       <View style={styles.headerBar}>

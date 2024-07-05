@@ -1,14 +1,22 @@
-import { Stack, Link } from "expo-router"
+import { Link } from "expo-router"
 import { Pressable } from "react-native"
 import { FontAwesome } from "@expo/vector-icons"
 import Colors from "@/constants/Colors"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import React from "react"
+import ShopScreen from ".";
+import editMenu from "./editMenu";
+import CreateProductScreen from "./editFAD";
+const Stack = createStackNavigator();
 
 export default function SaleStack() {
+
   const navigation = useNavigation();
   return (
-    <Stack>
+    <Stack.Navigator>
       <Stack.Screen
+        component={ShopScreen}
         name="index"
         options={{
           title: 'Shop',
@@ -16,6 +24,7 @@ export default function SaleStack() {
         }}
       />
       <Stack.Screen
+        component={editMenu}
         name="editMenu"
         options={{
           title: 'Thiết lập thực đơn',
@@ -37,12 +46,13 @@ export default function SaleStack() {
       >
       </Stack.Screen>
       <Stack.Screen
+        component={CreateProductScreen}
         name="editFAD"
         options={{
           title: 'edit FAD',
           headerShown: false,
         }}
       ></Stack.Screen>
-    </Stack>
+    </Stack.Navigator>
   )
 }
