@@ -101,7 +101,7 @@ const CartContext = createContext<CartType>({
     heightScreen: 0,
     mainColor: "#89CFF0",
     products: [],
-    baseURL: "http://10.1.7.234:8000/api",
+    baseURL: "http://10.20.7.112:8000/api",
     emailPattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
     phoneNumberPattern: /^0\d{9}$/,
     fullNamePattern: /^[\p{L}\s]+$/u,
@@ -109,6 +109,7 @@ const CartContext = createContext<CartType>({
     // textQueryPost: "",
     // setTextQueryPost: () => {},
     orderStatusList: [],
+    adminOrderStatusList: [],
     userID: 0,
     setUserID: () => { },
     setFADShop_ID: () => { },
@@ -174,7 +175,7 @@ const CartProvider = ({ children }: PropsWithChildren) => {
     const widthScreen = Dimensions.get("window").width
     const heightScreen = Dimensions.get("window").height
     const mainColor = "#89CFF0"
-    const baseURL = "http://10.1.7.234:8000/api"
+    const baseURL = "http://10.20.7.112:8000/api"
     const emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
     const phoneNumberPattern = /^0\d{9}$/
     const fullNamePattern = /^[\p{L}\s]+$/u
@@ -288,6 +289,14 @@ const CartProvider = ({ children }: PropsWithChildren) => {
     ];
 
     const orderStatusList = [
+        { id: 1, name: "Chờ xác nhận", icon: "clock" },
+        { id: 2, name: "Đang chuẩn bị", icon: "clock" },
+        { id: 3, name: "Đang giao", icon: "motorcycle" },
+        { id: 4, name: "Đã giao", icon: "clipboard-check" },
+        { id: 5, name: "Đã hủy", icon: "window-close" }
+    ]
+
+    const adminOrderStatusList = [
         { id: 1, name: "Chờ xác nhận", icon: "clock" },
         { id: 2, name: "Đang chuẩn bị", icon: "clock" },
         { id: 3, name: "Đang giao", icon: "motorcycle" },
