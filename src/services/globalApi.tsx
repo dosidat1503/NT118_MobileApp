@@ -238,6 +238,25 @@ const getShopInfo = async (shopId: number) => {
   }
 };
 
+
+const getShopOfUser = async (userId: number) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/admin/getShopByUser`, { params: { user_id: userId } });
+    return response.data;
+  } catch (error: any) {
+    // Handle errors
+    if (error.response) {
+      // Strapi returns errors in `error.response.data`
+      console.error("Error:", error.response.data);
+      throw error.response.data; // Rethrow to handle elsewhere
+    } else {
+      console.error("Network or unknown error:", error);
+      throw new Error("Network or unknown error occurred");
+    }
+  }
+};
+
+
 const updateShopInfo = async (request: object, id: number) => {
   try {
     const json = JSON.stringify(request);
@@ -261,6 +280,22 @@ const updateShopInfo = async (request: object, id: number) => {
   }
 };
 
+const getDailyRevenue = async (shopId: number) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/admin/getDailyRevenue/${shopId}`);
+    return response.data;
+  } catch (error: any) {
+    // Handle errors
+    if (error.response) {
+      // Strapi returns errors in `error.response.data`
+      console.error("Error:", error.response.data);
+      throw error.response.data; // Rethrow to handle elsewhere
+    } else {
+      console.error("Network or unknown error:", error);
+      throw new Error("Network or unknown error occurred");
+    }
+  }
+};
 
 
 export default {
@@ -276,5 +311,7 @@ export default {
   updateVoucher,
   deleteVoucher,
   getShopInfo,
-  updateShopInfo
+  updateShopInfo,
+  getShopOfUser,
+  getDailyRevenue
 };

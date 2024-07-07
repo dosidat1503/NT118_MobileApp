@@ -118,7 +118,7 @@ const index = () => {
           AsyncStorage.setItem('email', JSON.stringify(signInInfo.email));
           AsyncStorage.setItem('password', JSON.stringify(signInInfo.password));
           setIsLoadingLogin(false);
-          navigation.navigate('(admin)' as never);
+          navigation.navigate('(user)' as never);
         }
         else {
           if (response.data.message === errorText)

@@ -9,7 +9,7 @@ const AvatarExample = () => {
       <Avatar.Icon size={40} icon="coffee" />
       <View style={styles.textContainer}>
         <Text style={styles.avatarSmallTitle}>Chào mừng quay trở lại</Text>
-        <Text style={styles.avatarLargeTitle}>Xin chào, Lẩu chay Hữu Duyên!</Text>
+        <Text style={styles.avatarLargeTitle}>Xin chào, Cơm Ngô Quyền!</Text>
       </View>
     </View>
   );

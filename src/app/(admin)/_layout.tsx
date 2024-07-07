@@ -55,6 +55,7 @@ export default function TabLayout() {
         name="order"
         options={{
           title: 'Đơn hàng',
+          headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon1 name="box" color={color} />,
         }}
       />

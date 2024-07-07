@@ -168,18 +168,8 @@ export default function ShopScreen({ navigation, route }) {
             <Text style={styles.textLarge}>{shopInfo?.SHOP_NAME}</Text>
             <View style={[styles.flexRow, styles.marginVerticalSmall]}>
               <View style={[styles.flexRow, styles.alignCenter, styles.marginRightSmall]}>
-                <Image source={require('../../../../../assets/images/star.png')} style={styles.smallIcon} />
-                <Text style={styles.textSmall}>
-                  <Text style={styles.textGreen}>5</Text>
-                  <Text style={styles.textGray}>
-                    (10 Đánh giá)
-                  </Text>
-                </Text>
-              </View>
-              <Text style={[styles.fontSemiBold, styles.textGray]}>Lẩu</Text>
-              <View style={[styles.flexRow, styles.alignCenter, styles.marginRightSmall]}>
                 <Icon.MapPin color={'gray'} width={15} height={15} />
-                <Text style={[styles.textGray, styles.textSmall]}>{shopInfo ? shopInfo.ADDRESS.split(",")[0] : "Loading..."}</Text>
+                <Text style={[styles.textGray, styles.textSmall]}>{shopInfo ? shopInfo.ADDRESS : "Loading..."}</Text>
               </View>
             </View>
           </View>

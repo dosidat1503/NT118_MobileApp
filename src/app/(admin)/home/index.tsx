@@ -7,7 +7,7 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AvatarExample from "@/components/Avatar";
 import { FontAwesome, FontAwesome5, Entypo } from "@expo/vector-icons";
 import {
@@ -19,6 +19,8 @@ import Colors from "@/constants/Colors";
 import { useFonts } from "expo-font";
 import { Link, useNavigation } from "expo-router";
 import HeaderBar from "@/components/HeaderBar";
+import globalApi from "@/services/globalApi";
+import { formatCurrency } from "@/utils/formatter";
 
 // front end coded by BangBui
 export default function HomePageScreen() {
@@ -29,6 +31,33 @@ export default function HomePageScreen() {
     Roboto_500Medium,
     Roboto_700Bold,
   });
+  const [revenues, setRevenues] = useState({});
+  const [currentDateRevenue, setCurrentDateRevenue] = useState(0);
+
+  const fetchRevenue = async (shopId: number) => {
+    try {
+      const response = await globalApi.getDailyRevenue(shopId);
+      console.log(response);
+      if (response.dailyRevenues !== null && response.statusCode === 200) {
+        setRevenues(response.dailyRevenues);
+      }
+    } catch (e) {
+      console.error("Lỗi lấy thông tin doanh thu", e);
+    }
+  }
+  useEffect(() => {
+    fetchRevenue(1);
+  }, [])
+
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0]; // Lấy ngày hiện tại ở định dạng YYYY-MM-DD
+    if (revenues[today] !== undefined) {
+      setCurrentDateRevenue(revenues[today]);
+    } else {
+      setCurrentDateRevenue(0);
+    }
+  }, [revenues]);
+
   return (
     <View style={styles.homeContainer}>
       <HeaderBar />
@@ -36,7 +65,7 @@ export default function HomePageScreen() {
         <Text style={{ fontSize: 30, fontWeight: "800" }}>Doanh thu</Text>
         <View style={styles.income}>
           <Text style={{ color: Colors.light.background }}>
-            Ngày 22, tháng 4 Năm 2024
+            Ngày {new Date().getDate()}, tháng {new Date().getMonth() + 1} Năm {new Date().getFullYear()}
           </Text>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
@@ -48,10 +77,10 @@ export default function HomePageScreen() {
                 color: Colors.light.background,
               }}
             >
-              900,000Đ
+              {currentDateRevenue && formatCurrency(currentDateRevenue)}
             </Text>
             <Text style={{ fontSize: 15, color: Colors.light.background }}>
-              15%{" "}
+              0%{" "}
               <FontAwesome
                 name="arrow-up"
                 size={15}

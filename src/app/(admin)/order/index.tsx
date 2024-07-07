@@ -10,6 +10,7 @@ import RenderFooter from "@/components/RenderFooter";
 import Response from "../home/Response";
 import * as WebBrowser from 'expo-web-browser';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Loading from "@/components/Loading";
 
 
 interface orderItem {
@@ -199,11 +200,8 @@ export default function OrderManagement() {
 
   const itemButtonList = [
     { orderStatusCode: 1, icon: "window-close", name: "Huỷ đơn" },
-    { orderStatusCode: 2, icon: "phone-square-alt", name: "Liên hệ" },
-    { orderStatusCode: 2, icon: "credit-card", name: "Thanh toán" },
-    { orderStatusCode: 3, icon: "phone-square-alt", name: "Liên hệ" },
-    { orderStatusCode: 3, icon: "credit-card", name: "Thanh toán" },
-    { orderStatusCode: 4, icon: "star", name: "Đánh giá" },
+    { orderStatusCode: 1, icon: "check-circle", name: "Xác nhận" },
+    { orderStatusCode: 2, icon: "biking", name: "Vận chuyển" }
     // { orderStatusCode: 5, icon: "undo-alt", name: "Đặt lại" },
   ]
   const [parameterForChangeOrderStatus, setParameterForChangeOrderStatus] = useState({ orderStatusCode: 0, item: {}, itemStatus: {} });
@@ -215,7 +213,9 @@ export default function OrderManagement() {
   const [initialLoad, setInitialLoad] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isShowConfirmPopup, setIsShowConfirmPopup] = useState(false);
-  const [isShowPopupAfterCancelOrder, setIsShowPopupAfterCancelOrder] = useState(true);
+  const [isShowAcceptPopup, setIsShowAcceptPopup] = useState(false);
+  const [isShowDeliveryPopup, setIsShowDeliveryPopup] = useState(false);
+  const [isShowPopupAfterCancelOrder, setIsShowPopupAfterCancelOrder] = useState(false);
   // const [isStatusChange, setIsStatusChange] = useState(false);
 
 
@@ -292,9 +292,9 @@ export default function OrderManagement() {
   }
 
 
-  const handleChangeOrderStatus = useCallback(() => {
+  const handleChangeOrderStatus = useCallback((name: string) => {
     console.log("orderStatusCode")
-    if (parameterForChangeOrderStatus.orderStatusCode === itemButtonList[0].orderStatusCode) {
+    if (parameterForChangeOrderStatus.orderStatusCode === itemButtonList[0].orderStatusCode && name === 'Huỷ đơn') {
       let newOrderItemList = parameterForChangeOrderStatus.itemStatus.orderItemList.filter((itemInList) => itemInList.ORDER_ID !== parameterForChangeOrderStatus.item.ORDER_ID)
       setInfoManagementEveryOrderStatus(
         infoManagementEveryOrderStatus.map((itemInList) => {
@@ -318,13 +318,60 @@ export default function OrderManagement() {
           console.log(error)
         })
     }
+
+    if (parameterForChangeOrderStatus.orderStatusCode === itemButtonList[1].orderStatusCode && name === 'Xác nhận') {
+      let newOrderItemList = parameterForChangeOrderStatus.itemStatus.orderItemList.filter((itemInList) => itemInList.ORDER_ID !== parameterForChangeOrderStatus.item.ORDER_ID)
+      setInfoManagementEveryOrderStatus(
+        infoManagementEveryOrderStatus.map((itemInList) => {
+          if (itemInList.orderStatusCode === parameterForChangeOrderStatus.itemStatus.orderStatusCode) {
+            return {
+              ...itemInList,
+              orderItemList: newOrderItemList
+            };
+          }
+          return itemInList;
+        })
+      )
+      setIsShowAcceptPopup(false)
+      setIsShowPopupAfterCancelOrder(true)
+      setParameterForChangeOrderStatus({ orderStatusCode: 0, item: {}, itemStatus: {} })
+      axios.post(baseURL + "/changeOrderStatusToAccept", { orderID: parameterForChangeOrderStatus.item.ORDER_ID })
+        .then((response) => {
+          console.log(response.data.statusCode, "response.data.statusCode")
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
+
+    if (parameterForChangeOrderStatus.orderStatusCode === itemButtonList[2].orderStatusCode && name === 'Vận chuyển') {
+      let newOrderItemList = parameterForChangeOrderStatus.itemStatus.orderItemList.filter((itemInList) => itemInList.ORDER_ID !== parameterForChangeOrderStatus.item.ORDER_ID)
+      setInfoManagementEveryOrderStatus(
+        infoManagementEveryOrderStatus.map((itemInList) => {
+          if (itemInList.orderStatusCode === parameterForChangeOrderStatus.itemStatus.orderStatusCode) {
+            return {
+              ...itemInList,
+              orderItemList: newOrderItemList
+            };
+          }
+          return itemInList;
+        })
+      )
+      setIsShowDeliveryPopup(false)
+      setIsShowPopupAfterCancelOrder(true)
+      setParameterForChangeOrderStatus({ orderStatusCode: 0, item: {}, itemStatus: {} })
+      axios.post(baseURL + "/changeOrderStatusToDelivery", { orderID: parameterForChangeOrderStatus.item.ORDER_ID })
+        .then((response) => {
+          console.log(response.data.statusCode, "response.data.statusCode")
+        })
+        .catch((error) => {
+          console.log(error)
+        })
+    }
+
   }, [parameterForChangeOrderStatus])
 
   const openInBrowser = async () => {
-    // Linking.openURL(vnpURL)
-    // .catch(err => {
-    //     console.error("An error occurred", err); 
-    // })
     await WebBrowser.openBrowserAsync(vnpURL);
   };
 
@@ -334,7 +381,7 @@ export default function OrderManagement() {
   }, [vnpURL])
 
   const buttonPressCaseInEveryOrderStatus = (item: orderItem, itemButton: any, itemStatus: infoManagementEveryOrderStatus) => {
-    if (itemStatus.orderStatusCode === itemButtonList[0].orderStatusCode) {
+    if (itemStatus.orderStatusCode === itemButtonList[0].orderStatusCode && itemButton.name === 'Huỷ đơn') {
       setIsShowConfirmPopup(true)
       setParameterForChangeOrderStatus({
         orderStatusCode: itemButton.orderStatusCode,
@@ -342,50 +389,33 @@ export default function OrderManagement() {
         itemStatus: itemStatus
       })
     }
-    if (itemButton.orderStatusCode === itemStatus.orderStatusCode && parseInt(item.PAYMENT_STATUS) === 0 && itemButton.name === itemButtonList[2].name) {
-
-      setIsLoading(true);
-      axios.get(baseURL + "/paymentOnline", { params: { ORDER_ID: item.ORDER_ID } })
-        .then((response) => {
-          // xoan navigation đến trang thanh toán thành công
-          // orderInfo.paymentMethod === paymentType.paymentOnline ? 
-          // setVnpURL(response.data.vnp_Url)
-
-          setIsLoading(false);
-          // navigation.navigate("OrderSuccess" as never);
-          console.log(response.data, 'kksks')
-          // openInBrowser();
-        })
-        .catch((error) => {
-          console.log(error)
-        })
+    if (itemStatus.orderStatusCode === itemButtonList[1].orderStatusCode && itemButton.name === 'Xác nhận') {
+      setIsShowAcceptPopup(true)
+      setParameterForChangeOrderStatus({
+        orderStatusCode: itemButton.orderStatusCode,
+        item: item,
+        itemStatus: itemStatus
+      })
     }
-    if (itemStatus.orderStatusCode === itemButtonList[5].orderStatusCode) {
-      console.log("kjdjcd2")
-      const orderID = item.ORDER_ID
-      navigation.navigate("RateFAD" as never, { orderID })
+
+    if (itemStatus.orderStatusCode === itemButtonList[2].orderStatusCode && itemButton.name === 'Vận chuyển') {
+      setIsShowDeliveryPopup(true)
+      setParameterForChangeOrderStatus({
+        orderStatusCode: itemButton.orderStatusCode,
+        item: item,
+        itemStatus: itemStatus
+      })
     }
   }
 
   const renderShowConfirmPopup = () => {
-    // isShowConfirmPopup && (
-    //     <Response 
-    //         content="Bạn chắc chắn huỷ đơn hàng này chứ"
-    //         buttonIcon1="check-circle"
-    //         buttonFunction1={() => handleChangeOrderStatus(orderStatusCode, item, itemStatus)}
-    //         buttonName1="Huỷ"
-    //         buttonIcon2="window-close"
-    //         buttonFunction2={() => setIsShowConfirmPopup(false)}
-    //         buttonName2="Thoát"
-    //     ></Response>
-    // )
     return (
       <View style={{ position: "absolute", top: -(heightScreen * 0.1), width: widthScreen, height: heightScreen }}>
 
         <Response
           content="Bạn chắc chắn huỷ đơn hàng này không?"
           buttonIcon1="check-circle"
-          buttonFunction1={() => handleChangeOrderStatus()}
+          buttonFunction1={() => handleChangeOrderStatus('Huỷ đơn')}
           buttonName1="Huỷ đơn"
           buttonColor1="red"
           buttonIcon2="window-close"
@@ -397,6 +427,47 @@ export default function OrderManagement() {
       </View>
     )
   }
+
+  const renderShowAcceptPopup = () => {
+    return (
+      <View style={{ position: "absolute", top: -(heightScreen * 0.1), width: widthScreen, height: heightScreen }}>
+
+        <Response
+          content="Bạn muốn xác nhận nhận đơn đặt hàng này?"
+          buttonIcon1="check-circle"
+          buttonFunction1={() => handleChangeOrderStatus('Xác nhận')}
+          buttonName1="Xác nhận"
+          buttonColor1="red"
+          buttonIcon2="window-close"
+          buttonFunction2={() => setIsShowAcceptPopup(false)}
+          buttonName2="Không"
+          buttonColor2="green"
+          confirmPopup={true}
+        ></Response>
+      </View>
+    )
+  }
+
+  const renderShowDeliveryPopup = () => {
+    return (
+      <View style={{ position: "absolute", top: -(heightScreen * 0.1), width: widthScreen, height: heightScreen }}>
+
+        <Response
+          content="Bạn muốn xác nhận vận chuyển đơn này?"
+          buttonIcon1="check-circle"
+          buttonFunction1={() => handleChangeOrderStatus('Vận chuyển')}
+          buttonName1="Xác nhận"
+          buttonColor1="red"
+          buttonIcon2="window-close"
+          buttonFunction2={() => setIsShowAcceptPopup(false)}
+          buttonName2="Không"
+          buttonColor2="green"
+          confirmPopup={true}
+        ></Response>
+      </View>
+    )
+  }
+
 
   const renderOrderList = (item: orderItem, itemStatus: infoManagementEveryOrderStatus) => (
     <View style={styles.itemOrderContainer} key={item.ORDER_ID}>
@@ -451,41 +522,38 @@ export default function OrderManagement() {
 
       <View style={styles.footerOfItemOder}>
         {
-          // itemButtonList.map((itemButton, index) => {
-          //   if (itemButton.orderStatusCode === itemStatus.orderStatusCode && parseInt(item.PAYMENT_STATUS) === 0)
-          //     return (
-          //       <View key={index}>
-          //         <Button
-          //           iconName={itemButton.icon}
-          //           buttonName={itemButton.name}
-          //           handlePress={() => buttonPressCaseInEveryOrderStatus(item, itemButton, itemStatus)}
-          //         ></Button>
-          //       </View>
-          //     )
-          //   if (itemButton.orderStatusCode === itemStatus.orderStatusCode && itemButton.name !== itemButtonList[2].name)
-          //     return (
-          //       <View key={index}>
-          //         <Button
-          //           iconName={itemButton.icon}
-          //           buttonName={itemButton.name}
-          //           handlePress={() => buttonPressCaseInEveryOrderStatus(item, itemButton, itemStatus)}
-          //         ></Button>
-          //       </View>
-          //     )
-          // })
           itemButtonList.map((itemButton, index) => {
-            const isSameOrderStatusCode = itemButton.orderStatusCode === itemStatus.orderStatusCode;
-            const isUnpaid = parseInt(item.PAYMENT_STATUS) === 0;
-            const isNotThanhToan = itemButton.name !== itemButtonList[2].name;
-
-            if (isSameOrderStatusCode && (isUnpaid || isNotThanhToan)) {
+            // Điều kiện để hiển thị nút "Huỷ đơn"
+            if (itemButton.orderStatusCode === itemStatus.orderStatusCode && itemButton.name === "Huỷ đơn") {
               return (
                 <View key={index}>
                   <Button
                     iconName={itemButton.icon}
                     buttonName={itemButton.name}
                     handlePress={() => buttonPressCaseInEveryOrderStatus(item, itemButton, itemStatus)}
-                  ></Button>
+                  />
+                </View>
+              );
+            }
+            if (itemButton.orderStatusCode === itemStatus.orderStatusCode && itemButton.name === "Xác nhận") {
+              return (
+                <View key={index}>
+                  <Button
+                    iconName={itemButton.icon}
+                    buttonName={itemButton.name}
+                    handlePress={() => buttonPressCaseInEveryOrderStatus(item, itemButton, itemStatus)}
+                  />
+                </View>
+              );
+            }
+            if (itemButton.orderStatusCode === itemStatus.orderStatusCode && itemButton.name === "Vận chuyển") {
+              return (
+                <View key={index}>
+                  <Button
+                    iconName={itemButton.icon}
+                    buttonName={itemButton.name}
+                    handlePress={() => buttonPressCaseInEveryOrderStatus(item, itemButton, itemStatus)}
+                  />
                 </View>
               );
             }
@@ -573,7 +641,7 @@ export default function OrderManagement() {
               borderRadius: RD * 0.05,
               marginHorizontal: widthScreen * 0.025,
             }}>
-              <Text style={{ color: "white", fontWeight: "bold", alignItems: "center", textAlign: "center" }} >Đơn hàng của bạn đã bị huỷ</Text>
+              <Text style={{ color: "white", fontWeight: "bold", alignItems: "center", textAlign: "center" }} >Trạng thái đơn hàng đã được cập nhật</Text>
             </View>
           )
         }
@@ -587,8 +655,34 @@ export default function OrderManagement() {
         )
       }
       {
+        isShowAcceptPopup && (
+          <View style={{ position: "absolute", top: 0, height: heightScreen, width: widthScreen, backgroundColor: "gray", opacity: 0.6 }}>
+
+          </View>
+        )
+      }
+      {
+        isShowDeliveryPopup && (
+          <View style={{ position: "absolute", top: 0, height: heightScreen, width: widthScreen, backgroundColor: "gray", opacity: 0.6 }}>
+
+          </View>
+        )
+      }
+      {
         isShowConfirmPopup && renderShowConfirmPopup()
+      }
+      {
+        isShowAcceptPopup && renderShowAcceptPopup()
+      }
+      {
+        isShowDeliveryPopup && renderShowDeliveryPopup()
+      }
+      {
+        isLoading ? <View style={{ height: heightScreen * 0.5 }}>
+          <Loading></Loading>
+        </View> : renderEveryStatus()
       }
     </SafeAreaView>
   )
 }
+

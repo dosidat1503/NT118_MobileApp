@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native'
+import { View, Text, Pressable, StyleSheet, Alert } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { AntDesign, FontAwesome } from '@expo/vector-icons'
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
@@ -89,18 +89,28 @@ export default function EditMenu({ navigation }) {
   }, []);
 
   const onDelete = async (item) => {
-    try {
-      const response = await globalApi.deleteFAD(item.FAD_ID);
-      if (response.data !== null && response.statusCode === 200) {
-        console.log('Xóa thành công');
-        resetData();
-        fetchFadArray(1);
-      } else {
-        console.log('Xóa thất bại');
-      }
-    } catch (e) {
-      console.log('Lỗi khi xoá món ăn');
-    }
+    Alert.alert('Xác nhận', 'Bạn muốn xoá món ăn này? ', [
+      {
+        text: 'Không',
+      },
+      {
+        text: 'Có',
+        onPress: async () => {
+          try {
+            const response = await globalApi.deleteFAD(item.FAD_ID);
+            if (response.data !== null && response.statusCode === 200) {
+              console.log('Xóa thành công');
+              resetData();
+              fetchFadArray(1);
+            } else {
+              console.log('Xóa thất bại');
+            }
+          } catch (e) {
+            console.log('Lỗi khi xoá món ăn');
+          }
+        }
+      },
+    ]);
   };
 
 

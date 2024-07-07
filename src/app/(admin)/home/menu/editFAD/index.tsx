@@ -2,7 +2,7 @@ import Button from '@/components/Button';
 import React from 'react';
 import Colors from '@/constants/Colors';
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Image, Alert, KeyboardAvoidingView, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Image, Alert, KeyboardAvoidingView, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { StackActions, useNavigation, useRoute } from '@react-navigation/native';
@@ -11,10 +11,11 @@ import * as FileSystem from 'expo-file-system';
 import { randomUUID } from 'expo-crypto';
 import { Int32 } from 'react-native/Libraries/Types/CodegenTypes';
 import { ScrollView } from 'react-native-gesture-handler';
-
+import * as Icon from 'react-native-feather';
 import { Dropdown } from 'react-native-element-dropdown';
 import globalApi from '@/services/globalApi';
 import { uploadToFirebase } from '@/firebase';
+import { themeColors } from 'theme';
 
 interface Option {
   label: string;
@@ -393,7 +394,15 @@ const CreateProductScreen = ({ navigation, route }) => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
         <View style={styles.innerContainer}>
-          <Text style={styles.heading}>{isUpdating ? 'Cập nhật món ăn' : 'Tạo mới món ăn'}</Text>
+          <View style={{ position: 'relative' }}>
+            <Text style={styles.heading}>{isUpdating ? 'Cập nhật món ăn' : 'Tạo mới món ăn'}</Text>
+            <TouchableOpacity style={styles.absolute} onPress={() => {
+              navigation.pop();
+            }
+            }>
+              <Icon.ArrowLeft strokeWidth={3} stroke={themeColors.bgColor(1)} />
+            </TouchableOpacity>
+          </View>
           <Image
             source={{ uri: image || "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/default.png" }}
             style={styles.image}
@@ -548,6 +557,22 @@ const CreateProductScreen = ({ navigation, route }) => {
 export default CreateProductScreen;
 
 const styles = StyleSheet.create({
+  absolute: {
+    position: 'absolute',
+    top: 20, // 14 * 4
+    left: 1, // 4 * 4
+    backgroundColor: 'rgba(255,255,255,1)', // bg-gray-50
+    padding: 8, // p-2
+    borderRadius: 9999, // rounded-full
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   container: {
     flex: 1,
     paddingTop: StatusBar.currentHeight,

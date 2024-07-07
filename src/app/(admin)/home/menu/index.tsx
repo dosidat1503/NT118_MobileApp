@@ -6,7 +6,7 @@ import {
   Pressable,
   Image,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { FontAwesome, FontAwesome5, Entypo } from "@expo/vector-icons";
 import {
   Roboto_400Regular,
@@ -15,6 +15,21 @@ import {
 } from "@expo-google-fonts/roboto";
 import { useFonts } from "expo-font";
 import { router, useNavigation } from "expo-router";
+import { useCartContext } from "@/providers.tsx/CartProvider";
+
+type PersonalInfo = {
+  name: string;
+  avatar: string;
+  email: string;
+  phoneNumber: string;
+  birthDate: string;
+  facebookLink: string;
+  schoolName: string;
+  address: string;
+  codeVerifyEmail: string;
+};
+
+
 
 export default function MenuScreen({ navigation, route }) {
   const [fontsLoaded] = useFonts({
@@ -22,6 +37,8 @@ export default function MenuScreen({ navigation, route }) {
     Roboto_500Medium,
     Roboto_700Bold,
   });
+
+  const { heightScreen, widthScreen, mainColor, emailPattern, phoneNumberPattern, baseURL, userID } = useCartContext();
   return (
     <View style={styles.homeContainer}>
       <View style={styles.headerBar}>

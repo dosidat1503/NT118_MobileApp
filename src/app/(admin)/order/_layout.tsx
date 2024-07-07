@@ -9,8 +9,16 @@ export default function OrderStack() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Shop',
-          headerShown: false,
+          title: 'Orders',
+          headerTitleAlign: 'center'
+        }}
+      />
+      <Stack.Screen
+        name="OrderDetail"
+        options={{
+          title: 'Chi tiết đơn hàng',
+          // headerShown: false,
+          headerTitleAlign: 'center'
         }}
       />
     </Stack>

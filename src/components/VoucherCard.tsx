@@ -1,3 +1,4 @@
+import { formatCurrency } from "@/utils/formatter";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Link } from "expo-router";
 import React
@@ -29,8 +30,8 @@ const VoucherCard = ({ url, item, onEdit, onDelete }: VoucherCardProps) => {
       <Image source={require(`../../assets/images/discount.png`)} style={styles.itemImage} />
       <View style={styles.nameView}>
         <View style={styles.textContainer}>
-          <Text style={styles.nameText}>Giảm {item.DISCOUNT_VALUE}</Text>
-          <Text style={styles.descText}>Đơn tối thiểu{item.MIN_ORDER_TOTAL}</Text>
+          <Text style={styles.nameText}>Giảm {item.DISCOUNT_VALUE}%</Text>
+          <Text style={styles.descText}>Đơn tối thiểu {formatCurrency(item.MIN_ORDER_TOTAL)}</Text>
           <View style={styles.priceView}>
             <Text style={styles.priceText}>{item.VOUCHER_CODE}</Text>
           </View>
