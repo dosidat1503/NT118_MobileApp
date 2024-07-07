@@ -44,7 +44,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Restaurant',
+          title: 'Trang chủ',
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
 
@@ -54,7 +54,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="order"
         options={{
-          title: 'Orders',
+          title: 'Đơn hàng',
           tabBarIcon: ({ color }) => <TabBarIcon1 name="box" color={color} />,
         }}
       />
@@ -62,7 +62,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="user"
         options={{
-          title: 'User',
+          title: 'Người dùng',
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
