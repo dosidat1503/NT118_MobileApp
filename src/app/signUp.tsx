@@ -75,14 +75,14 @@ export default function SignUp () {
     const handleRegistration = () => {
 
         //kiểm tra định dạng email
-        // if(!emailPattern.test(signUpInfo.email)) {
-        //     console.log('Email không hợp lệ!');
-        //     setValidation({
-        //       ...validation,
-        //       email: false
-        //     })
-        //     return;
-        // }
+        if(!emailPattern.test(signUpInfo.email)) {
+            console.log('Email không hợp lệ!');
+            setValidation({
+              ...validation,
+              email: false
+            })
+            return;
+        }
         setIsLoading(true);
         //kiểm tra định dạng số điện thoại
         if(!phoneNumberPattern.test(signUpInfo.phoneNumber)) {
@@ -138,8 +138,10 @@ export default function SignUp () {
         console.log('Đăng ký thành công!', signUpInfo);
     };
  
-  return (   
-    <SafeAreaView>
+  return (  
+    isLoading
+    ? <Loading></Loading> 
+    : <SafeAreaView>
       <Stack.Screen  options={{ headerShown: false }} />
       <View style={isLoading ? [{display: 'none'}] :styles.divContainer}>
         <ImageBackground
@@ -315,10 +317,7 @@ export default function SignUp () {
             </View>
           </TouchableOpacity> 
         </ImageBackground>
-      </View> 
-      <View>
-        <Loading></Loading>
-      </View>
+      </View>  
     </SafeAreaView>
   );
 }; 

@@ -189,7 +189,9 @@ export default function OrderManagement() {
     const [isLoading, setIsLoading] = useState(false); 
     const [isShowConfirmPopup, setIsShowConfirmPopup] = useState(false);
     const [isShowPopupAfterCancelOrder, setIsShowPopupAfterCancelOrder] = useState(false);
+    const [changingStatus, setChangingStatus] = useState(false);
 
+    //useEffect phục vụ cho thanh taskbar để chuyển đổi trạng thái
     useEffect(() => {   
         let newInfoManagementEveryOrderStatus: infoManagementEveryOrderStatus[] = []
         orderStatusList.map((item: any, index: any) => { 
@@ -204,67 +206,68 @@ export default function OrderManagement() {
                     isActive: item.name === orderStatusList[0].name ? true : false
                 } 
             )
-        })  
+        })   
         setInfoManagementEveryOrderStatus(newInfoManagementEveryOrderStatus)
         setInitialLoad(true);
     }, []);
 
     useEffect(() => {
         getOrderListFromServe(orderStatusList[0].id, 1);
-        // console.log(infoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus useeffect")
+        console.log(infoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus useeffect")
     }, [initialLoad])
 
     //orderStatusName = "" thì có nghĩa là load lần đầu. mà load lần đầu thì load 10 trạng thái đơn hàng đầu tiên của mỗi trạng thái đơn hàng
     //orderStatusName = "Đang chuẩn bị" (có thể là tên các trạng thái khác) thì load 10 trạng thái đơn hàng tiếp theo của trạng thái đơn hàng "Đang chuẩn bị"
-    const getOrderListFromServe = useCallback((orderStatusCode: number, pageNumber: number) => { 
+    const getOrderListFromServe = (orderStatusCode: number, pageNumber: number) => { 
 
-            // nếu mà load theo một trạng thái thì startIndexLoadOneStatus = số lượng đơn hàng muốn load thêm * (số trang - 1) + 1
-            // ví dụ load thêm 10 đơn hàng của trạng thái "Đang chuẩn bị" thì startIndexLoadOneStatus = 10 * (2 - 1) + 1 = 11 
-            setIsLoading(true);
-            const requestData = {
-                orderStatusCode: orderStatusCode,
-                startIndex: (itemQuantityEveryLoad * ( pageNumber - 1 )),
-                itemQuantityEveryLoad: itemQuantityEveryLoad, 
-                userID: userID === 0 ? 1 : userID
-            }
-    
-            // console.log(requestData, "requestData", orderStatusCode)
-    
-            axios.get( baseURL + "/getOrderInfoOfUser", { params: requestData })
-            .then((response) => {
-                console.log(response.data.infoOrder, "response.data âccs")
-                if(response.data.infoOrder.length !== 0) {
-                    const newInfoManagementEveryOrderStatus =  infoManagementEveryOrderStatus.map((itemInList) => {
-                        if (itemInList.orderStatusCode === orderStatusCode) {
-                            return {
-                                ...itemInList,
-                                orderItemList: itemInList.orderItemList.concat(response.data.infoOrder),
-                                pageNumber: ++pageNumber,
-                                isActive: true
-                            };
-                        }
-                        return {
-                            ...itemInList, 
-                            isActive: false
-                        };
-                    }) 
-                    setInfoManagementEveryOrderStatus(newInfoManagementEveryOrderStatus)
-                    // console.log(newInfoManagementEveryOrderStatus, "newInfoManagementEveryOrderStatus")
-                }
-                setIsLoading(false);
-            })
+        // nếu mà load theo một trạng thái thì startIndexLoadOneStatus = số lượng đơn hàng muốn load thêm * (số trang - 1) + 1
+        // ví dụ load thêm 10 đơn hàng của trạng thái "Đang chuẩn bị" thì startIndexLoadOneStatus = 10 * (2 - 1) + 1 = 11 
+        setIsLoading(true);
+        const requestData = {
+            orderStatusCode: orderStatusCode,
+            startIndex: (itemQuantityEveryLoad * ( pageNumber - 1 )),
+            itemQuantityEveryLoad: itemQuantityEveryLoad, 
+            userID: userID === 0 ? 1 : userID
         }
-    , [infoManagementEveryOrderStatus])
+        setChangingStatus(true);
+
+        // console.log(requestData, "requestData", orderStatusCode)
+
+        axios.get( baseURL + "/getOrderInfoOfUser", { params: requestData })
+        .then((response) => {
+            console.log(response.data.infoOrder, "response.data âccs")
+            if(response.data.infoOrder.length !== 0) {
+                const newInfoManagementEveryOrderStatus =  infoManagementEveryOrderStatus.map((itemInList) => {
+                    if (itemInList.orderStatusCode === orderStatusCode) {
+                        return {
+                            ...itemInList,
+                            orderItemList: itemInList.orderItemList.concat(response.data.infoOrder),
+                            pageNumber: ++pageNumber,
+                            isActive: true
+                        };
+                    }
+                    return {
+                        ...itemInList, 
+                        isActive: false
+                    };
+                }) 
+                setInfoManagementEveryOrderStatus(newInfoManagementEveryOrderStatus)
+                console.log(newInfoManagementEveryOrderStatus, "newInfoManagementEv2eryOrderStatus", orderStatusCode)
+                setChangingStatus(false);
+            }
+            setIsLoading(false);
+        })
+    } 
 
     const getOrderInfo = (item: infoManagementEveryOrderStatus) => {
         getOrderListFromServe(item.orderStatusCode, item.pageNumber);
-        // console.log(item, "item") 
+        console.log(item, "getOrderInfoê") 
     }
 
     const navigation = useNavigation();
  
-    const handleChangeOrderStatus = useCallback(() => {
-        console.log(  "orderStatusCode")
+    const handleChangeOrderStatus =  () => {
+        console.log(  "orderStatusssCode")
         if(parameterForChangeOrderStatus.orderStatusCode === itemButtonList[0].orderStatusCode){
             let newOrderItemList = parameterForChangeOrderStatus.itemStatus.orderItemList.filter((itemInList) => itemInList.ORDER_ID !== parameterForChangeOrderStatus.item.ORDER_ID)
             setInfoManagementEveryOrderStatus(
@@ -289,7 +292,7 @@ export default function OrderManagement() {
                 console.log(error)
             })
         } 
-    }, [parameterForChangeOrderStatus])
+    } 
 
     const openInBrowser = async () => {
         // Linking.openURL(vnpURL)
@@ -325,7 +328,7 @@ export default function OrderManagement() {
                 setIsLoading(false);
                 // navigation.navigate("OrderSuccess" as never);
                 console.log(response.data, 'kksks')
-                // openInBrowser();
+                openInBrowser();
             })
             .catch((error) => {
                 console.log(error)
@@ -372,7 +375,7 @@ export default function OrderManagement() {
     const renderOrderList = (item: orderItem, itemStatus: infoManagementEveryOrderStatus) =>  (
         <View  style={styles.itemOrderContainer} key={item.ORDER_ID}>
             <View style={styles.headerOfItemOrder}>
-                <Image source={{ uri: item.FAD_INFO.IMAGE_URL }} style={styles.imgOfItem}/>
+                <Image source={{ uri: item.FAD_INFO.IMAGE_URL || "" }} style={styles.imgOfItem}/>
                 <View style={{marginLeft: widthScreen * 0.02 }}>
                     <Text style={styles.headerTitelOfItemOder}>{item.FAD_INFO.FAD_NAME}</Text>
                     <Text style={styles.headerNormalTextOfItemOder}>Giá: {item.FAD_INFO.FAD_PRICE} - id: {item.ORDER_ID}</Text>
@@ -454,11 +457,11 @@ export default function OrderManagement() {
         </View>
     )  
  
-    const renderEveryStatus = () => {
+    const renderEveryStatus = useCallback(() => {
         return infoManagementEveryOrderStatus.map((itemStatus, index) => {
-            console.log(itemStatus.orderStatusName, itemStatus.isActive, "isActive");
             if (itemStatus.isActive && itemStatus.orderItemList.length !== 0) {
-                console.log(itemStatus.orderItemList, "itemStatus.orderItemList2f2ss")
+                console.log(itemStatus.orderStatusName, itemStatus.isActive, "isActive");
+                // console.log(itemStatus.orderItemList, "itemStatus.orderItemList2f2ss")
                 return (
                     <FlatList
                         data={itemStatus.orderItemList}
@@ -471,9 +474,8 @@ export default function OrderManagement() {
                 );
             } 
             else return null;
-        });
- 
-    }
+        }); 
+    }, [infoManagementEveryOrderStatus]);
 
     useEffect(() => {
         let timer: any;
@@ -532,7 +534,7 @@ export default function OrderManagement() {
                         </View>
                     )
                 }
-                { renderEveryStatus() }
+                { changingStatus === false && renderEveryStatus()}
             </View> 
             {
                 isShowConfirmPopup && ( 

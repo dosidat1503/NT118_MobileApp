@@ -56,7 +56,7 @@ export default function InfoListItemFADofShop({item}: {item: any}) {
             <View style={styles.itemContainer}>
                 <View style={styles.imageContainer}> 
                     <Image
-                        source={{uri: item.image}}
+                        source={{uri: item.image || ""}}
                         style={styles.image}
                     ></Image>
                     <FontAwesome5

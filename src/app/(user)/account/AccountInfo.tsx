@@ -411,7 +411,9 @@ export default function AccountInfo() {
       ? <Loading></Loading>
       : <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
-        <Image source={{ uri: personalInfo.avatar }} style={styles.avatar} />
+        {
+          personalInfo.avatar && <Image source={{ uri: personalInfo.avatar || "" }} style={styles.avatar} />
+        }
         {isEditing ? (
           <>
             {/* <TextInput

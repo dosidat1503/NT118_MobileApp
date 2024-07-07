@@ -127,7 +127,7 @@ export default function FoodStallShop() {
                         :  <View> 
                             {/* Hiển thị ảnh cover */}
                             <Image
-                                source={{ uri: infoShop?.COVER_IMAGE_URL }}
+                                source={{ uri: infoShop?.COVER_IMAGE_URL || ""}}
                                 style={styles.cover}
                             ></Image>   
                             <InfoShop infoShop={infoShop}></InfoShop>

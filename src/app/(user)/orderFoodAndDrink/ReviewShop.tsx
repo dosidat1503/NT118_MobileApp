@@ -20,6 +20,7 @@ export default function ReviewShop( rateInfo: rateProps ) {
             flexDirection: 'column',
             justifyContent: 'center', 
             alignSelf: "center", 
+            marginTop: heightScreen * 0.01,
         },
         reviewShopContainer: { 
             flexDirection: 'column', 
@@ -90,7 +91,7 @@ export default function ReviewShop( rateInfo: rateProps ) {
                 <View style={styles.reviewShopItem}>
                     <View style={{ flexDirection: "row" }}>
                         <Image
-                            source={{uri: rateInfo.USER_AVT_URL}}
+                            source={{uri: rateInfo.USER_AVT_URL || ""}}
                             style={styles.avatar}
                         />
                         <View style={styles.nameAndStarContainer}>

@@ -37,7 +37,7 @@ export default function FADShop({products}: {products: any}){
                 {/* <View> */}
                     <View style={{ flex: 4.5, width: "100%", justifyContent: "center", alignItems: "center"}}>
                         <Image
-                            source={{uri: item.SHOP_IMAGE_URL}}
+                            source={{uri: item.SHOP_IMAGE_URL || ""}}
                             style={styles.FADShopImage as ImageStyle} // Cast the style to ImageStyle
                         ></Image>
                     </View>

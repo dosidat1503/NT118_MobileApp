@@ -52,6 +52,7 @@ interface OrderInfo {
     sizes: Size[];
     toppings: Topping[];
     note: string;
+    description: string;
     quantity: number;
     isCheckedForPayment: boolean;
     totalOfItem: number;    
@@ -98,20 +99,21 @@ export default function DetailInfoOfFAD() {
         console.log("useEffect DetailInfoOfFAD", DetailInfoOfFAD.FAD_PRICE, orderInfoOfItem)  
         if (DetailInfoOfFAD.FAD_ID !== undefined) {
             setOrderInfoOfItem({
-              id: DetailInfoOfFAD.FAD_ID,
-              name: DetailInfoOfFAD.FAD_NAME,
-              price: DetailInfoOfFAD.FAD_PRICE,
-              uri: DetailInfoOfFAD.FOOD_IMAGE_URL,
-              shopName: DetailInfoOfFAD.SHOP_NAME,
-              shopID: 0,
-              shopAvatarURL: "",
-              sizes: [],
-              toppings: [],
-              note: "",
-              quantity: 1,
-              isCheckedForPayment: true,
-              totalOfItem: 0,
-              moneyWhenQuantityIsOne: 0
+                id: DetailInfoOfFAD.FAD_ID,
+                name: DetailInfoOfFAD.FAD_NAME,
+                price: DetailInfoOfFAD.FAD_PRICE,
+                uri: DetailInfoOfFAD.FOOD_IMAGE_URL,
+                shopName: DetailInfoOfFAD.SHOP_NAME,
+                shopID: 0,
+                shopAvatarURL: "",
+                sizes: [],
+                toppings: [],
+                note: "",
+                description: DetailInfoOfFAD.DESCRIPTION,
+                quantity: 1,
+                isCheckedForPayment: true,
+                totalOfItem: 0,
+                moneyWhenQuantityIsOne: 0
             });
         }
     }, [DetailInfoOfFAD])
@@ -266,6 +268,35 @@ export default function DetailInfoOfFAD() {
             fontWeight: 'bold',
             textAlign: 'center',
         },
+        descriptionShopDivContainer: {
+            flexDirection: 'column',
+            justifyContent: 'center', 
+            alignSelf: "center", 
+            marginTop: heightScreen * 0.01,
+        },
+        descriptionShopContainer: { 
+            flexDirection: 'column', 
+            borderWidth: 1, 
+            borderColor: "#89CFF0",
+            backgroundColor: "white",   
+            borderRadius: heightScreen * 0.1,
+        },  
+        descriptionShopItem: {
+            flexDirection: 'row',
+            alignItems: "center",
+            justifyContent: "space-between",
+            paddingVertical: heightScreen * 0.01,
+            paddingHorizontal: widthScreen * 0.04,
+            width: widthScreen * 0.95,
+            // borderBottomWidth: 1,
+            // borderBottomColor: "#89CFF0"
+        },
+        descriptionText: {
+            fontWeight: "500",
+            fontSize: heightScreen * 0.019,
+            paddingLeft: widthScreen * 0.02,
+            opacity: 0.9
+        },
     }) 
 
     const [orderInfoOfItem, setOrderInfoOfItem] = useState<OrderInfo>({
@@ -279,6 +310,7 @@ export default function DetailInfoOfFAD() {
         sizes: [],
         toppings: [],
         note: "",
+        description: "",
         quantity: 1,
         isCheckedForPayment: true,
         totalOfItem: 0,
@@ -540,7 +572,7 @@ export default function DetailInfoOfFAD() {
         : <SafeAreaView style={[{flex: 10}]}> 
             <Stack.Screen 
                 options={{ 
-                    title: "Chi tiết sản phẩm",
+                    title: "Thông tin sản phẩm",
                     headerRight: () => (
                         <Link href="/(user)/orderFoodAndDrink/Cart" asChild>
                             <Pressable>
@@ -643,11 +675,21 @@ export default function DetailInfoOfFAD() {
                                             <Text  
                                                 style={styles.nameFADText}
                                             >Mô tả</Text>
+                                        </View> 
+                                    </View>
+                                    
+                                    <View style={styles.descriptionShopDivContainer}>
+                                        <View style={styles.descriptionShopContainer}>
+                                            <View style={styles.descriptionShopItem}>
+                                                <Text
+                                                    style={styles.descriptionText}
+                                                >
+                                                    {DetailInfoOfFAD.DESCRIPTION}
+                                                </Text> 
+                                            </View>   
                                         </View>
-                                         
                                     </View>
-                                    <View style={styles.selectItemContainer}> 
-                                    </View>
+                                     
                                     <View style={styles.titleFADContainer}> 
                                         <View>
                                             <Text  

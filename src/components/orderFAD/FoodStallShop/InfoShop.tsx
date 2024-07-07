@@ -94,7 +94,7 @@ export default function InfoShop({infoShop}: {infoShop: any}) {
                 {/* avatar & name shop */}
                 <View style={styles.infoShopItem}>
                     <Image
-                        source={{uri: infoShop?.AVT_IMAGE_URL}}
+                        source={{uri: infoShop?.AVT_IMAGE_URL || ""}}
                         style={styles.avatar}
                     />
                     <Text
