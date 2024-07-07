@@ -2,7 +2,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, NavigationContainer, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { SplashScreen } from 'expo-router';
-import {  Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { Fragment, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import CartProvider from '@/providers.tsx/CartProvider';
@@ -57,14 +57,14 @@ function RootLayoutNav() {
   return (
     <Fragment>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <CartProvider> 
+        <CartProvider>
           <Stack>
             <Stack.Screen name="(user)" options={{ headerShown: false }} />
-            <Stack.Screen name="(admin)" options={{ headerShown: false }} /> 
+            <Stack.Screen name="(admin)" options={{ headerShown: false }} />
             <Stack.Screen name="signUp" options={{ headerShown: false }} />
-            <Stack.Screen name="signUpSuccess" options={{ headerShown: false }} /> 
-            {/* <Stack.Screen name="(user)/home/filter" options={{ headerShown: false }} />  */} 
-          </Stack> 
+            <Stack.Screen name="signUpSuccess" options={{ headerShown: false }} />
+            {/* <Stack.Screen name="(user)/home/filter" options={{ headerShown: false }} />  */}
+          </Stack>
         </CartProvider>
       </ThemeProvider >
     </Fragment>

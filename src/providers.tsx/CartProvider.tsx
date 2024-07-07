@@ -1,7 +1,7 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 import { Dimensions } from "react-native";
 import { CartItem, Product } from "@/types";
-import {randomUUID} from 'expo-crypto' 
+import { randomUUID } from 'expo-crypto'
 import React from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -9,14 +9,14 @@ type productsProp = {
     id: number,
     name: string,
     image: string,
-    price: number 
+    price: number
 }
 
 type selectedItemProp = {
     topicItem: any[],
-    sortByItem: number, 
+    sortByItem: number,
     startDate: string,
-    endDate: string 
+    endDate: string
 }
 
 type toppingType = {
@@ -31,13 +31,13 @@ type productListType = {
     name: string,
     price: number,
     size: string,
-    toppings: toppingType[], 
+    toppings: toppingType[],
     quantity: number,
-    totalOfItem: number 
+    totalOfItem: number
 }
 
 type orderInforType = {
-    deliveryInfo: { 
+    deliveryInfo: {
         id: number,
         name: string,
         phone: string,
@@ -52,7 +52,7 @@ type orderInforType = {
     paymentStatus: number,
     voucherCODE: string,
     paymentTotal: number,
-    userID: number 
+    userID: number
 }
 
 type CartType = {
@@ -63,30 +63,30 @@ type CartType = {
     widthScreen: number,
     heightScreen: number,
     mainColor: string,
-    products: productsProp[], 
+    products: productsProp[],
     baseURL: string,
     emailPattern: RegExp,
     phoneNumberPattern: RegExp,
-    fullNamePattern: RegExp, 
+    fullNamePattern: RegExp,
     defaultImageID: number,
     // textQueryPost: string,
     // setTextQueryPost: any,
     orderStatusList: any,
     userID: number,
-    setUserID: any, 
-    setFADShop_ID: any,  
-    setDetailInfoOfFAD: any, 
+    setUserID: any,
+    setFADShop_ID: any,
+    setDetailInfoOfFAD: any,
     RD: number, //rectangular diagonal  
-    setOrderID: any,   
-    setTextToSearchFAD: any,  
-    setTagIDToGetFADInfo: any, 
+    setOrderID: any,
+    setTextToSearchFAD: any,
+    setTagIDToGetFADInfo: any,
     setVnpURL: any,
     // deliveryInfoItem: any,
     // setDeliveryInfoItem: any, 
     isUpdatedInfoDelivery: boolean,
-    setIsUpdatedInfoDelivery: any, 
-    setOrderInfo: any, 
-    setShopID: any, 
+    setIsUpdatedInfoDelivery: any,
+    setOrderInfo: any,
+    setShopID: any,
     setContentForOrderSuccess: any,
     returnHome: boolean,
     setReturnHome: any
@@ -100,28 +100,29 @@ const CartContext = createContext<CartType>({
     widthScreen: 0,
     heightScreen: 0,
     mainColor: "#89CFF0",
-    products: [],  
-    baseURL: "http://26.85.40.176:8000/api",
+    products: [],
+    baseURL: "http://10.20.7.112:8000/api",
     emailPattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
     phoneNumberPattern: /^0\d{9}$/,
-    fullNamePattern: /^[\p{L}\s]+$/u, 
+    fullNamePattern: /^[\p{L}\s]+$/u,
     defaultImageID: 1,
     // textQueryPost: "",
     // setTextQueryPost: () => {},
     orderStatusList: [],
+    adminOrderStatusList: [],
     userID: 0,
-    setUserID: () => {}, 
-    setFADShop_ID: () => {},  
-    setDetailInfoOfFAD: () => {}, 
-    RD: 0, 
-    setOrderID: () => {},    
-    setTextToSearchFAD: ()=> {},  
-    setTagIDToGetFADInfo: () => {}, 
-    setVnpURL: () => {},
+    setUserID: () => { },
+    setFADShop_ID: () => { },
+    setDetailInfoOfFAD: () => { },
+    RD: 0,
+    setOrderID: () => { },
+    setTextToSearchFAD: () => { },
+    setTagIDToGetFADInfo: () => { },
+    setVnpURL: () => { },
     // deliveryInfoItem: {},
     // setDeliveryInfoItem: () => {}, 
     isUpdatedInfoDelivery: false,
-    setIsUpdatedInfoDelivery: () => {},
+    setIsUpdatedInfoDelivery: () => { },
     // orderInfo: {
     //     deliveryInfo: {
     //         id: 0,
@@ -140,14 +141,14 @@ const CartContext = createContext<CartType>({
     //     paymentTotal: 0,
     //     userID: 0,
     // },
-    setOrderInfo: () => {},  
-    setShopID: () => {}, 
-    setContentForOrderSuccess: () => {},
+    setOrderInfo: () => { },
+    setShopID: () => { },
+    setContentForOrderSuccess: () => { },
     returnHome: false,
-    setReturnHome: () => {}
+    setReturnHome: () => { }
 });
 
-const CartProvider = ({children} : PropsWithChildren) => {
+const CartProvider = ({ children }: PropsWithChildren) => {
     // const [items, setItems] = useState<CartItem[]>([])
     // const addItem = (product: Product, size: CartItem['size']) => {
     //     const existingItem = items.find(item => item.product === product && size === item.size)
@@ -174,7 +175,7 @@ const CartProvider = ({children} : PropsWithChildren) => {
     const widthScreen = Dimensions.get("window").width
     const heightScreen = Dimensions.get("window").height
     const mainColor = "#89CFF0"
-    const baseURL = "http://26.85.40.176:8000/api"
+    const baseURL = "http://10.20.7.112:8000/api"
     const emailPattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
     const phoneNumberPattern = /^0\d{9}$/
     const fullNamePattern = /^[\p{L}\s]+$/u
@@ -184,14 +185,14 @@ const CartProvider = ({children} : PropsWithChildren) => {
     // const [FADShop_ID, setFADShop_ID] = useState(0) 
     const setFADShop_ID = (id: number) => {
         AsyncStorage.setItem('FADShop_ID', id.toString());
-    } 
+    }
     // const [DetailInfoOfFAD, setDetailInfoOfFAD] = useState({} as any) // Fix: Update the type of DetailInfoOfFAD to any
     const setDetailInfoOfFAD = (data: any) => {
         AsyncStorage.setItem('DetailInfoOfFAD', JSON.stringify(data));
-    }  
+    }
     const setOrderID = (id: number) => {
         AsyncStorage.setItem('orderID', id.toString());
-    } 
+    }
     const setTextToSearchFAD = (text: string) => {
         AsyncStorage.setItem('textToSearchFAD', text);
     }
@@ -214,7 +215,7 @@ const CartProvider = ({children} : PropsWithChildren) => {
     }
     const RD = widthScreen * heightScreen;//rectangular diagonal      
     const [returnHome, setReturnHome] = useState(false) // Fix: Update the type of returnHome to boolean
-    
+
     const products = [
         {
             id: 1,
@@ -288,13 +289,21 @@ const CartProvider = ({children} : PropsWithChildren) => {
     ];
 
     const orderStatusList = [
-        { id: 1, name: "Chờ xác nhận", icon: "clock"},
+        { id: 1, name: "Chờ xác nhận", icon: "clock" },
         { id: 2, name: "Đang chuẩn bị", icon: "clock" },
         { id: 3, name: "Đang giao", icon: "motorcycle" },
         { id: 4, name: "Đã giao", icon: "clipboard-check" },
         { id: 5, name: "Đã hủy", icon: "window-close" }
     ]
-     
+
+    const adminOrderStatusList = [
+        { id: 1, name: "Chờ xác nhận", icon: "clock" },
+        { id: 2, name: "Đang chuẩn bị", icon: "clock" },
+        { id: 3, name: "Đang giao", icon: "motorcycle" },
+        { id: 4, name: "Đã giao", icon: "clipboard-check" },
+        { id: 5, name: "Đã hủy", icon: "window-close" }
+    ]
+
     // const [deliveryInfoItem, setDeliveryInfoItem] = useState({ 
     //     name: "",
     //     phone: 0,
@@ -336,28 +345,28 @@ const CartProvider = ({children} : PropsWithChildren) => {
     //     paymentTotal: 0,
     //     userID: userID
     // }) 
- 
+
     return (
         <CartContext.Provider value={{
             // items, addItem, updateQuantity, total, 
-            heightScreen, widthScreen, mainColor, products,  
+            heightScreen, widthScreen, mainColor, products,
             baseURL, emailPattern, phoneNumberPattern, fullNamePattern, // Fix: Update the type of emailPattern to string
-            defaultImageID, 
+            defaultImageID,
             // textQueryPost, setTextQueryPost,
             orderStatusList, userID, setUserID,
-            setFADShop_ID, 
-            setDetailInfoOfFAD, RD,  setOrderID,
-            setTextToSearchFAD,  setTagIDToGetFADInfo,
+            setFADShop_ID,
+            setDetailInfoOfFAD, RD, setOrderID,
+            setTextToSearchFAD, setTagIDToGetFADInfo,
             setVnpURL,
             // deliveryInfoItem, setDeliveryInfoItem,
-            setIsUpdatedInfoDelivery,  setOrderInfo, setShopID,
-            setContentForOrderSuccess,  
+            setIsUpdatedInfoDelivery, setOrderInfo, setShopID,
+            setContentForOrderSuccess,
             returnHome, setReturnHome,
             isUpdatedInfoDelivery,
-        }}> 
+        }}>
             {children}
         </CartContext.Provider>
-    )   
+    )
 }
 
 export default CartProvider;

@@ -2,7 +2,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { Link, Tabs } from 'expo-router';
 import { Pressable, useColorScheme } from 'react-native';
-
+import React from 'react';
 import Colors from '../../constants/Colors';
 
 /**
@@ -32,7 +32,8 @@ export default function TabLayout() {
         tabBarInactiveTintColor: 'gainsboro',
         tabBarStyle: {
           backgroundColor: Colors.light.tint
-        }
+        },
+        tabBarHideOnKeyboard: true,
       }}>
 
       <Tabs.Screen
@@ -43,7 +44,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          title: 'Restaurant',
+          title: 'Trang chủ',
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
 
@@ -53,7 +54,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="order"
         options={{
-          title: 'Orders',
+          title: 'Đơn hàng',
+          headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon1 name="box" color={color} />,
         }}
       />
@@ -61,7 +63,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="user"
         options={{
-          title: 'User',
+          title: 'Người dùng',
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
