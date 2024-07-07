@@ -3,7 +3,7 @@ import { FlatList, StyleSheet, View, Text, Image, TextInput, Button,  Pressable,
 import { useCartContext } from '@/providers.tsx/CartProvider';  
 import FontAwesome from '@expo/vector-icons/FontAwesome'; 
 import { FontAwesome5 } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';   
+import { useCallback, useEffect, useState } from 'react';   
 import { SelectList } from 'react-native-dropdown-select-list';
 import Filter, { filters } from './filter';  
 import { useNavigation } from 'expo-router'; 
@@ -22,7 +22,7 @@ LogBox.ignoreLogs(['Warning: ...']);
 
 
 const  Home = React.memo( () => {   
-  const { heightScreen, widthScreen, mainColor, baseURL, RD } = useCartContext();
+  const { heightScreen, widthScreen, mainColor, baseURL, RD, returnHome } = useCartContext();
 
   const styles = StyleSheet.create({ 
     image: {
@@ -130,37 +130,28 @@ const  Home = React.memo( () => {
     },
   });
 
-  const navigation = useNavigation();
-  const [image, setImage] = useState('');
-  const [imageList, setImageList] = useState<string[]>([]); 
+  const navigation = useNavigation();  
   
   const [expandInputPostInfo, setExpandInputPostInfo] = useState(false)
   const [topicSelectedToPost, setTopicSelectedToPost] = useState("")
-  const [backFromAddPost, setBackFromAddPost] = useState(false)
-  // const handleBackFromAddPost = () => {
-  //   setBackFromAddPost(!backFromAddPost)
-  // } 
-  // const route = useRoute();
-  // console.log(route.params, 'route.params');
-  // const { screen } = route.params as any;
-  // useEffect(() => { setBackFromAddPost(true) }, [screen])
+  
   
   const dataToSelectTopic = [
     {key:'1', value:'Chọn chủ đề', disabled:true}, 
   ]
 
   const [nameAndAVTURL, setNameAndAVTURL] = useState({name: '', url: ''})
-  const getNameAndAVTURL = async () => {
+  const getNameAndAVTURL = useCallback(async () => {
     const NameAndAVTURL = await AsyncStorage.getItem('NameAndAVTURL'); 
     if (NameAndAVTURL) {
-      const JSONNameAndAVTURL = JSON.parse(NameAndAVTURL )
+      const JSONNameAndAVTURL = JSON.parse(NameAndAVTURL);
       setNameAndAVTURL({
         name: JSONNameAndAVTURL.NAME,
-        url: JSONNameAndAVTURL.AVT_URL
-      })
+        url: JSONNameAndAVTURL.AVT_URL,
+      });
       console.log(JSONNameAndAVTURL, 'JSONNameAndAVTURL');
     }
-  }
+  }, []);
   useEffect(() => {
     getNameAndAVTURL() 
   }, [])
@@ -186,20 +177,32 @@ const  Home = React.memo( () => {
   
   importDataFromFilters(); // Call the function here
 
+  const renderAvatar = useCallback(() => {
+    return ( 
+        nameAndAVTURL.url && 
+        <Image
+          style={ styles.image }
+          source={{ uri: nameAndAVTURL.url || "" }}
+        ></Image>  
+    )
+  }, [nameAndAVTURL.url])
+
+  const searchPost = useCallback(() => {
+    return ( 
+      <SearchPost 
+        // backFromAddPost={backFromAddPost} 
+        // setBackFromAddPost={setBackFromAddPost}
+        isHome={true}
+      ></SearchPost>
+    )
+  }, [])
+
   return (   
-      <View style={{backgroundColor: "white"}}>  
-        {
-          image 
-          && <FlatList
-                data={imageList}
-                renderItem={({item}) => (<Image source={{ uri: item }} style={styles.image} />)}
-            ></FlatList>
-        }
+      <View style={{backgroundColor: "white"}}> 
         <View style={ [styles.createPost, expandInputPostInfo && styles.expandInputPostInfoContainer]}> 
-          <Image
-            style={ styles.image }
-            source={{ uri: nameAndAVTURL.url }}
-          ></Image> 
+          {
+            renderAvatar()
+          }
           <View style={styles.createPostCenterContainer}>   
             <View style={styles.selectTopicToPost} >
                
@@ -246,10 +249,9 @@ const  Home = React.memo( () => {
             ></FontAwesome>  
           </View>
         </View>   
-        <SearchPost 
-          // backFromAddPost={backFromAddPost} 
-          // setBackFromAddPost={setBackFromAddPost}
-        ></SearchPost>
+        {
+          searchPost()
+        }
       </View>  
   );
 } )

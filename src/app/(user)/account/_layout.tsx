@@ -49,6 +49,18 @@ export default function MenuStack(){
             title: 'Bảo mật',    
           }}
         />
+        <Stack.Screen
+          name="LikeAndSave" 
+          options={{
+            title: 'Bài viết đã thích và lưu',    
+          }}
+        />
+        <Stack.Screen
+          name="ManagePost" 
+          options={{
+            title: 'Quản lý bài viết',    
+          }}
+        />
       </Stack>
     )
 }

@@ -13,9 +13,8 @@ const CollapsibleFilterMemo = React.memo(CollapsibleFilter);
 
 export default function SearchPost(
     // {backFromAddPost, setBackFromAddPost} : {backFromAddPost: boolean, setBackFromAddPost: any}
-    {isLikeAndSave, isManagePost } : {isLikeAndSave? : boolean, isManagePost? : boolean}
-) {
-
+    {isLikeAndSave, isManagePost, isHome } : {isLikeAndSave? : boolean, isManagePost? : boolean, isHome? : boolean}
+) { 
     const { setSelectedItem } = useSearchPostContext()
     
     const [isShowFilter, setIsShowFilter] = useState(true);
@@ -23,7 +22,13 @@ export default function SearchPost(
     const handleReloadPost = useCallback(() => {
         setReloadPost(!reloadPost);
         setIsShowFilter(true);
-        console.log("handleReloadPost");
+        console.log("handleRelodcfadPost");
+        setSelectedItem({
+            topicItem: [],
+            sortByItem: '',
+            startDate: "",
+            endDate: "", 
+        })
     }, [reloadPost]);
 
     // useEffect(() => {
@@ -45,7 +50,12 @@ export default function SearchPost(
 
     const renderPostAtHome = useCallback(() => {
         console.log("reloadPost", reloadPost)
-        return <PostAtHomeMemo reloadPost={reloadPost} isLikeAndSave={isLikeAndSave} isManagePost = {isManagePost}/>
+        return <PostAtHomeMemo 
+                    reloadPost={reloadPost} 
+                    isLikeAndSave={isLikeAndSave} 
+                    isManagePost = {isManagePost}
+                    isHome = {isHome}
+                />
     }, [reloadPost, handleReloadPost])
 
     return ( 
@@ -56,7 +66,13 @@ export default function SearchPost(
                 keyExtractor={(item, index) => index.toString()}
                 // sử dụng listHeaderComponent và ListFooterComponent để thêm các thành phần vào đầu và cuối danh sách
                 ListHeaderComponent={
-                    isManagePost ? <></> : <CollapsibleFilterMemo handleReloadPost={handleReloadPost} isShowFilter={isShowFilter} setIsShowFilter={setIsShowFilter}/>
+                    isManagePost 
+                    ? <></> 
+                    : <CollapsibleFilterMemo 
+                        handleReloadPost={handleReloadPost} 
+                        isShowFilter={isShowFilter} 
+                        setIsShowFilter={setIsShowFilter}
+                    />
                 }
                 ListFooterComponent={
                     renderPostAtHome()

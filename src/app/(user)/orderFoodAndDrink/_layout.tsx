@@ -69,32 +69,32 @@ const FADLayout = React.memo(() => {
           name="ShowFADSearchInfo" 
           options={{
               title: 'Tìm món',
-              headerLeft: () => (
-                <TouchableOpacity
-                  onPress={() => {
-                    // setTextToSearchFAD(''); // Đặt setTextQuery về chuỗi rỗng
-                    // setSelectedItem({
-                    //   topicItem: [],
-                    //   sortByItem: '',
-                    //   startDate: "",
-                    //   endDate: "", 
-                    // }); 
-                    // Đặt setSelectedItem về object rỗng
-                    // navigation.goBack(); // Điều hướng quay lại trang trước
-                    navigation.navigate('index' as never);
-                  }} 
-                >
-                  <FontAwesome
-                    name="chevron-left"
-                    size={RD * 0.00005}
-                    color={mainColor} 
-                    style={{ 
-                      marginRight: widthScreen * 0.02, 
-                      paddingTop: heightScreen * 0.003
-                    }}
-                  />
-                </TouchableOpacity>
-              ),   
+              // headerLeft: () => (
+              //   <TouchableOpacity
+              //     onPress={() => {
+              //       // setTextToSearchFAD(''); // Đặt setTextQuery về chuỗi rỗng
+              //       // setSelectedItem({
+              //       //   topicItem: [],
+              //       //   sortByItem: '',
+              //       //   startDate: "",
+              //       //   endDate: "", 
+              //       // }); 
+              //       // Đặt setSelectedItem về object rỗng
+              //       navigation.goBack(); // Điều hướng quay lại trang trước
+              //       // navigation.navigate('index' as never);
+              //     }} 
+              //   >
+              //     <FontAwesome
+              //       name="chevron-left"
+              //       size={RD * 0.00005}
+              //       color={mainColor} 
+              //       style={{ 
+              //         marginRight: widthScreen * 0.02, 
+              //         paddingTop: heightScreen * 0.003
+              //       }}
+              //     />
+              //   </TouchableOpacity>
+              // ),   
           }} 
         > 
         </Stack.Screen>

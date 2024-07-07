@@ -280,7 +280,7 @@ const PostList = ({infoPostItem, infoPostList, setInfoPost, isManagePost } : Pos
         }}
         > 
         <Image
-          source={{ uri: item}}
+          source={{ uri: item || ""}}
           style={{
             borderRadius: widthScreen * 0.03,
             width: widthScreen - (widthScreen * 0.02) * 2,
@@ -330,7 +330,7 @@ const PostList = ({infoPostItem, infoPostList, setInfoPost, isManagePost } : Pos
           <View style={ styles.postHeaderLeft }>
             <Image
               style={ styles.image_avatar }
-              source={{ uri: infoPostItem.user.avatarImage}} 
+              source={{ uri: infoPostItem.user.avatarImage || ""}} 
             ></Image>  
             <View style={styles.postHeaderCenter}>
               <Text style={styles.postHeaderCenterName} >{infoPostItem.user.Name}</Text>
@@ -400,7 +400,7 @@ const PostList = ({infoPostItem, infoPostList, setInfoPost, isManagePost } : Pos
             </View>
             : isManagePost 
             ? <></>
-            : <View>
+            : <View style={{ flexDirection: "row" }}>
               <TouchableOpacity onPress={() => handleInteractPost("isLiked")}>
                 { 
                   infoPostItem.interact.isLiked 

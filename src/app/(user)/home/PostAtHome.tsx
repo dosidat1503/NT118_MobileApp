@@ -9,14 +9,17 @@ import { itemInfoPost } from "@/types";
 import { View, Text } from "react-native";
 import RenderFooter from "@/components/RenderFooter";
 import { useSearchPostContext } from "./SearchPostContext";
+import { LogBox } from 'react-native';  
+LogBox.ignoreLogs(['Warning: ...']);
 
 type PostAtHomeProp = {
     reloadPost: boolean,
     isLikeAndSave?: boolean, 
     isManagePost?: boolean,
+    isHome?: boolean
 }
 
-export default function PostAtHome({reloadPost, isLikeAndSave, isManagePost}: PostAtHomeProp) {
+export default function PostAtHome({reloadPost, isLikeAndSave, isManagePost, isHome}: PostAtHomeProp) {
     const [queryNotHaveResult, setQueryNotHaveResult] = useState("")
     const itemQuantityEveryLoad = 15;
     const [pageNumber, setPageNumber] = useState(0)
@@ -109,6 +112,7 @@ export default function PostAtHome({reloadPost, isLikeAndSave, isManagePost}: Po
             itemQuantityEveryLoad: itemQuantityEveryLoad, 
             isLikeAndSave: isLikeAndSave,
             isManagePost: isManagePost,
+            isHome: isHome,
             userID: userID,
         }
 

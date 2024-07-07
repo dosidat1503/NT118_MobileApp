@@ -15,6 +15,7 @@ import { uploadToFirebase } from '../../../firebase/index';
 import React, { useRef }  from "react";
 import Response from "@/app/(user)/Response";
 import { useRoute } from "@react-navigation/native";
+import Loading from "@/components/Loading";
 
 type dataToSelectTopic = {
     key: string,
@@ -24,7 +25,7 @@ type dataToSelectTopic = {
  
 export default function AddPost() {   
 
-    const {widthScreen, heightScreen, baseURL } = useCartContext();
+    const {widthScreen, heightScreen, baseURL  } = useCartContext();
     const widthAvatar = widthScreen * 0.12;
     const endContainer = widthScreen * 0.15;
     const widthCenterContainer = widthScreen - widthAvatar - endContainer;
@@ -34,6 +35,8 @@ export default function AddPost() {
     const [imageList, setImageList] = useState<string[]>([]);
     const inputRef = useRef<TextInput>(null); 
     const [showWarning, setShowWarning] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
+    const screen = "ReturnHome"
 
     const styles = StyleSheet.create({
         container: {
@@ -161,6 +164,7 @@ export default function AddPost() {
     const [userID, setUserID] = useState(1)
     const [nameAndAVTURL, setNameAndAVTURL] = useState({name: '', url: ''})
     const getNameAndAVTURL = async () => {
+        setIsLoading(true)
         const NameAndAVTURL = await AsyncStorage.getItem('NameAndAVTURL'); 
         const userID = await AsyncStorage.getItem('userID'); 
         if (NameAndAVTURL) {
@@ -172,6 +176,7 @@ export default function AddPost() {
             })
             setUserID(JSONuserID)
             console.log(JSONNameAndAVTURL, 'JSONNameAndAV22TURL', JSONuserID, 'JSONuserID');
+            setIsLoading(false)
         }
     }
     useEffect(() => {
@@ -324,21 +329,25 @@ export default function AddPost() {
                     }}
                 ></FontAwesome5>
             </TouchableOpacity>
-            <Image
-              source={{ uri: item}}
-              style={{
-                borderRadius: widthScreen * 0.03,
-                width: "100%",
-                height: heightScreen * 0.4,
-                aspectRatio: 1, 
-              }}
-            ></Image> 
+            {
+                item &&  <Image
+                  source={{ uri: item || ""}}
+                  style={{
+                    borderRadius: widthScreen * 0.03,
+                    width: "100%",
+                    height: heightScreen * 0.4,
+                    aspectRatio: 1, 
+                  }}
+                ></Image> 
+            }
           </View>
         )
     }
 
     return (
-        <SafeAreaView style = {{ backgroundColor: "white"}}> 
+        isLoading 
+        ? <Loading></Loading>
+        : <SafeAreaView style = {{ backgroundColor: "white"}}> 
             <View>
                 {
                     response === "" && <View style={ styles.container }  >
@@ -347,10 +356,12 @@ export default function AddPost() {
                         expandInputPostInfo && styles.expandInputPostInfoContainer,
                         isSavingPost ? { display: "none"} : {}
                     ]}> 
-                        <Image
-                            style={ styles.image }
-                            source={{ uri: nameAndAVTURL.url }}
-                        ></Image> 
+                        {
+                            nameAndAVTURL.url && <Image
+                                style={ styles.image }
+                                source={{ uri: nameAndAVTURL.url || "" }}
+                            ></Image> 
+                        }
                         <View style={styles.createPostCenterContainer}> 
                             <View style={{ 
                                 flexDirection: "row", 
@@ -451,7 +462,9 @@ export default function AddPost() {
                         href2="/(user)"
                         buttonIcon2="eye"
                         buttonName2="Bài Viết"
-                        buttonFunction2={() => {  navigation.navigate('index' as never, { screen: 'Home' }) }}
+                        buttonFunction2={() => {   
+                            navigation.navigate('index' as never) 
+                        }}
                     ></Response>
                     : <Response
                         content="Đã có lỗi xảy ra khi đăng bài. Hãy đăng lại bài viết."
@@ -472,8 +485,7 @@ export default function AddPost() {
                         }}
                     ></Response> 
                 }
-            </View>
-            
+            </View> 
         </SafeAreaView>
     )
 }

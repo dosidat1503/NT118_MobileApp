@@ -235,16 +235,19 @@ export default function Cart() {
                                     opacity: 0.7
                                 }}
                             >
-                                <Image
-                                    source={{uri: item.shopAvatarURL}}
-                                    style={{
-                                        height: RD * 0.00005,
-                                        width: RD * 0.00005,
-                                        borderRadius: avatarSize * 0.5,
-                                        // marginLeft: widthScreen * 0.01,
-                                        marginRight: widthScreen * 0.02, 
-                                    }}
-                                ></Image>
+                                {
+                                    item.shopAvatarURL && 
+                                    <Image
+                                        source={{uri: item.shopAvatarURL || ""}}
+                                        style={{
+                                            height: RD * 0.00005,
+                                            width: RD * 0.00005,
+                                            borderRadius: avatarSize * 0.5,
+                                            // marginLeft: widthScreen * 0.01,
+                                            marginRight: widthScreen * 0.02, 
+                                        }}
+                                    ></Image>
+                                }
                                 <Text style={[styles.nameShopText, { opacity: 0.8 }]}>
                                     {item.shopName || ""}
                                 </Text>

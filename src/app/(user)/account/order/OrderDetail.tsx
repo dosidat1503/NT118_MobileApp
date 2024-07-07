@@ -312,7 +312,8 @@ export default function Payment() {
                     // ), 0)
                     paymentTotal: response.data.TOTAL_PAYMENT,
                     discountValue: response.data.DISCOUNT_VALUE !== null ? response.data.DISCOUNT_VALUE : 0,
-                    voucherCODE: response.data.VOUCHER_CODE
+                    voucherCODE: response.data.VOUCHER_CODE,
+                    paymentMethod: response.data.PAYMENT_METHOD,
                 })
                 setIsLoading(false);
                 // console.log(response.data.imagesURL, response.data.deliveryInfo[0].NAME, "orderDetailI22nfo")
@@ -533,7 +534,7 @@ export default function Payment() {
                     >
                         <View style={{ flexDirection: "row" }}>
                             <CheckBox
-                                checked={isCash} 
+                                checked={orderInfo.paymentMethod === "Tiền mặt"} 
                                 onPress={() => { setIsCash(!isCash) }}
                                 containerStyle={{
                                     padding: 0,
@@ -552,8 +553,7 @@ export default function Payment() {
                         </View> 
                         <View style={{ flexDirection: "row" }}>
                             <CheckBox
-                                checked={!isCash} 
-                                onPress={() => {setIsCash(!isCash)}}
+                                checked={orderInfo.paymentMethod === "Chuyển khoản"}  
                                 containerStyle={{
                                     padding: 0,
                                     margin: 0, 

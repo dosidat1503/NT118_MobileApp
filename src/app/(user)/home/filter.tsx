@@ -354,10 +354,14 @@ const Filter = React.memo( ({handleReloadPost}: FilterProps ) => {
                             style={[mainStyle, selectedStyle]}
                             onPress={ () => handleChooseFilterItem(itemInList.id, item.propertyNameOfSlectedItem) }
                         > 
-                            <Image
-                                source={itemInList.imagePath}
-                                style={styleIcon}
-                            ></Image> 
+
+                            {
+                                itemInList.imagePath && 
+                                <Image
+                                    source={itemInList.imagePath}
+                                    style={styleIcon}
+                                ></Image> 
+                            }
                             <Text style={ styles.topicText} >
                                 {itemInList.name}
                             </Text>   
@@ -398,7 +402,11 @@ const Filter = React.memo( ({handleReloadPost}: FilterProps ) => {
         > 
             <View>
                 { renderFilterGroup() }   
-                <FilterButton handleReloadPost={ handleReloadPost } selectedInFile={ selectedInFile } ></FilterButton>
+                <FilterButton 
+                    handleReloadPost={ handleReloadPost } 
+                    selectedInFile={ selectedInFile } 
+                    setSelectedInFile={ setSelectedInFile }
+                ></FilterButton>
             </View>
         </SafeAreaView>
     )

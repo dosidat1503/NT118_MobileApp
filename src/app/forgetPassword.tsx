@@ -57,7 +57,7 @@ const index = () => {
         const email = await AsyncStorage.getItem('email');
         const password = await AsyncStorage.getItem('password');
         setSignInInfo({
-          email: email ? email : '',
+          email: email ? email.substring(1, email.length - 1) : '',
           password: password ? password : ''
         });
       }
@@ -103,7 +103,9 @@ const index = () => {
   };
   
   return (   
-    <View style={styles.divContainer}>
+    isLoading
+    ? <Loading></Loading>
+    : <View style={styles.divContainer}>
       <Stack.Screen  options={{ headerShown: false }} />
       <ImageBackground
         source={require('@assets/images/backgroundBlue.jpg')}
@@ -123,6 +125,7 @@ const index = () => {
             fontWeight: "bold",
             fontSize: widthScreen * 0.07,
             color: "white",
+            marginBottom: heightScreen * 0.3,
           }}
         >KHÔI PHỤC MẬT KHẨU</Text>
       </View>
@@ -172,7 +175,6 @@ const index = () => {
           </View>
         </TouchableOpacity> 
       </View>
-      <Loading></Loading>
       </ImageBackground>
     </View> 
 );

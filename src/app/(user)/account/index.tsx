@@ -102,10 +102,13 @@ export default function AccountHome() {
       {/* header */}
       <View style={styles.headerInfoContainer}>
         <View>
-          <Image
-            source={{uri: nameAndAVTURL.url }}
-            style={styles.avatarImage}
-          ></Image>
+          {
+            nameAndAVTURL.url &&
+            <Image
+              source={{uri: nameAndAVTURL.url || "" }}
+              style={styles.avatarImage}
+            ></Image>
+          }
         </View>
         <View style={styles.textHeaderContainer}>
           <Text style={styles.nameText}>{ nameAndAVTURL.name }</Text>

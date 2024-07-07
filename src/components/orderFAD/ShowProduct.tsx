@@ -23,7 +23,7 @@ export default function ShowProduct({products}: {products: any[]}) {
             >   
                 <View style={styles.FADCategoryContainer}>
                     <Image
-                        source={{uri: item.FOOD_IMAGE_URL}}
+                        source={{uri: item.FOOD_IMAGE_URL || ""}}
                         style={styles.FADCategoryImage}
                     ></Image>
                     <View>
@@ -43,7 +43,7 @@ export default function ShowProduct({products}: {products: any[]}) {
                         </Text>
                         <View style={{flexDirection: "row", justifyContent: "center", alignItems: "center"}}>
                             <Image
-                                source={{uri: item.SHOP_IMAGE_URL}}
+                                source={{uri: item.SHOP_IMAGE_URL || ""}}
                                 style={{
                                     width: RD * 0.00007,
                                     height: RD * 0.00007,

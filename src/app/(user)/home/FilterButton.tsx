@@ -5,7 +5,13 @@ import { TouchableOpacity, View, StyleSheet, Text, Dimensions } from "react-nati
 import { useSearchPostContext } from "./SearchPostContext";
 import { selectedType } from "./SearchPostContext";
 
-export default function FilterButton({ handleReloadPost, selectedInFile } : { handleReloadPost: () => void, selectedInFile?: selectedType }){
+type FilterButtonProps = {
+    handleReloadPost: () => void,
+    selectedInFile?: selectedType,
+    setSelectedInFile?: (selectedInFile: any) => void 
+}
+
+export default function FilterButton({ handleReloadPost, selectedInFile, setSelectedInFile } : FilterButtonProps){
     const { setSelectedItem } = useSearchPostContext();
     const widthScreen = Dimensions.get("window").width
     const heightScreen = Dimensions.get("window").height
@@ -70,6 +76,12 @@ export default function FilterButton({ handleReloadPost, selectedInFile } : { ha
                         sortByItem: '',
                         startDate: "",
                         endDate: "", 
+                    })
+                    setSelectedInFile && setSelectedInFile({
+                        topicItem: [],
+                        sortByItem: '',
+                        startDate: "",
+                        endDate: "",  
                     })
                     handleReloadPost()
                 }}

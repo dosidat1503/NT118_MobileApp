@@ -430,15 +430,18 @@ export default function ShowFADSearchInfo() {
                             <FilterButton handleReloadPost={ getFADInfo }></FilterButton>
                         </Collapsible>
                     </View> 
-                    <View style={{ 
-                        flexDirection: "row", 
-                        marginHorizontal: widthScreen * 0.03,
-                        marginTop: heightScreen * 0.01, 
-                        // position: "relative",
-                    }}>
-                        <Text >Từ khoá tìm kiếm: </Text>
-                        <Text>"{ textToSearchFAD }"</Text>
-                    </View>
+                    {
+                        textToSearchFAD !== "" 
+                        && <View style={{ 
+                            flexDirection: "row", 
+                            marginHorizontal: widthScreen * 0.03,
+                            marginTop: heightScreen * 0.01, 
+                            // position: "relative",
+                        }}>
+                            <Text>Từ khoá tìm kiếm: </Text> 
+                            <Text>"{ textToSearchFAD }"</Text> 
+                        </View>
+                    }
                 </View>
             }   
             ListFooterComponent={
